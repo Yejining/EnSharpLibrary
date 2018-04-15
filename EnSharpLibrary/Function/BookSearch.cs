@@ -263,7 +263,7 @@ namespace EnSharpLibrary.Function
                     {
                         if (Console.CursorTop >= 12 && Console.CursorTop <= 12 + countOfBooks - 1)
                         {
-                            // 도서 대출/반납/연장,  도서 관리
+                            
                         }
                         isFirstLoop = true;
                     }
