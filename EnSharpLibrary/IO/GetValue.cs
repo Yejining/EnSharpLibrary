@@ -57,9 +57,10 @@ namespace EnSharpLibrary.IO
             return bookList;
         }
 
-        // 0 : (책검사)영어, 한글, 특수기호, 숫자
-        // 1 : (로그인 학번 입력)숫자만
-        public string SearchWord(int limit, int typeofSearch)
+        // 0 : (도서검색어)영어, 한글, 숫자 등 문자
+        // 1 : (로그인 학번 검색) 숫자
+        // 2 : (로그인 암호 검색) 암호
+        public string SearchWord(int limit, int searchType)
         {
             ConsoleKeyInfo keyInfo;
             StringBuilder answer = new StringBuilder();
@@ -100,7 +101,7 @@ namespace EnSharpLibrary.IO
                     else if (answer.Length == 0) Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
                 }
                 else if (IsNotAvailableKey(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
-                else if (typeofSearch == 1 && IsNotNumber(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
+                else if (searchType == 1 && !IsNotNumber(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
                 else
                 {
                     full = 0;
@@ -115,6 +116,7 @@ namespace EnSharpLibrary.IO
                         Console.SetCursorPosition(leftCursor, Console.CursorTop);
                         print.ClearSearchBar(leftCursor, answer.ToString());
                     }
+                    if (searchType == 2) { print.ClearOneLetter(Console.CursorLeft - 1); Console.Write('*'); }
                 }
             }
         }
@@ -143,15 +145,16 @@ namespace EnSharpLibrary.IO
 
         public bool IsNotNumber(ConsoleKeyInfo key)
         {
+            List<int> numbers = new List<int>();
+
+            for (int number = 48; number < -57; number++) numbers.Add(number);
+
             bool isNotAvailable = IsNotAvailableKey(key);
-            List<int> numberKey = new List<int>();
-
-            for (int valid = 48; valid <= 57; valid++) numberKey.Add(valid); 
-
+            
             if (isNotAvailable) return true;
             else
             {
-                foreach (int valid in numberKey) if (key.KeyChar == valid) return false;
+                foreach (int number in numbers) if (key.KeyChar == number) return false;
                 return true;
             }
         }
@@ -179,12 +182,14 @@ namespace EnSharpLibrary.IO
         public bool IsAvailableStudentNumber(List<MemberVO> members, string studentNumber)
         {
             if (string.Compare(studentNumber, "@입력취소@") == 0) return false;
+            foreach (MemberVO member in members) if (member.IdentificationNumber == Int32.Parse(studentNumber)) return true;
+            return false;
+        }
 
-            for (int member = 0; member < members.Count; member++)
-            {
-                if (members[member].IdentificationNumber == Int32.Parse(studentNumber)) return true;
-            }
-
+        public bool IsCorrectPassword(List<MemberVO> members, int studentNumber, string password)
+        {
+            foreach (MemberVO member in members)
+                if (member.IdentificationNumber == studentNumber && string.Compare(member.Password, password) == 0) return true;
             return false;
         }
 

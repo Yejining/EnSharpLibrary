@@ -60,7 +60,7 @@ namespace EnSharpLibrary.Function
                                 bookSearch.Run(1, books);
                                 return;
                             case 10:    // 로그인
-                                logIn.Member(members);
+                                logIn.Member(admin, members, books);
                                 return;
                             case 12:    // 회원가입
                                 logIn.Join(members);
