@@ -13,7 +13,7 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
 
-        public void Member(AdminVO admin, List<MemberVO> members, List<BookVO>books)
+        public int Member(AdminVO admin, List<MemberVO> members, List<BookVO>books)
         {
             string studentNumber = "";
             string password;
@@ -27,7 +27,7 @@ namespace EnSharpLibrary.Function
 
             while (!getValue.IsAvailableStudentNumber(members, studentNumber))
             {
-                if (string.Compare(studentNumber, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return; }
+                if (string.Compare(studentNumber, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return -1; }
 
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("등록되지 않은 학번입니다!");
@@ -43,7 +43,7 @@ namespace EnSharpLibrary.Function
 
             while (!getValue.IsCorrectPassword(members, Int32.Parse(studentNumber), password))
             {
-                if (string.Compare(studentNumber, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return; }
+                if (string.Compare(studentNumber, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return -1; }
                 
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("암호가 틀렸습니다!");
@@ -62,9 +62,11 @@ namespace EnSharpLibrary.Function
 
             Console.SetCursorPosition(0, Console.CursorTop + 1);
             print.Announce(welcome.ToString());
+
+            return Int32.Parse(studentNumber);
         }
 
-        public void Admin(AdminVO admin)
+        public int Admin(AdminVO admin)
         {
             string password;
 
@@ -76,7 +78,7 @@ namespace EnSharpLibrary.Function
 
             while (string.Compare(password, admin.Password) != 0)
             {
-                if (string.Compare(password, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return; }
+                if (string.Compare(password, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return 1; }
 
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("암호가 틀립니다!");
@@ -88,6 +90,8 @@ namespace EnSharpLibrary.Function
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("관리자님 환영합니다!");
             }
+
+            return 4;
         }
 
         public void Join(List<MemberVO> members)

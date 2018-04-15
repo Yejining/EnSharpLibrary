@@ -29,6 +29,20 @@ namespace EnSharpLibrary.IO
             if (string.Compare(title, "") > 0) Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (title.Length / 2)) + "}\n\n", title));
         }
 
+        public void BookSearchTitle(int mode)
+        {
+            if (mode == 1) Title("비회원 도서검색     ");
+            else if (mode == 2) Title("도서 보기");
+            else Title("도서 관리");
+        }
+
+        public void BookSearchAllBooksTitle(int mode)
+        {
+            if (mode == 1) Title("비회원 도서검색 → 전체 도서 목록               ");
+            else if (mode == 2) Title("도서 보기 → 전체 도서 목록");
+            else Title("도서 관리 → 전체 도서 목록");
+        }
+
         public void BookDetailTitle(int mode, int detailMode)
         {
             switch (mode)

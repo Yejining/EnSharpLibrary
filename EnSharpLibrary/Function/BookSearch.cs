@@ -371,6 +371,10 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        // 1 : 전체 도서 보기
+        // 2 : 도서명 검색
+        // 3 : 출판사 검색
+        // 4 : 작가 검색
         public void BookDetail(int mode, int detailMode, List<BookVO> books, int numberOfBook, string searchWord)
         {
             int countOfBooks;
