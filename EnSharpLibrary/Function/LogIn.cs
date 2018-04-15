@@ -43,7 +43,7 @@ namespace EnSharpLibrary.Function
 
             while (!getValue.IsCorrectPassword(members, Int32.Parse(studentNumber), password))
             {
-                if (string.Compare(studentNumber, "@입력취소@") == 0) return -1;
+                if (string.Compare(password, "@입력취소@") == 0) return -1;
 
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("암호가 틀렸습니다!");

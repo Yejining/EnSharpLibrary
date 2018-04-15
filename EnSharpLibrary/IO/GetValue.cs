@@ -101,7 +101,7 @@ namespace EnSharpLibrary.IO
                     else if (answer.Length == 0) Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
                 }
                 else if (IsNotAvailableKey(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
-                else if (searchType == 1 && !IsNotNumber(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
+                else if (searchType == 1 && IsNotNumber(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
                 else
                 {
                     full = 0;
@@ -147,7 +147,7 @@ namespace EnSharpLibrary.IO
         {
             List<int> numbers = new List<int>();
 
-            for (int number = 48; number < -57; number++) numbers.Add(number);
+            for (int number = 48; number < 57; number++) numbers.Add(number);
 
             bool isNotAvailable = IsNotAvailableKey(key);
             
