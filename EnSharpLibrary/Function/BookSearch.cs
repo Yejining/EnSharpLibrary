@@ -81,11 +81,11 @@ namespace EnSharpLibrary.Function
         // mode 3 : 관리자 도서 검색 및 도서 관리
         public void AllBooks(int programMode, int usingMemberNumber, List<BookVO> books)
         {
-            List<int> bookList = new List<int>();
+            List<float> bookList = new List<float>();
             int countOfBooks;
             bool isFirstLoop = true;
             
-            bookList = getValue.BookList(books);
+            bookList = getValue.BookList(books, 1, -1);
             countOfBooks = bookList.Count;
        
             while (true)
@@ -120,7 +120,7 @@ namespace EnSharpLibrary.Function
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
                         if (Console.CursorTop >= 12 && Console.CursorTop <= 12 + countOfBooks - 1)
-                            BookDetail(programMode, 1, books, bookList[Console.CursorTop - 12]);
+                            BookDetail(programMode, 1, books, (int)bookList[Console.CursorTop - 12]);
                         
                         isFirstLoop = true;
                     }
@@ -268,6 +268,56 @@ namespace EnSharpLibrary.Function
                         isFirstLoop = true;
                     }
                     else print.BlockCursorMove(3, "☞ ");
+                }
+            }
+        }
+
+        public void BorrowedBook(int usingMemberNumber, List<MemberVO> members, List<BookVO> books)
+        {
+            List<float> bookList = new List<float>();
+            int countOfBooks;
+            bool isFirstLoop = true;
+
+            bookList = getValue.BookList(books, 2, usingMemberNumber);
+            countOfBooks = bookList.Count;
+
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    print.Title("대출도서 보기");
+                    print.BorrowedBook(usingMemberNumber, books, bookList);
+
+                    print.SetCursorAndChoice(2, countOfBooks + 3, '☞');
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    print.ClearOneLetter(2);
+                    if (Console.CursorTop > 12) Console.SetCursorPosition(2, Console.CursorTop - 1);
+                    Console.Write('☞');
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    print.ClearOneLetter(2);
+                    if (Console.CursorTop < 12 + countOfBooks - 1) Console.SetCursorPosition(2, Console.CursorTop + 1);
+                    Console.Write('☞');
+                }
+                else if (keyInfo.Key == ConsoleKey.Escape) return;
+                else
+                {
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        if (Console.CursorTop >= 12 && Console.CursorTop <= 12 + countOfBooks - 1)
+                            //BookDetail(programMode, 1, books, bookList[Console.CursorTop - 12]);
+
+                        isFirstLoop = true;
+                    }
+                    else print.BlockCursorMove(2, "☞ ");
                 }
             }
         }

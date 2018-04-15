@@ -180,6 +180,7 @@ namespace EnSharpLibrary.IO
                     Console.Write(books[order].NumberOfBooks);
                     Console.SetCursorPosition(0, Console.CursorTop + 1);
                 }
+                
             }
 
             Console.SetCursorPosition(0, Console.CursorTop + 2);
@@ -230,6 +231,50 @@ namespace EnSharpLibrary.IO
                     }
                 }
             }
+
+            Console.SetCursorPosition(0, Console.CursorTop + 2);
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
+        }
+
+        public void BorrowedBook(int usingMemberNumber, List<BookVO> books, List<float> bookList)
+        {
+            string categories = " 선택 |             도서            |     저자    |    출판사    | 출판년도 |  대출일  | 반납 예정일 | 청구기호 | 연장 ";
+            string line = "-----------------------------------------------------------------------------------------------------------------------";
+            string guide = "나가기(ESC)";
+            string message = "찾는 도서가 없습니다!         ";
+            
+            Console.WriteLine(categories);
+            Console.WriteLine(line);
+
+            if (bookList.Count == 0)
+            {
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (message.Length / 2)) + "}", message));
+                Console.SetCursorPosition(0, Console.CursorTop + 2);
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
+                return;
+            }
+
+            foreach (BookVO book in books)
+                foreach (float number in bookList) if (book.NumberOfThis == number)
+                    {
+                        Console.SetCursorPosition(8, Console.CursorTop);
+                        Console.Write(book.Name);
+                        Console.SetCursorPosition(37, Console.CursorTop);
+                        Console.Write(book.Author);
+                        Console.SetCursorPosition(51, Console.CursorTop);
+                        Console.Write(book.Publisher);
+                        Console.SetCursorPosition(69, Console.CursorTop);
+                        Console.Write(book.PublishingYear);
+                        Console.SetCursorPosition(78, Console.CursorTop);
+                        Console.Write(book.Rental.ToString("yy/MM/dd"));
+                        Console.SetCursorPosition(90, Console.CursorTop);
+                        Console.Write(book.ExpectedToReturn.ToString("yy/MM/dd"));
+                        Console.SetCursorPosition(104, Console.CursorTop);
+                        Console.Write(book.NumberOfThis);
+                        Console.SetCursorPosition(115, Console.CursorTop);
+                        Console.Write(book.NumberOfRenew);
+                        Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    }
 
             Console.SetCursorPosition(0, Console.CursorTop + 2);
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));

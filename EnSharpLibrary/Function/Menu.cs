@@ -77,7 +77,7 @@ namespace EnSharpLibrary.Function
                                     if (usingMemberNumber != -1) programMode = 2;
                                     else programMode = 1;
                                 }
-                                //else if (programMode == 2) 대출도서 보기
+                                else if (programMode == 2) bookSearch.BorrowedBook(usingMemberNumber, members, books);
                                 //else 회원관리
                                 break;
                             case 12:    // 회원가입, 정보수정, 암호수정

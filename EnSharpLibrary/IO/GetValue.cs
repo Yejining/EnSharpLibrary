@@ -43,15 +43,19 @@ namespace EnSharpLibrary.IO
             return count;
         }
 
-        public List<int> BookList(List<BookVO> books)
+        // 1 : 전체 도서 리스트
+        // 2 : 대출 도서 리스트
+        public List<float> BookList(List<BookVO> books, int type, int usingMemberNumber)
         {
-            List<int> bookList = new List<int>();
+            List<float> bookList = new List<float>();
             bookList.Clear();
-
+            
             for (int order = 0; order < books.Count; order++)
             {
-                if (books[order].OrderOfBooks == 0)
+                if (books[order].OrderOfBooks == 0 && type == 1)
                     bookList.Add((int)Math.Floor(books[order].NumberOfThis));
+                if (books[order].NumberOfMember == usingMemberNumber && type == 2)
+                    bookList.Add(books[order].NumberOfThis);
             }
 
             return bookList;
@@ -147,7 +151,7 @@ namespace EnSharpLibrary.IO
         {
             List<int> numbers = new List<int>();
 
-            for (int number = 48; number < 57; number++) numbers.Add(number);
+            for (int number = 48; number <= 57; number++) numbers.Add(number);
 
             bool isNotAvailable = IsNotAvailableKey(key);
             
