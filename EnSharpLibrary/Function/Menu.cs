@@ -60,13 +60,13 @@ namespace EnSharpLibrary.Function
                                 bookSearch.Run(1, books);
                                 return;
                             case 10:    // 로그인
-                                logIn.A();
+                                logIn.Member(members);
                                 return;
                             case 12:    // 회원가입
-                                logIn.A();
+                                logIn.Join(members);
                                 return;
                             case 14:    // 관리자 로그인
-                                logIn.A();
+                                logIn.Admin(admin);
                                 return;
                             case 16:    // 종료
                                 return;

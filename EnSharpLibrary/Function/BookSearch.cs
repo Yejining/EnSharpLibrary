@@ -148,7 +148,7 @@ namespace EnSharpLibrary.Function
 
             Console.SetCursorPosition(10, Console.CursorTop);
             Console.Write("▷ 검색할 도서명 : ");
-            if (bookName.Length == 0) bookNameToSearch = getValue.SearchWord(10);
+            if (bookName.Length == 0) bookNameToSearch = getValue.SearchWord(10, 0);
             else { bookNameToSearch = bookName; Console.Write(bookName); }
             if (string.Compare(bookNameToSearch, "@입력취소@") == 0) { Run(mode, books); return; }
             Console.SetCursorPosition(0, Console.CursorTop + 2);
@@ -226,7 +226,7 @@ namespace EnSharpLibrary.Function
             
             Console.SetCursorPosition(10, Console.CursorTop);
             Console.Write("▷ 검색할 출판사 : ");
-            if (publisher.Length == 0) publishertoSearch = getValue.SearchWord(10);
+            if (publisher.Length == 0) publishertoSearch = getValue.SearchWord(10, 0);
             else { publishertoSearch = publisher; Console.Write(publisher); }
             if (string.Compare(publishertoSearch, "@입력취소@") == 0) { Run(mode, books); return; }
             Console.SetCursorPosition(0, Console.CursorTop + 2);
@@ -304,7 +304,7 @@ namespace EnSharpLibrary.Function
 
             Console.SetCursorPosition(10, Console.CursorTop);
             Console.Write("▷ 검색할 작가 : ");
-            if (author.Length == 0) authorToSearch = getValue.SearchWord(10);
+            if (author.Length == 0) authorToSearch = getValue.SearchWord(10, 0);
             else { authorToSearch = author; Console.Write(author); }
             if (string.Compare(authorToSearch, "@입력취소@") == 0) { Run(mode, books); return; }
             Console.SetCursorPosition(0, Console.CursorTop + 2);

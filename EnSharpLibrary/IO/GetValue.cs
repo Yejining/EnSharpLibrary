@@ -57,7 +57,9 @@ namespace EnSharpLibrary.IO
             return bookList;
         }
 
-        public string SearchWord(int limit)
+        // 0 : (책검사)영어, 한글, 특수기호, 숫자
+        // 1 : (로그인 학번 입력)숫자만
+        public string SearchWord(int limit, int typeofSearch)
         {
             ConsoleKeyInfo keyInfo;
             StringBuilder answer = new StringBuilder();
@@ -98,6 +100,7 @@ namespace EnSharpLibrary.IO
                     else if (answer.Length == 0) Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
                 }
                 else if (IsNotAvailableKey(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
+                else if (typeofSearch == 1 && IsNotNumber(keyInfo)) Console.SetCursorPosition(currentCursor, Console.CursorTop);
                 else
                 {
                     full = 0;
@@ -118,24 +121,39 @@ namespace EnSharpLibrary.IO
 
         public bool IsNotAvailableKey(ConsoleKeyInfo key)
         {
-            List<int> availableKey = new List<int>();
+            List<int> nonAvailableKey = new List<int>();
 
-            availableKey.Add(9);
-            availableKey.Add(12);
-            availableKey.Add(19);
-            availableKey.Add(33);
-            availableKey.Add(118);
-            availableKey.Add(229);
-            availableKey.Add(131);
+            nonAvailableKey.Add(9);
+            nonAvailableKey.Add(12);
+            nonAvailableKey.Add(19);
+            nonAvailableKey.Add(33);
+            nonAvailableKey.Add(118);
+            nonAvailableKey.Add(229);
+            nonAvailableKey.Add(131);
 
-            for (int valid = 35; valid <= 38; valid++) availableKey.Add(valid);
-            for (int valid = 127; valid <= 135; valid++) availableKey.Add(valid);
-            for (int valid = 166; valid <= 183; valid++) availableKey.Add(valid);
-            for (int valid = 246; valid <= 253; valid++) availableKey.Add(valid);
+            for (int valid = 35; valid <= 38; valid++) nonAvailableKey.Add(valid);
+            for (int valid = 127; valid <= 135; valid++) nonAvailableKey.Add(valid);
+            for (int valid = 166; valid <= 183; valid++) nonAvailableKey.Add(valid);
+            for (int valid = 246; valid <= 253; valid++) nonAvailableKey.Add(valid);
 
-            foreach (int valid in availableKey) if (key.KeyChar == valid) return true;
+            foreach (int valid in nonAvailableKey) if (key.KeyChar == valid) return true;
 
             return false;
+        }
+
+        public bool IsNotNumber(ConsoleKeyInfo key)
+        {
+            bool isNotAvailable = IsNotAvailableKey(key);
+            List<int> numberKey = new List<int>();
+
+            for (int valid = 48; valid <= 57; valid++) numberKey.Add(valid); 
+
+            if (isNotAvailable) return true;
+            else
+            {
+                foreach (int valid in numberKey) if (key.KeyChar == valid) return false;
+                return true;
+            }
         }
 
         public bool IsValidAnswer(string answer)
@@ -156,6 +174,18 @@ namespace EnSharpLibrary.IO
             }
 
             return true;
+        }
+
+        public bool IsAvailableStudentNumber(List<MemberVO> members, string studentNumber)
+        {
+            if (string.Compare(studentNumber, "@입력취소@") == 0) return false;
+
+            for (int member = 0; member < members.Count; member++)
+            {
+                if (members[member].IdentificationNumber == Int32.Parse(studentNumber)) return true;
+            }
+
+            return false;
         }
 
         // 1 : 도서명 검색
