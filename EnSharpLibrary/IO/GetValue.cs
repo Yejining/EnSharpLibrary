@@ -124,13 +124,11 @@ namespace EnSharpLibrary.IO
             availableKey.Add(12);
             availableKey.Add(19);
             availableKey.Add(33);
-            availableKey.Add(112);
+            availableKey.Add(118);
             availableKey.Add(229);
             availableKey.Add(131);
 
             for (int valid = 35; valid <= 38; valid++) availableKey.Add(valid);
-            for (int valid = 107; valid <= 108; valid++) availableKey.Add(valid);
-            for (int valid = 114; valid <= 122; valid++) availableKey.Add(valid);
             for (int valid = 127; valid <= 135; valid++) availableKey.Add(valid);
             for (int valid = 166; valid <= 183; valid++) availableKey.Add(valid);
             for (int valid = 246; valid <= 253; valid++) availableKey.Add(valid);
@@ -158,6 +156,51 @@ namespace EnSharpLibrary.IO
             }
 
             return true;
+        }
+
+        // 1 : 도서명 검색
+        // 2 : 출판사 검색
+        // 3 : 저자 검색
+        public List<int> FoundBooks(List<BookVO> books, string searchWord, int searchMode)
+        {
+            List<int> indexesOfSearchResult = new List<int>();
+            indexesOfSearchResult.Clear();
+
+            switch (searchMode)
+            {
+                case 1:
+                    for (int i = 0; i < books.Count; i++)
+                        if (System.Text.RegularExpressions.Regex.IsMatch(books[i].Name, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                        {
+                            bool thereIs = false;
+                            foreach (int number in indexesOfSearchResult) if ((int)Math.Floor(books[i].NumberOfThis) == number) thereIs = true;
+
+                            if (!thereIs) indexesOfSearchResult.Add((int)Math.Floor(books[i].NumberOfThis));
+                        }
+                    break;
+                case 2:
+                    for (int i = 0; i < books.Count; i++)
+                        if (System.Text.RegularExpressions.Regex.IsMatch(books[i].Publisher, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                        {
+                            bool thereIs = false;
+                            foreach (int number in indexesOfSearchResult) if ((int)Math.Floor(books[i].NumberOfThis) == number) thereIs = true;
+
+                            if (!thereIs) indexesOfSearchResult.Add((int)Math.Floor(books[i].NumberOfThis));
+                        }
+                    break;
+                case 3:
+                    for (int i = 0; i < books.Count; i++)
+                        if (System.Text.RegularExpressions.Regex.IsMatch(books[i].Author, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                        {
+                            bool thereIs = false;
+                            foreach (int number in indexesOfSearchResult) if ((int)Math.Floor(books[i].NumberOfThis) == number) thereIs = true;
+
+                            if (!thereIs) indexesOfSearchResult.Add((int)Math.Floor(books[i].NumberOfThis));
+                        }
+                    break;
+            }
+
+            return indexesOfSearchResult;
         }
     }
 }

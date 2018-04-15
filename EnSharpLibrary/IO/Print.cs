@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 
 using EnSharpLibrary.Data;
+using EnSharpLibrary.Function;
 
 namespace EnSharpLibrary.IO
 {
     class Print
     {
+        //GetValue getValueInPrintClass = new GetValue();
+
         public void Title(string title)
         {
             string title1 = "┏                     ┓";
@@ -133,9 +136,50 @@ namespace EnSharpLibrary.IO
         // 1 : 도서명 검색
         // 2 : 출판사 검색
         // 3 : 저자 검색
-        public void BookSearchResult(List<BookVO> books, string searchWord, int searchMode)
+        public void BookSearchResult(List<BookVO> books, List<int>foundBooks)
         {
+            List<int> indexesOfSearchResult = foundBooks;
 
+            string categories = "  선택  |                    도서                   |          저자         |       출판사       |  출판년도  |  수량  ";
+            string line = "-----------------------------------------------------------------------------------------------------------------------";
+            string guide = "나가기(ESC)";
+            string message = "찾는 도서가 없습니다!         ";
+            
+            Console.SetCursorPosition(0, Console.CursorTop + 1);
+            Console.WriteLine(categories);
+            Console.WriteLine(line);
+
+            if (indexesOfSearchResult.Count == 0)
+            {
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (message.Length / 2)) + "}", message));
+                Console.SetCursorPosition(0, Console.CursorTop + 2);
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
+                return;
+            }
+
+            for (int inList = 0; inList < indexesOfSearchResult.Count; inList++)
+            {
+                for (int index = 0; index < books.Count; index++)
+                {
+                    if (indexesOfSearchResult[inList] == books[index].NumberOfThis)
+                    {
+                        Console.SetCursorPosition(10, Console.CursorTop);
+                        Console.Write(books[index].Name);
+                        Console.SetCursorPosition(54, Console.CursorTop);
+                        Console.Write(books[index].Author);
+                        Console.SetCursorPosition(78, Console.CursorTop);
+                        Console.Write(books[index].Publisher);
+                        Console.SetCursorPosition(102, Console.CursorTop);
+                        Console.Write(books[index].PublishingYear);
+                        Console.SetCursorPosition(114, Console.CursorTop);
+                        Console.Write(books[index].NumberOfBooks);
+                        Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    }
+                }
+            }
+
+            Console.SetCursorPosition(0, Console.CursorTop + 2);
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
         }
 
         public void BookDetail(int mode, List<BookVO> books, int numberOfBook)
