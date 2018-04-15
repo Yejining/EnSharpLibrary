@@ -43,32 +43,58 @@ namespace EnSharpLibrary.IO
             else Title("도서 관리 → 전체 도서 목록");
         }
 
-        public void BookDetailTitle(int mode, int detailMode)
+        public void SpecificallySearchTitle(int programMode, int detailMode)
         {
-            switch (mode)
+            StringBuilder title = new StringBuilder();
+
+            if (programMode == 1) title.AppendFormat("비회원 도서검색 -> ");
+            else if (programMode == 2) title.AppendFormat("도서 보기 -> ");
+            else title.AppendFormat("도서 관리 -> ");
+
+            switch (detailMode)
             {
-                case 1:
-                    if (detailMode == 1) Title("비회원 도서검색 -> 전체 도서 목록 -> 도서 상세               ");
-                    else if (detailMode == 2) Title("비회원 도서검색 -> 도서명 검색 -> 도서 상세               ");
-                    else if (detailMode == 3) Title("비회원 도서검색 -> 출판사 검색 -> 도서 상세               ");
-                    else Title("비회원 도서검색 -> 저자 검색 -> 도서 상세               ");
-                    break;
                 case 2:
-                    if (detailMode == 1) Title("도서 보기 -> 전체 도서 목록 -> 도서 상세               ");
-                    else if (detailMode == 2) Title("도서 보기 -> 도서명 검색 -> 도서 상세               ");
-                    else if (detailMode == 3) Title("도서 보기 -> 출판사 검색 -> 도서 상세               ");
-                    else Title("도서 보기 -> 저자 검색 -> 도서 상세               ");
+                    title.AppendFormat("도서명 검색 ");
                     break;
                 case 3:
-                    if (detailMode == 1) Title("도서 관리 -> 전체 도서 목록 -> 도서 상세               ");
-                    else if (detailMode == 2) Title("도서 관리 -> 도서명 검색 -> 도서 상세               ");
-                    else if (detailMode == 3) Title("도서 관리 -> 출판사 검색 -> 도서 상세               ");
-                    else Title("도서 관리 -> 저자 검색 -> 도서 상세               ");
+                    title.AppendFormat("출판사 검색");
+                    break;
+                case 4:
+                    title.AppendFormat("저자 검색");
                     break;
             }
+
+            Title(title.ToString());
         }
 
-        public void NonMemberMenuOption()
+        public void BookDetailTitle(int mode, int detailMode)
+        {
+            StringBuilder title = new StringBuilder();
+            
+            if (mode == 1) title.AppendFormat("비회원 도서검색 -> ");
+            else if (mode == 2) title.AppendFormat("도서 보기 -> ");
+            else title.AppendFormat("도서 관리 -> ");
+
+            switch (detailMode)
+            {
+                case 1:
+                    title.AppendFormat("전체 도서 목록 -> 도서 상세               ");
+                    break;
+                case 2:
+                    title.AppendFormat("도서명 검색 -> 도서 상세               ");
+                    break;
+                case 3:
+                    title.AppendFormat("출판사 검색 -> 도서 상세               ");
+                    break;
+                case 4:
+                    title.AppendFormat("저자 검색 -> 도서 상세               ");
+                    break;
+            }
+
+            Title(title.ToString());
+        }
+
+        public void MenuOption(int mode)
         {
             string line1 = "┏                     ┓";
             string line2 = "┣                     ┫";
@@ -78,17 +104,30 @@ namespace EnSharpLibrary.IO
             string menu3 = "회원가입   ";
             string menu4 = "관리자 로그인      ";
             string menu5 = "종료  ";
+            string menu6 = "도서 보기  ";
+            string menu7 = "대출도서 보기     ";
+            string menu8 = "정보수정   ";
+            string menu9 = "로그아웃   ";
+            string menu10 = "도서 관리   ";
+            string menu11 = "회원 관리   ";
+            string menu12 = "암호 수정   ";
+            string[] member = { menu6, menu7, menu8, menu9, menu5 };
+            string[] admin = { menu10, menu11, menu12, menu9, menu5 };
+            string[] toPrint = new string[] { menu1, menu2, menu3, menu4, menu5 };
 
+            if (mode == 2) toPrint = member;
+            else if (mode == 3) toPrint = admin;
+           
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu1.Length / 2)) + "}", menu1));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[0].Length / 2)) + "}", toPrint[0]));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu2.Length / 2)) + "}", menu2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[1].Length / 2)) + "}", toPrint[1]));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu3.Length / 2)) + "}", menu3));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[2].Length / 2)) + "}", toPrint[2]));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu4.Length / 2)) + "}", menu4));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[3].Length / 2)) + "}", toPrint[3]));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[4].Length / 2)) + "}", toPrint[4]));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
         }
 
@@ -266,12 +305,27 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(spaces, Console.CursorTop);
         }
 
-        public void ClearSearchBar(int currentLeftCursor, string answer)
+        public void ClearSearchBar(int currentLeftCursor, string answer, int searchType)
         {
             Console.SetCursorPosition(currentLeftCursor, Console.CursorTop);
             Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(currentLeftCursor, Console.CursorTop - 1);
-            Console.Write(answer);
+            if (searchType != 2) Console.Write(answer);
+            else Console.Write(new string('*', answer.Length));
+        }
+
+        public void SetCursorAndChoice(int cursorLeft, int numberForTop, char pointer)
+        {
+            Console.SetCursorPosition(cursorLeft, Console.CursorTop - numberForTop);
+            Console.Write(pointer);
+            Console.SetCursorPosition(cursorLeft, Console.CursorTop);
+        }
+
+        public void BlockCursorMove(int cursorLeft, string pointer)
+        {
+            Console.SetCursorPosition(cursorLeft, Console.CursorTop);
+            Console.Write(pointer);
+            Console.SetCursorPosition(cursorLeft, Console.CursorTop);
         }
     }
 }

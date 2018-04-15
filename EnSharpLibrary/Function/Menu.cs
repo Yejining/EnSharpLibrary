@@ -18,24 +18,35 @@ namespace EnSharpLibrary.Function
         private AdminVO admin = new AdminVO("970106");
         private List<BookVO> books = new List<BookVO>();
         private List<MemberVO> members = new List<MemberVO>();
+        private int usingMemberNumber;
+        private int programMode;
 
         public void Start(int mode)
         {
+            bool isFirtLoop = true;
+
             if (mode == 0)
             {
                 InitBooks();
                 InitMembers();
+                usingMemberNumber = -1;
+                programMode = 1;
+                mode = 1;
             }
-
-            print.Title("");
-            print.NonMemberMenuOption();
-
-            Console.SetCursorPosition(74, Console.CursorTop - 10);
-            Console.Write('☜');
-            Console.SetCursorPosition(74, Console.CursorTop);
-
+            
             while (true)
             {
+                if (isFirtLoop)
+                {
+                    // 타이틀 및 옵션 출력하고 커서 조절
+                    print.Title("");
+                    print.MenuOption(programMode);
+
+                    print.SetCursorAndChoice(74, 10, '☜');
+                    
+                    isFirtLoop = false;
+                }
+
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
                 if (keyInfo.Key == ConsoleKey.UpArrow)
@@ -56,26 +67,39 @@ namespace EnSharpLibrary.Function
                     {
                         switch (Console.CursorTop)
                         {
-                            case 8:     // 비회원 도서검색
-                                bookSearch.Run(1, books);
-                                return;
-                            case 10:    // 로그인
-                                logIn.Member(admin, members, books);
-                                return;
-                            case 12:    // 회원가입
-                                logIn.Join(members);
-                                return;
-                            case 14:    // 관리자 로그인
-                                logIn.Admin(admin);
-                                return;
+                            case 8:     // 비회원 도서검색, 도서보기. 도서관리
+                                bookSearch.Run(programMode, usingMemberNumber, books);
+                                break;
+                            case 10:    // 로그인, 대출도서 보기, 회원관리
+                                if (programMode == 0 || programMode == 1)
+                                {
+                                    usingMemberNumber = logIn.Member(admin, members, books);
+                                    if (usingMemberNumber != -1) programMode = 2;
+                                    else programMode = 1;
+                                }
+                                //else if (programMode == 2) 대출도서 보기
+                                //else 회원관리
+                                break;
+                            case 12:    // 회원가입, 정보수정, 암호수정
+                                if (programMode == 0 || programMode == 1) logIn.Join(members);
+                                //else if (programMode == 2) 정보수정
+                                //else 암호수정
+                                break;
+                            case 14:    // 관리자 로그인, 로그아웃, 로그아웃
+                                if (programMode == 0 || programMode == 1) programMode = logIn.Admin(admin);
+                                else programMode = 1;
+                                break;
                             case 16:    // 종료
                                 return;
                         }
+                        isFirtLoop = true;
                     }
-
-                    Console.SetCursorPosition(74, Console.CursorTop);
-                    Console.Write("☜ ");
-                    Console.SetCursorPosition(74, Console.CursorTop);
+                    else
+                    {
+                        Console.SetCursorPosition(74, Console.CursorTop);
+                        Console.Write("☜ ");
+                        Console.SetCursorPosition(74, Console.CursorTop);
+                    }
                 }
             }
         }

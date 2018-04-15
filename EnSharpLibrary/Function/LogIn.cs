@@ -27,7 +27,7 @@ namespace EnSharpLibrary.Function
 
             while (!getValue.IsAvailableStudentNumber(members, studentNumber))
             {
-                if (string.Compare(studentNumber, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return -1; }
+                if (string.Compare(studentNumber, "@입력취소@") == 0) return -1;
 
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("등록되지 않은 학번입니다!");
@@ -43,14 +43,14 @@ namespace EnSharpLibrary.Function
 
             while (!getValue.IsCorrectPassword(members, Int32.Parse(studentNumber), password))
             {
-                if (string.Compare(studentNumber, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return -1; }
-                
+                if (string.Compare(studentNumber, "@입력취소@") == 0) return -1;
+
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("암호가 틀렸습니다!");
                 Console.SetCursorPosition(55, Console.CursorTop - 1);
                 Console.Write(new string(' ', password.Length));
                 Console.SetCursorPosition(55, Console.CursorTop);
-                password = getValue.SearchWord(10, 1);
+                password = getValue.SearchWord(18, 2);
             }
 
             foreach (MemberVO member in members)
@@ -78,20 +78,20 @@ namespace EnSharpLibrary.Function
 
             while (string.Compare(password, admin.Password) != 0)
             {
-                if (string.Compare(password, "@입력취소@") == 0) { Menu menu = new Menu(); menu.Start(1); return 1; }
+                if (string.Compare(password, "@입력취소@") == 0) { return 1; }
 
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 print.Announce("암호가 틀립니다!");
                 Console.SetCursorPosition(55, Console.CursorTop - 1);
                 Console.Write(new string(' ', password.Length));
                 Console.SetCursorPosition(55, Console.CursorTop);
-                password = getValue.SearchWord(10, 1);
-
-                Console.SetCursorPosition(0, Console.CursorTop + 1);
-                print.Announce("관리자님 환영합니다!");
+                password = getValue.SearchWord(18, 2);
             }
 
-            return 4;
+            Console.SetCursorPosition(0, Console.CursorTop + 1);
+            print.Announce("관리자님 환영합니다!");
+
+            return 3;
         }
 
         public void Join(List<MemberVO> members)

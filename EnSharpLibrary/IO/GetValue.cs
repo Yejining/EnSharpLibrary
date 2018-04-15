@@ -23,15 +23,15 @@ namespace EnSharpLibrary.IO
             return -1;
         }
 
-        public int FirstBooksCount(List<BookVO> books)
-        {
-            int count = 0;
+        //public int FirstBooksCount(List<BookVO> books)
+        //{
+        //    int count = 0;
 
-            for (int i = 0; i < books.Count; i++)
-                if (books[i].OrderOfBooks == 0) count++;
+        //    for (int i = 0; i < books.Count; i++)
+        //        if (books[i].OrderOfBooks == 0) count++;
 
-            return count;
-        }
+        //    return count;
+        //}
 
         public int DetailBooksCount(List<BookVO> books, int numberOfBook)
         {
@@ -96,7 +96,7 @@ namespace EnSharpLibrary.IO
                             Console.Write(' ');
                             Console.SetCursorPosition(leftCursor, Console.CursorTop);
                         }
-                        else print.ClearSearchBar(leftCursor, answer.ToString());
+                        else print.ClearSearchBar(leftCursor, answer.ToString(), searchType);
                     }
                     else if (answer.Length == 0) Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
                 }
@@ -114,7 +114,7 @@ namespace EnSharpLibrary.IO
                             full = 1;
                         }
                         Console.SetCursorPosition(leftCursor, Console.CursorTop);
-                        print.ClearSearchBar(leftCursor, answer.ToString());
+                        print.ClearSearchBar(leftCursor, answer.ToString(), searchType);
                     }
                     if (searchType == 2) { print.ClearOneLetter(Console.CursorLeft - 1); Console.Write('*'); }
                 }
@@ -193,9 +193,9 @@ namespace EnSharpLibrary.IO
             return false;
         }
 
-        // 1 : 도서명 검색
-        // 2 : 출판사 검색
-        // 3 : 저자 검색
+        // 2 : 도서명 검색
+        // 3 : 출판사 검색
+        // 4 : 저자 검색
         public List<int> FoundBooks(List<BookVO> books, string searchWord, int searchMode)
         {
             List<int> indexesOfSearchResult = new List<int>();
@@ -203,7 +203,7 @@ namespace EnSharpLibrary.IO
 
             switch (searchMode)
             {
-                case 1:
+                case 2:
                     for (int i = 0; i < books.Count; i++)
                         if (System.Text.RegularExpressions.Regex.IsMatch(books[i].Name, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                         {
@@ -213,7 +213,7 @@ namespace EnSharpLibrary.IO
                             if (!thereIs) indexesOfSearchResult.Add((int)Math.Floor(books[i].NumberOfThis));
                         }
                     break;
-                case 2:
+                case 3:
                     for (int i = 0; i < books.Count; i++)
                         if (System.Text.RegularExpressions.Regex.IsMatch(books[i].Publisher, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                         {
@@ -223,7 +223,7 @@ namespace EnSharpLibrary.IO
                             if (!thereIs) indexesOfSearchResult.Add((int)Math.Floor(books[i].NumberOfThis));
                         }
                     break;
-                case 3:
+                case 4:
                     for (int i = 0; i < books.Count; i++)
                         if (System.Text.RegularExpressions.Regex.IsMatch(books[i].Author, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                         {
