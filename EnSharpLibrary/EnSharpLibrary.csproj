@@ -40,15 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\AdminVO.cs" />
+    <Compile Include="Data\BookVO.cs" />
+    <Compile Include="Data\MemberVO.cs" />
+    <Compile Include="Function\BookSearch.cs" />
+    <Compile Include="Function\LogIn.cs" />
+    <Compile Include="Function\Menu.cs" />
+    <Compile Include="IO\GetValue.cs" />
+    <Compile Include="IO\Print.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="data\" />
-    <Folder Include="src\Data\" />
-    <Folder Include="src\Main\" />
-    <Folder Include="src\Scene\" />
-    <Folder Include="src\UI\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

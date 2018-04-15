@@ -4,4 +4,3 @@ C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\EnSharpLi
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\EnSharpLibrary.pdb
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\obj\Debug\EnSharpLibrary.exe
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\obj\Debug\EnSharpLibrary.pdb
-C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\obj\Debug\EnSharpLibrary.csproj.ResolveComReference.cache
