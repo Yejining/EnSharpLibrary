@@ -143,6 +143,7 @@ namespace EnSharpLibrary.Function
             int cursorTop = 10;
             StringBuilder newPhone = new StringBuilder();
             string newPhoneNumber;
+            string newAddress;
 
             MemberVO user = new MemberVO();
             foreach (MemberVO member in members) 
@@ -152,40 +153,56 @@ namespace EnSharpLibrary.Function
                     break;
                 }
 
-            if (mode == 1) print.Title("주소 변경");
-            else print.Title("전화번호 변경");
-            
-            Console.SetCursorPosition(30, cursorTop);
-            Console.Write("▷ 현재 전화번호 : {0}", user.PhoneNumber);
-            Console.SetCursorPosition(30, cursorTop + 2);
-            Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
-            newPhoneNumber = getValue.SearchWord(12, 1);
-
-            if (string.Compare(newPhoneNumber, "@입력취소@") == 0) return members;
-
-            while(getValue.NotValidPhoneNumber(newPhoneNumber, members))
+            if (mode == 1)
             {
-                Console.SetCursorPosition(0, Console.CursorTop + 1);
-                print.Announce("유효하지 않은 전화번호입니다!");
-                Console.SetCursorPosition(30, cursorTop + 2);
-                print.ClearCurrentConsoleLine();
+                print.Title("주소 변경");
+                Console.SetCursorPosition(20, cursorTop);
+                Console.Write("▷ 현재 주소 : {0}", user.Address);
+                Console.SetCursorPosition(20, cursorTop + 2);
+                Console.Write("▷ 변경할 주소 입력(○○도 ○○시 ○○동 형식) : ");
+                newAddress = getValue.SearchWord(20, 0);
+
+                foreach (MemberVO member in members)
+                    if (member.IdentificationNumber == usingMemberNumber)
+                    {
+                        member.Address = newAddress;
+                        break;
+                    }
+            }
+            else
+            {
+                print.Title("전화번호 변경");
+                Console.SetCursorPosition(30, cursorTop);
+                Console.Write("▷ 현재 전화번호 : {0}", user.PhoneNumber);
                 Console.SetCursorPosition(30, cursorTop + 2);
                 Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
-                newPhoneNumber = getValue.SearchWord(17, 1);
-            }
+                newPhoneNumber = getValue.SearchWord(12, 1);
 
-            StringBuilder phoneNumber = new StringBuilder();
-            phoneNumber.Append(newPhoneNumber);
-            phoneNumber.Insert(3, '-');
-            phoneNumber.Insert(8, '-');
+                if (string.Compare(newPhoneNumber, "@입력취소@") == 0) return members;
 
-            foreach (MemberVO member in members)
-                if (member.IdentificationNumber == usingMemberNumber)
+                while (getValue.NotValidPhoneNumber(newPhoneNumber, members))
                 {
-                    member.PhoneNumber = phoneNumber.ToString();
-                    break;
+                    Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    print.Announce("유효하지 않은 전화번호입니다!");
+                    Console.SetCursorPosition(30, cursorTop + 2);
+                    print.ClearCurrentConsoleLine();
+                    Console.SetCursorPosition(30, cursorTop + 2);
+                    Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
+                    newPhoneNumber = getValue.SearchWord(17, 1);
                 }
 
+                StringBuilder phoneNumber = new StringBuilder();
+                phoneNumber.Append(newPhoneNumber);
+                phoneNumber.Insert(3, '-');
+                phoneNumber.Insert(8, '-');
+
+                foreach (MemberVO member in members)
+                    if (member.IdentificationNumber == usingMemberNumber)
+                    {
+                        member.PhoneNumber = phoneNumber.ToString();
+                        break;
+                    }
+            } 
             return members;
         }
 
