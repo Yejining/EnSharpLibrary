@@ -24,6 +24,7 @@ namespace EnSharpLibrary.Function
         public void Start(int mode)
         {
             bool isFirtLoop = true;
+            LibraryVO library = new LibraryVO(members, books);
 
             if (mode == 0)
             {
@@ -68,7 +69,7 @@ namespace EnSharpLibrary.Function
                         switch (Console.CursorTop)
                         {
                             case 8:     // 비회원 도서검색, 도서보기. 도서관리
-                                bookSearch.Run(programMode, usingMemberNumber, books, members);
+                                library = bookSearch.Run(programMode, usingMemberNumber, books, members);
                                 break;
                             case 10:    // 로그인, 대출도서 보기, 회원관리
                                 if (programMode == 0 || programMode == 1)
@@ -77,7 +78,7 @@ namespace EnSharpLibrary.Function
                                     if (usingMemberNumber != -1) programMode = 2;
                                     else programMode = 1;
                                 }
-                                else if (programMode == 2) bookSearch.BorrowedBook(usingMemberNumber, members, books);
+                                else if (programMode == 2) library = bookSearch.BorrowedBook(usingMemberNumber, members, books);
                                 //else 회원관리
                                 break;
                             case 12:    // 회원가입, 정보수정, 암호수정
@@ -92,6 +93,10 @@ namespace EnSharpLibrary.Function
                             case 16:    // 종료
                                 return;
                         }
+
+                        books = library.Books;
+                        members = library.Members;
+
                         isFirtLoop = true;
                     }
                     else

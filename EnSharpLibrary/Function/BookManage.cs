@@ -22,6 +22,7 @@ namespace EnSharpLibrary.Function
             StringBuilder bookInformation2 = new StringBuilder();
             int overdueDays;
             string guide = "나가기(ESC)";
+            bool endOfProcess = false;
 
             print.Title(books[indexOfBook].Name);
             bookInformation1.AppendFormat("▷ {0}/{1}/{2}/{3}", books[indexOfBook].Name, books[indexOfBook].Author,
@@ -69,6 +70,8 @@ namespace EnSharpLibrary.Function
                             member.ReturnBook(books[indexOfBook].NumberOfThis);
                     
                     books[indexOfBook].SetNonRentalMode();
+
+                    endOfProcess = true;
                 }
                 else if (overdueDays <= 0 && books[indexOfBook].NumberOfRenew < 2)
                 {
@@ -94,7 +97,7 @@ namespace EnSharpLibrary.Function
             }
 
             // 대출가능 책
-            if (books[indexOfBook].BookCondition == 0)
+            if (books[indexOfBook].BookCondition == 0 && !endOfProcess)
             {
                 string content1 = "▷ 다른 책이 연체되어 이 도서는 대출이 불가능합니다.";
                 string content2 = "▷ 이미 대여된 도서와 같은 종류의 책은 대여가 불가능합니다.";
@@ -137,7 +140,7 @@ namespace EnSharpLibrary.Function
             }
 
             // 분실 및 훼손
-            if (books[indexOfBook].BookCondition == 2 || books[indexOfBook].BookCondition == 3)
+            if (books[indexOfBook].BookCondition == 2 || books[indexOfBook].BookCondition == 3 && !endOfProcess)
             {
                 Console.SetCursorPosition(10, Console.CursorTop + 1);
                 Console.Write("▷ 현재 이 책은 대여가 불가능합니다.");

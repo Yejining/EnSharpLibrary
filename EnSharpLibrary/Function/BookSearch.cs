@@ -17,10 +17,11 @@ namespace EnSharpLibrary.Function
         // mode 1: 비회원 도서 검색
         // mode 2 : 회원 도서 검색 및 대출
         // mode 3 : 관리자 도서 검색 및 도서 관리
-        public void Run(int programMode, int usingMemberNumber, List<BookVO> books, List<MemberVO> members)
+        public LibraryVO Run(int programMode, int usingMemberNumber, List<BookVO> books, List<MemberVO> members)
         {
             bool isFirstLoop = true;
-            
+            LibraryVO library = new LibraryVO(members, books);
+
             while (true)
             {
                 if (isFirstLoop)
@@ -55,20 +56,23 @@ namespace EnSharpLibrary.Function
                         switch (Console.CursorTop)
                         {
                             case 11:     // 도서 전체 출력
-                                AllBooks(programMode, usingMemberNumber, books, members);
+                                library = AllBooks(programMode, usingMemberNumber, books, members);
                                 break;
                             case 13:    // 도서명 검색
-                                Specifically(programMode, 2, usingMemberNumber, books, members);
+                                library = Specifically(programMode, 2, usingMemberNumber, books, members);
                                 break;
                             case 15:    // 출판사명 검색
-                                Specifically(programMode, 3, usingMemberNumber, books, members);
+                                library = Specifically(programMode, 3, usingMemberNumber, books, members);
                                 break;
                             case 17:    // 저자명 검색
-                                Specifically(programMode, 4, usingMemberNumber, books, members);
+                                library = Specifically(programMode, 4, usingMemberNumber, books, members);
                                 break;
                             case 19:    // 뒤로(비회원 : 메뉴, 회원 : 회원 버전 메뉴, 관리자 : 관리자 버전 메뉴)
-                                return;
+                                return library;
                         }
+
+                        books = library.Books;
+                        members = library.Members;
 
                         isFirstLoop = true;
                     }
@@ -80,12 +84,13 @@ namespace EnSharpLibrary.Function
         // mode 1: 비회원 도서 검색
         // mode 2 : 회원 도서 검색 및 대출
         // mode 3 : 관리자 도서 검색 및 도서 관리
-        public void AllBooks(int programMode, int usingMemberNumber, List<BookVO> books, List<MemberVO> members)
+        public LibraryVO AllBooks(int programMode, int usingMemberNumber, List<BookVO> books, List<MemberVO> members)
         {
             List<float> bookList = new List<float>();
             int countOfBooks;
             bool isFirstLoop = true;
-            
+            LibraryVO library = new LibraryVO(members, books);
+
             bookList = getValue.BookList(books, 1, -1);
             countOfBooks = bookList.Count;
        
@@ -115,14 +120,17 @@ namespace EnSharpLibrary.Function
                     if (Console.CursorTop < 12 + countOfBooks - 1) Console.SetCursorPosition(3, Console.CursorTop + 1);
                     Console.Write('☞');
                 }
-                else if (keyInfo.Key == ConsoleKey.Escape) return;
+                else if (keyInfo.Key == ConsoleKey.Escape) return library;
                 else
                 {
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
                         if (Console.CursorTop >= 12 && Console.CursorTop <= 12 + countOfBooks - 1)
-                            BookDetail(programMode, 1, books, (int)bookList[Console.CursorTop - 12], usingMemberNumber, members);
-                        
+                            library = BookDetail(programMode, 1, books, (int)bookList[Console.CursorTop - 12], usingMemberNumber, members);
+
+                        books = library.Books;
+                        members = library.Members;
+
                         isFirstLoop = true;
                     }
                     else print.BlockCursorMove(3, "☞ ");
@@ -133,13 +141,14 @@ namespace EnSharpLibrary.Function
         // 2 : 도서명 검색
         // 3 : 출판사 검색
         // 4 : 작가 검색
-        public void Specifically(int programMode, int detailMode, int usingMemberNumber, List<BookVO> books, List<MemberVO> members)
+        public LibraryVO Specifically(int programMode, int detailMode, int usingMemberNumber, List<BookVO> books, List<MemberVO> members)
         {
             List<int> foundBooks = new List<int>();
             string keywordToSearch;
             ConsoleKeyInfo keyInfo;
             StringBuilder title = new StringBuilder();
             bool isFirstLoop = false;
+            LibraryVO library = new LibraryVO(members, books);
             
             if (detailMode == 2) title.AppendFormat("▷ 검색할 도서명 : ");
             else if (detailMode == 3) title.AppendFormat("▷ 검색할 출판사 : ");
@@ -151,7 +160,7 @@ namespace EnSharpLibrary.Function
             keywordToSearch = getValue.SearchWord(10, 0);
             title.Append(keywordToSearch);            
 
-            if (string.Compare(keywordToSearch, "@입력취소@") == 0) return;
+            if (string.Compare(keywordToSearch, "@입력취소@") == 0) return library;
 
             Console.SetCursorPosition(0, Console.CursorTop + 2);
 
@@ -161,7 +170,7 @@ namespace EnSharpLibrary.Function
             while (foundBooks.Count == 0)
             {
                 keyInfo = Console.ReadKey();
-                if (keyInfo.Key == ConsoleKey.Escape) return;
+                if (keyInfo.Key == ConsoleKey.Escape) return library;
             }
 
             print.SetCursorAndChoice(3, foundBooks.Count + 3, '☞');
@@ -194,15 +203,18 @@ namespace EnSharpLibrary.Function
                     if (Console.CursorTop < 15 + foundBooks.Count - 1) Console.SetCursorPosition(3, Console.CursorTop + 1);
                     Console.Write('☞');
                 }
-                else if (keyInfo.Key == ConsoleKey.Escape) return;
+                else if (keyInfo.Key == ConsoleKey.Escape) return library;
                 else
                 {
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
                         if (Console.CursorTop >= 15 && Console.CursorTop <= 15 + foundBooks.Count - 1)
                         {
-                            BookDetail(programMode, detailMode, books, foundBooks[Console.CursorTop - 15], usingMemberNumber, members);
+                            library = BookDetail(programMode, detailMode, books, foundBooks[Console.CursorTop - 15], usingMemberNumber, members);
                         }
+
+                        books = library.Books;
+                        members = library.Members;
 
                         isFirstLoop = true;
                     }
@@ -215,7 +227,7 @@ namespace EnSharpLibrary.Function
         // 2 : 도서명 검색 -> 도서 상세
         // 3 : 출판사 검색 -> 도서 상세
         // 4 : 작가 검색 -> 도서 상세
-        public void BookDetail(int mode, int detailMode, List<BookVO> books, int numberOfBook, int usingMemberNumber, List<MemberVO> members)
+        public LibraryVO BookDetail(int mode, int detailMode, List<BookVO> books, int numberOfBook, int usingMemberNumber, List<MemberVO> members)
         {
             int countOfBooks;
             bool isFirstLoop = true;
@@ -231,7 +243,7 @@ namespace EnSharpLibrary.Function
                 print.BookDetail(mode, books, indexOfBooks);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
-                if (keyInfo.Key == ConsoleKey.Escape) return;
+                if (keyInfo.Key == ConsoleKey.Escape) return library;
             }
 
             while (true)
@@ -260,7 +272,7 @@ namespace EnSharpLibrary.Function
                     if (Console.CursorTop < 12 + countOfBooks - 1) Console.SetCursorPosition(3, Console.CursorTop + 1);
                     Console.Write('☞');
                 }
-                else if (keyInfo.Key == ConsoleKey.Escape) return;
+                else if (keyInfo.Key == ConsoleKey.Escape) return library;
                 else
                 {
                     if (keyInfo.Key == ConsoleKey.Enter)
@@ -284,20 +296,20 @@ namespace EnSharpLibrary.Function
             }
         }
 
-        public void BorrowedBook(int usingMemberNumber, List<MemberVO> members, List<BookVO> books)
+        public LibraryVO BorrowedBook(int usingMemberNumber, List<MemberVO> members, List<BookVO> books)
         {
             List<float> bookList = new List<float>();
-            int countOfBooks;
+            int countOfBooks = 0;
             bool isFirstLoop = true;
             LibraryVO library = new LibraryVO(members, books);
-
-            bookList = getValue.BookList(books, 2, usingMemberNumber);
-            countOfBooks = bookList.Count;
 
             while (true)
             {
                 if (isFirstLoop)
                 {
+                    bookList = getValue.BookList(books, 2, usingMemberNumber);
+                    countOfBooks = bookList.Count;
+
                     print.Title("대출도서 보기");
                     print.BorrowedBook(usingMemberNumber, books, bookList);
 
@@ -320,14 +332,14 @@ namespace EnSharpLibrary.Function
                     if (Console.CursorTop < 12 + countOfBooks - 1) Console.SetCursorPosition(2, Console.CursorTop + 1);
                     Console.Write('☞');
                 }
-                else if (keyInfo.Key == ConsoleKey.Escape) return;
+                else if (keyInfo.Key == ConsoleKey.Escape) return library;
                 else
                 {
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
                         if (Console.CursorTop >= 12 && Console.CursorTop <= 12 + countOfBooks - 1)
                             library = bookManage.MemberMode(usingMemberNumber, getValue.GetIndex(bookList[Console.CursorTop - 12], books), books, members);
-
+                        
                         books = library.Books;
                         members = library.Members;
 
