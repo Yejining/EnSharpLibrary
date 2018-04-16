@@ -169,9 +169,87 @@ namespace EnSharpLibrary.Function
             return library;
         }
 
-        //public LibraryVO AdminMode(int indexOfBook, List<BookVO> books, List<MemberVO> members)
-        //{
+        public LibraryVO AdminMode(int indexOfBook, List<BookVO> books, List<MemberVO> members)
+        {
+            LibraryVO library = new LibraryVO(members, books);
+            int leftCursor, topCursor;
+            int mode, mode1;
+            int userNumber;
+            int index = -1;
+            string guide = "나가기(ESC)";
 
-        //}
+            print.BookCondition(indexOfBook, books, members);
+            leftCursor = Console.CursorLeft;
+            topCursor = Console.CursorTop;
+            
+            mode = print.BookManageOption(18);
+            if (mode == -1) return library;
+            Console.SetCursorPosition(0, 18);
+            
+
+            Console.SetCursorPosition(10, 18);
+            if (mode == 1) Console.Write("▷ 분실 및 훼손, 발견 등록");
+            else Console.Write("▷ 도서 삭제");
+
+            // 반납처리
+            userNumber = books[indexOfBook].NumberOfMember;
+            if (userNumber != -1)
+            {
+                for (int i = 0; i < members.Count; i++)
+                    if (members[i].IdentificationNumber == userNumber)
+                    {
+                        index = i;
+                        break;
+                    }
+                members[index].ReturnBook(books[indexOfBook].NumberOfThis);
+            }
+
+            if (mode == 2)
+            {
+                books.RemoveAt(indexOfBook);
+                Console.SetCursorPosition(10, 18);
+                Console.Write("▷ 도서 삭제가 완료되었습니다.");
+            }
+            else
+            {
+                mode1 = print.BookConditionManageOption(Console.CursorLeft + 3, 18);
+                if (mode1 == -1) return library;
+                books[indexOfBook].SetNonRentalMode();
+
+                Console.SetCursorPosition(10, 18);
+
+                switch (mode1)
+                {
+                    case 1: // 분실
+                        books[indexOfBook].BookCondition = 2;
+                        Console.Write("▷ 분실 등록이 완료되었습니다.");
+                        break;
+                    case 2: // 훼손
+                        books[indexOfBook].BookCondition = 3;
+                        Console.Write("▷ 훼손 등록이 완료되었습니다.");
+                        break;
+                    case 3: // 발견
+                        books[indexOfBook].BookCondition = 0;
+                        Console.Write("▷ 발견 등록이 완료되었습니다.");
+                        break;
+                }    
+            }
+
+            library.Books = books;
+            library.Members = members;
+
+            Console.SetCursorPosition(55, Console.CursorTop + 4);
+            Console.WriteLine(guide);
+
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo;
+
+                keyInfo = Console.ReadKey();
+                if (keyInfo.Key == ConsoleKey.Escape) break;
+            }
+
+            return library;
+        }
     }
 }

@@ -478,5 +478,186 @@ namespace EnSharpLibrary.IO
                 if (keyInfo.Key == ConsoleKey.Escape) return;
             }
         }
+
+        public void BookCondition(int indexOfBook, List<BookVO> books, List<MemberVO> members)
+        {
+            StringBuilder bookInformation1 = new StringBuilder();
+            StringBuilder bookInformation2 = new StringBuilder();
+            StringBuilder bookInformation3 = new StringBuilder();
+            StringBuilder bookInformation4 = new StringBuilder();
+
+            Title(books[indexOfBook].Name);
+            bookInformation1.AppendFormat("▷ {0}/{1}/{2}/{3}", books[indexOfBook].Name, books[indexOfBook].Author,
+                books[indexOfBook].Publisher, books[indexOfBook].PublishingYear);
+            bookInformation2.AppendFormat("청구기호 : {0}", books[indexOfBook].NumberOfThis);
+            if (books[indexOfBook].BookCondition == 0) bookInformation3.AppendFormat("도서상태 : 대출 가능");
+            else if (books[indexOfBook].BookCondition == 1)
+            {
+                bookInformation3.AppendFormat("도서상태 : 대출중({0})", books[indexOfBook].NumberOfMember);
+                bookInformation4.AppendFormat("대출일 : {0} / 반납 예정일 : {1}", books[indexOfBook].Rental.ToString("yy/MM/dd"), books[indexOfBook].ExpectedToReturn.ToString("yy/MM/dd"));
+            }
+            else if (books[indexOfBook].BookCondition == 2) bookInformation3.AppendFormat("도서상태 : 분실");
+            else bookInformation3.AppendFormat("도서상태 : 훼손");
+
+            Console.SetCursorPosition(10, Console.CursorTop);
+            Console.WriteLine(bookInformation1);
+            Console.SetCursorPosition(13, Console.CursorTop + 1);
+            Console.WriteLine(bookInformation2);
+            Console.SetCursorPosition(13, Console.CursorTop + 1);
+            Console.WriteLine(bookInformation3);
+            if (books[indexOfBook].BookCondition == 1)
+            {
+                Console.SetCursorPosition(13, Console.CursorTop + 1);
+                Console.WriteLine(bookInformation4);
+            }
+            else Console.SetCursorPosition(13, Console.CursorTop + 2);
+        }
+
+        public int BookManageOption(int topCursor)
+        {
+            string option1 = "▷ 분실 및 훼손, 발견 등록";
+            string option2 = "▷ 도서 삭제";
+            string option3 = "▷ 뒤로";
+            bool isFirstLoop = true;
+            int cursor;
+
+            Console.SetCursorPosition(10, topCursor);
+            Console.WriteLine(option1);
+            Console.SetCursorPosition(10, topCursor + 2);
+            Console.WriteLine(option2);
+            Console.SetCursorPosition(10, topCursor + 4);
+            Console.WriteLine(option3);
+
+            while (true)
+            {
+                if(isFirstLoop)
+                {
+                    SetCursorAndChoice(40, 5, '☜');
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    ClearOneLetter(40);
+                    if (Console.CursorTop > 18) Console.SetCursorPosition(40, Console.CursorTop - 2);
+                    Console.Write('☜');
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    ClearOneLetter(40);
+                    if (Console.CursorTop < 22) Console.SetCursorPosition(40, Console.CursorTop + 2);
+                    Console.Write('☜');
+                }
+                else
+                {
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        cursor = Console.CursorTop;
+
+                        for (int i = 18; i <= 22; i++)
+                        {
+                            ClearCurrentConsoleLine();
+                            Console.SetCursorPosition(0, Console.CursorTop + 1);
+                        }
+
+                        switch (cursor)
+                        {
+                            case 18:
+                                return 1;
+                            case 20:
+                                return 2;
+                            case 22:
+                                return -1;
+                        }
+
+                        isFirstLoop = true;
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(40, Console.CursorTop);
+                        Console.Write("☜ ");
+                        Console.SetCursorPosition(40, Console.CursorTop);
+                    }
+                }
+            }
+        }
+
+        public int BookConditionManageOption(int cursorLeft, int cursorTop)
+        {
+            string option1 = "▷ 분실";
+            string option2 = "▷ 훼손";
+            string option3 = "▷ 발견";
+            string option4 = "▷ 뒤로";
+            bool isFirstLoop = true;
+            int cursor;
+
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.WriteLine(option1);
+            Console.SetCursorPosition(cursorLeft, cursorTop + 2);
+            Console.WriteLine(option2);
+            Console.SetCursorPosition(cursorLeft, cursorTop + 4);
+            Console.WriteLine(option3);
+            Console.SetCursorPosition(cursorLeft, cursorTop + 6);
+            Console.WriteLine(option4);
+
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    SetCursorAndChoice(cursorLeft + 10, 5, '☜');
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    ClearOneLetter(cursorLeft + 10);
+                    if (Console.CursorTop > 18) Console.SetCursorPosition(cursorLeft + 10, Console.CursorTop - 2);
+                    Console.Write('☜');
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    ClearOneLetter(cursorLeft + 10);
+                    if (Console.CursorTop < 24) Console.SetCursorPosition(cursorLeft + 10, Console.CursorTop + 2);
+                    Console.Write('☜');
+                }
+                else
+                {
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        cursor = Console.CursorTop;
+
+                        for (int i = 18; i <= 24; i++)
+                        {
+                            ClearCurrentConsoleLine();
+                            Console.SetCursorPosition(0, Console.CursorTop + 1);
+                        }
+
+                        switch (cursor)
+                        {
+                            case 18:
+                                return 1;
+                            case 20:
+                                return 2;
+                            case 22:
+                                return 3;
+                            case 24:
+                                return -1;
+                        }
+
+                        isFirstLoop = true;
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(cursorLeft + 10, Console.CursorTop);
+                        Console.Write("☜ ");
+                        Console.SetCursorPosition(cursorLeft + 10, Console.CursorTop);
+                    }
+                }
+            }
+        }
     }
 }

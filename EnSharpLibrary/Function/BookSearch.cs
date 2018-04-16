@@ -109,6 +109,9 @@ namespace EnSharpLibrary.Function
             {
                 if (isFirstLoop)
                 {
+                    bookList = getValue.BookList(books, 1, -1);
+                    countOfBooks = bookList.Count;
+
                     print.BookSearchAllBooksTitle(programMode);
                     print.AllBooks(books);
 
@@ -194,6 +197,14 @@ namespace EnSharpLibrary.Function
                     Console.SetCursorPosition(10, Console.CursorTop);
                     Console.Write(title);
 
+                    foundBooks = getValue.FoundBooks(books, keywordToSearch, detailMode);
+
+                    while (foundBooks.Count == 0)
+                    {
+                        keyInfo = Console.ReadKey();
+                        if (keyInfo.Key == ConsoleKey.Escape) return library;
+                    }
+
                     Console.SetCursorPosition(0, Console.CursorTop + 2);
                     print.BookSearchResult(books, foundBooks);
 
@@ -261,6 +272,9 @@ namespace EnSharpLibrary.Function
             {
                 if (isFirstLoop)
                 {
+                    countOfBooks = getValue.DetailBooksCount(books, numberOfBook);
+                    indexOfBooks = getValue.IndexOfBooks(books, numberOfBook);
+
                     print.BookDetailTitle(mode, detailMode);
                     print.BookDetail(mode, books, indexOfBooks);
 
@@ -294,8 +308,8 @@ namespace EnSharpLibrary.Function
                             {
                                 library = bookManage.MemberMode(usingMemberNumber, indexOfBooks[Console.CursorTop - 12], books, members);
                             }
-                            //else
-                                //library = bookManage.AdminMode(indexOfBooks[Console.CursorTop - 12], books, members);
+                            else
+                                library = bookManage.AdminMode(indexOfBooks[Console.CursorTop - 12], books, members);
                         }
                         isFirstLoop = true;
 
