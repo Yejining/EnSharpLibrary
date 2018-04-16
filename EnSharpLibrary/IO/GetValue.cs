@@ -411,5 +411,32 @@ namespace EnSharpLibrary.IO
 
             return 0;
         }
+
+        public bool NotValidPhoneNumber(string newPhoneNumber, List<MemberVO> members)
+        {
+            if (newPhoneNumber.Length != 11) return true;
+            int middleNumber;
+
+            StringBuilder phoneNumber = new StringBuilder();
+            phoneNumber.Append(newPhoneNumber);
+            phoneNumber.Insert(3, '-');
+            phoneNumber.Insert(8, '-'); 
+            
+            foreach (MemberVO member in members)
+                if (string.Compare(member.PhoneNumber, phoneNumber.ToString()) == 0) return true;
+
+            phoneNumber.Remove(3, 10);
+            if (string.Compare(phoneNumber.ToString(), "010") != 0) return true;
+
+            StringBuilder middle = new StringBuilder();
+            middle.Append(newPhoneNumber);
+            middle.Remove(5, 6);
+            middle.Remove(0, 3); Console.WriteLine(middle); 
+            middleNumber = Int32.Parse(middle.ToString());
+
+            if (middleNumber >= 0 && middleNumber <= 19 || middleNumber >= 59 && middleNumber <= 61) return true;
+
+            return false;
+        }
     }
 }

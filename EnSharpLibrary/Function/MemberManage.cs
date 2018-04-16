@@ -79,7 +79,59 @@ namespace EnSharpLibrary.Function
 
         public List<MemberVO>  MemberPasswordEdit(int usingMemberNumber, List<MemberVO> members)
         {
+            string userPassword = "";
+            
+            foreach (MemberVO member in members)
+                if (member.IdentificationNumber == usingMemberNumber)
+                {
+                    userPassword = member.Password;
+                    break;
+                }
+
+            string newPassword;
+            int cursorTop = 10;
+
             print.Title("암호변경");
+
+            Console.SetCursorPosition(30, cursorTop);
+            Console.Write("▷ 현재 암호 입력 : ");
+            newPassword = getValue.SearchWord(17, 2);
+
+            if (string.Compare(newPassword, "@입력취소@") == 0) return members;
+
+            while (string.Compare(userPassword, newPassword) != 0)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                print.Announce("암호가 일치하지 않습니다!");
+                Console.SetCursorPosition(30, cursorTop);
+                print.ClearCurrentConsoleLine();
+                Console.SetCursorPosition(30, cursorTop);
+                Console.Write("▷ 현재 암호 입력 : ");
+                newPassword = getValue.SearchWord(17, 2);
+            }
+
+            Console.SetCursorPosition(30, cursorTop + 2);
+            Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
+            newPassword = getValue.SearchWord(17, 2);
+            if (string.Compare(newPassword, "@입력취소@") == 0) return members;
+            while (getValue.NotValidPassword(newPassword) != 0)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                if (getValue.NotValidPassword(newPassword) == 1) print.Announce("길이에 맞는 암호를 입력하세요!");
+                else if (getValue.NotValidPassword(newPassword) == 2) print.Announce("3자리 연속으로 문자 혹은 숫자가  사용되면 안 됩니다!");
+                Console.SetCursorPosition(30, cursorTop + 2);
+                print.ClearCurrentConsoleLine();
+                Console.SetCursorPosition(30, cursorTop + 2);
+                Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
+                newPassword = getValue.SearchWord(17, 2);
+            }
+
+            foreach (MemberVO member in members)
+                if (member.IdentificationNumber == usingMemberNumber)
+                {
+                    member.Password = newPassword;
+                    break;
+                }
 
             return members;
         }
@@ -88,9 +140,37 @@ namespace EnSharpLibrary.Function
         // 2 : 전화번호 변경
         public List<MemberVO> MemberInformationEdit(int mode, int usingMemberNumber, List<MemberVO> members)
         {
+            int cursorTop = 10;
+            StringBuilder newPhone = new StringBuilder();
+            string newPhoneNumber;
+
+            MemberVO user = new MemberVO();
+            foreach (MemberVO member in members) 
+                if (member.IdentificationNumber == usingMemberNumber)
+                {
+                    user = member;
+                    break;
+                }
+
             if (mode == 1) print.Title("주소 변경");
             else print.Title("전화번호 변경");
-
+            
+            Console.SetCursorPosition(30, cursorTop);
+            Console.Write("▷ 현재 전화번호 : {0}", user.PhoneNumber);
+            Console.SetCursorPosition(30, cursorTop + 2);
+            Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
+            newPhoneNumber = getValue.SearchWord(12, 1);
+            
+            while(getValue.NotValidPhoneNumber(newPhoneNumber, members))
+            {
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                print.Announce("유효하지 않은 전화번호입니다!");
+                Console.SetCursorPosition(30, cursorTop + 2);
+                print.ClearCurrentConsoleLine();
+                Console.SetCursorPosition(30, cursorTop + 2);
+                Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
+                newPhoneNumber = getValue.SearchWord(17, 1);
+            }
             return members;
         }
 
