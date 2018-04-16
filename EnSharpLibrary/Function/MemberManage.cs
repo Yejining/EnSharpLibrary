@@ -238,6 +238,7 @@ namespace EnSharpLibrary.Function
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
                 if (getValue.NotValidPassword(newPassword) == 1) print.Announce("길이에 맞는 암호를 입력하세요!");
                 else if (getValue.NotValidPassword(newPassword) == 2) print.Announce("3자리 연속으로 문자 혹은 숫자가  사용되면 안 됩니다!");
+                else if (getValue.NotValidPassword(newPassword) == 3) print.Announce("암호는 영어와 숫자만 가능합니다!");
                 Console.SetCursorPosition(30, cursorTop + 2);
                 print.ClearCurrentConsoleLine();
                 Console.SetCursorPosition(30, cursorTop + 2);

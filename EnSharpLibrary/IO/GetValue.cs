@@ -403,11 +403,38 @@ namespace EnSharpLibrary.IO
         {
             if (newPassword.Length < 8 || newPassword.Length > 15) return 1;
 
+            for (int letter = 0; letter < newPassword.Length; letter++)
+            {
+                if ((newPassword[letter] >= 'a' && newPassword[letter] <= 'z') ||
+                    (newPassword[letter] >= 'A' && newPassword[letter] <= 'Z') ||
+                    (newPassword[letter] >= '0' && newPassword[letter] <= '9'))
+                    continue;
+                else return 3;
+            }
+
             for (int i = 0; i < newPassword.Length - 2; i++)
             {
                 if (newPassword[i + 2] - newPassword[i + 1] == 1 && newPassword[i + 1] - newPassword[i] == 1)
                     return 2;
             }
+
+            return 0;
+        }
+
+        public int NotValidNumber(string number, List<MemberVO> members)
+        {
+            StringBuilder twoLetters = new StringBuilder(number);
+            int year;
+            int nextyear = DateTime.Now.AddYears(1).Year - 2000;
+
+            if (number.Length != 8) return 1;
+            foreach (MemberVO member in members)
+                if (string.Compare(number, member.IdentificationNumber.ToString()) == 0) return 2;
+
+            twoLetters.Remove(2, 6);
+            year = Int32.Parse(twoLetters.ToString());
+
+            if (year >= nextyear && year <= 89) return 3;
 
             return 0;
         }
@@ -437,6 +464,20 @@ namespace EnSharpLibrary.IO
             if (middleNumber >= 0 && middleNumber <= 19 || middleNumber >= 59 && middleNumber <= 61) return true;
 
             return false;
+        }
+
+        public int NotValidPhoneNumberSpecifically(string phoneNumber, List<MemberVO> members)
+        {
+            StringBuilder newPhoneNumber = new StringBuilder(phoneNumber);
+            newPhoneNumber.Insert(3, '-');
+            newPhoneNumber.Insert(8, '-');
+
+            if (phoneNumber.Length != 11) return 1;
+            foreach (MemberVO member in members)
+            {
+                if (member.PhoneNumber == newPhoneNumber.ToString()) return 2;
+            }
+            return 0;
         }
     }
 }
