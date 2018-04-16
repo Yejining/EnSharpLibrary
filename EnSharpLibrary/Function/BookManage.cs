@@ -160,6 +160,15 @@ namespace EnSharpLibrary.Function
             return library;
         }
 
+        public LibraryVO AddBook(List<MemberVO> members, List<BookVO> books)
+        {
+            LibraryVO library = new LibraryVO(members, books);
+
+            print.Title("도서 등록");
+
+            return library;
+        }
+
         //public LibraryVO AdminMode(int indexOfBook, List<BookVO> books, List<MemberVO> members)
         //{
 

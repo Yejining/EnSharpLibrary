@@ -15,6 +15,7 @@ namespace EnSharpLibrary.Function
         BookSearch bookSearch = new BookSearch();
         LogIn logIn = new LogIn();
         MemberManage memberManage = new MemberManage();
+        MemberSearch memberSearch = new MemberSearch();
 
         private AdminVO admin = new AdminVO("970106");
         private List<BookVO> books = new List<BookVO>();
@@ -89,12 +90,17 @@ namespace EnSharpLibrary.Function
                                     books = library.Books;
                                     members = library.Members;
                                 }
-                                //else 회원관리
+                                else
+                                {
+                                    library = memberSearch.Run(members, books);
+                                    books = library.Books;
+                                    members = library.Members;
+                                }
                                 break;
                             case 12:    // 회원가입, 정보수정, 암호수정
                                 if (programMode == 0 || programMode == 1) logIn.Join(members);
-                                else if (programMode == 2)  members = memberManage.MemberEdit(usingMemberNumber, members); 
-                                //else 암호수정
+                                else if (programMode == 2) members = memberManage.MemberEdit(usingMemberNumber, members);
+                                else admin = memberManage.AdminEdit(admin); 
                                 break;
                             case 14:    // 관리자 로그인, 로그아웃, 로그아웃
                                 if (programMode == 0 || programMode == 1) programMode = logIn.Admin(admin);

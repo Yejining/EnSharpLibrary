@@ -92,5 +92,12 @@ namespace EnSharpLibrary.Function
 
             return members;
         }
+
+        public AdminVO AdminEdit(AdminVO admin)
+        {
+            print.Title("관리자 암호 수정");
+
+            return admin;
+        }
     }
 }

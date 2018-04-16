@@ -131,7 +131,7 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
         }
 
-        public void BookSearchOption()
+        public void BookSearchOption(int programMode)
         {
             string line1 = "┏                     ┓";
             string line2 = "┣                     ┫";
@@ -140,6 +140,44 @@ namespace EnSharpLibrary.IO
             string menu2 = "도서명 검색   ";
             string menu3 = "출판사 검색   ";
             string menu4 = "저자 검색   ";
+            string menu5 = "뒤로  ";
+            string menu6 = "대출된 도서 목록       ";
+            string menu7 = "연체된 도서 목록       ";
+            string menu8 = "도서 등록   ";
+
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu1.Length / 2)) + "}", menu1));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu2.Length / 2)) + "}", menu2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu3.Length / 2)) + "}", menu3));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu4.Length / 2)) + "}", menu4));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            if (programMode != 3) Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
+            else Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu6.Length / 2)) + "}", menu6));
+            if (programMode != 3) Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
+            else Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            if (programMode == 3)
+            {
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu7.Length / 2)) + "}", menu7));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu8.Length / 2)) + "}", menu8));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
+            }
+        }
+
+        public void MemberEditOption()
+        {
+            string line1 = "┏                     ┓";
+            string line2 = "┣                     ┫";
+            string line3 = "┗                     ┛";
+            string menu1 = "내 정보  ";
+            string menu2 = "암호 변경   ";
+            string menu3 = "주소 변경    ";
+            string menu4 = "전화번호 변경    ";
             string menu5 = "뒤로  ";
 
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
@@ -155,16 +193,19 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
         }
 
-        public void MemberEditOption()
+        public void MemberSearchOption()
         {
             string line1 = "┏                     ┓";
             string line2 = "┣                     ┫";
             string line3 = "┗                     ┛";
-            string menu1 = "내 정보  ";
-            string menu2 = "암호 변경   ";
-            string menu3 = "주소 변경   ";
-            string menu4 = "전화번호 변경    ";
-            string menu5 = "뒤로  ";
+            string menu1 = "전체 회원 목록     ";
+            string menu2 = "이름 검색   ";
+            string menu3 = "학번 검색   ";
+            string menu4 = "주소 검색   ";
+            string menu5 = "대출자 보기   ";
+            string menu6 = "연체자 보기   ";
+            string menu7 = "회원 등록   ";
+            string menu8 = "뒤로  ";
 
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu1.Length / 2)) + "}", menu1));
@@ -176,6 +217,12 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu4.Length / 2)) + "}", menu4));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu6.Length / 2)) + "}", menu6));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu7.Length / 2)) + "}", menu7));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu8.Length / 2)) + "}", menu8));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
         }
 
