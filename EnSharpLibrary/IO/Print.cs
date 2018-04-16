@@ -278,16 +278,18 @@ namespace EnSharpLibrary.IO
                     else Console.Write(",{0}", members[order].BorrowedBook[i]);
                 }
                 Console.SetCursorPosition(103, Console.CursorTop);
+                
+
 
                 overdueBooks.Clear();
-                for (int i = 0; i < members[order].BorrowedBook.Count; i++)
+                for (int book = 0; book < members[order].BorrowedBook.Count; book++)
                 {
                     for (int j = 0; j < books.Count; j++)
                     {
-                        if (members[order].BorrowedBook[i] == books[j].NumberOfThis)
+                        if (members[order].BorrowedBook[book] == books[j].NumberOfThis)
                         {
-                            date = DateTime.Now - books[i].ExpectedToReturn;
-                            if (date.Days > 0) overdueBooks.Add(books[i].NumberOfThis);
+                            date = DateTime.Now - books[book].ExpectedToReturn;
+                            if (date.Days > 0) overdueBooks.Add(books[j].NumberOfThis);
                         }
                     }
                 }
