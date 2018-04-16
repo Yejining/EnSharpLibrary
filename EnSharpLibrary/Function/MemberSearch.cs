@@ -13,6 +13,7 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
         LogIn logIn = new LogIn();
+        MemberManage memberManage = new MemberManage();
 
         public LibraryVO Run(List<MemberVO> members, List<BookVO> books)
         {
@@ -253,20 +254,81 @@ namespace EnSharpLibrary.Function
         // 4 : 주소 검색 -> 회원 상세
         public LibraryVO MemberDetail(int mode, MemberVO member, List<BookVO> books, List<MemberVO> members)
         {
-            int countOfMembers;
-            List<int> indexOfMembers = new List<int>();
             LibraryVO library = new LibraryVO(members, books);
+            int cursorTop;
             bool isFirstLoop = true;
 
             print.Title(member.Name);
-            print.MemberInformation(member);
+            print.MemberInformation(member, 2);
+
+            cursorTop = Console.CursorTop + 2;
             
+            print.MemberManageOption(45, cursorTop);
+
+            Console.SetCursorPosition(65, cursorTop);
+
             while (true)
             {
-                ConsoleKeyInfo key;
+                if (isFirstLoop)
+                {
+                    print.Title(member.Name);
+                    print.MemberInformation(member, 2);
 
-                key = Console.ReadKey();
-                if (key.Key == ConsoleKey.Escape) return library;
+                    cursorTop = Console.CursorTop + 2;
+
+                    print.MemberManageOption(45, cursorTop);
+
+                    Console.SetCursorPosition(65, cursorTop);
+                    print.SetCursorAndChoice(65, -2, '☜');
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    print.ClearOneLetter(65);
+                    if (Console.CursorTop > 20) Console.SetCursorPosition(65, Console.CursorTop - 2);
+                    Console.Write('☜');
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    print.ClearOneLetter(65);
+                    if (Console.CursorTop < 26) Console.SetCursorPosition(65, Console.CursorTop + 2);
+                    Console.Write('☜');
+                }
+                else
+                {
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        switch (Console.CursorTop)
+                        {
+                            case 20:    // 회원 삭제
+                                library = memberManage.RemoveMember(member.IdentificationNumber, members, books);
+                                return library;
+                            case 22:    // 주소 변경
+                                members = memberManage.MemberInformationEdit(1, member.IdentificationNumber, members);
+                                break;
+                            case 24:    // 전화번호 변경
+                                members = memberManage.MemberInformationEdit(2, member.IdentificationNumber, members);
+                                break;
+                            case 26:    // 뒤로
+                                return library;
+                        }
+
+                        library.Members = members;
+                        library.Books = books;
+
+                        isFirstLoop = true;
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(74, Console.CursorTop);
+                        Console.Write("☜ ");
+                        Console.SetCursorPosition(74, Console.CursorTop);
+                    }
+                }
             }
         }
     }

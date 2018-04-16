@@ -556,7 +556,9 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(cursorLeft, Console.CursorTop);
         }
 
-        public void MemberInformation(MemberVO user)
+        // 1 : 내정보
+        // 2 : 회원 정보
+        public void MemberInformation(MemberVO user, int mode)
         {
             string content1 = "▷ 이름 : ";
             string content2 = "▷ 학번 : ";
@@ -582,10 +584,13 @@ namespace EnSharpLibrary.IO
             Console.Write(content4);
             Console.Write(user.Address);
 
-            Console.SetCursorPosition(55, Console.CursorTop + 4);
-            Console.WriteLine(guide);
+            if (mode == 1)
+            {
+                Console.SetCursorPosition(55, Console.CursorTop + 4);
+                Console.WriteLine(guide);
+            }
 
-            while (true)
+            while (mode == 1)
             {
                 ConsoleKeyInfo keyInfo;
 
@@ -773,6 +778,24 @@ namespace EnSharpLibrary.IO
                     }
                 }
             }
+        }
+
+        public void MemberManageOption(int cursorLeft, int cursorTop)
+        {
+            string option1 = "▶ 회원 삭제";
+            string option2 = "▶ 주소 변경";
+            string option3 = "▶ 전화번호 변경";
+            string option4 = "▶ 뒤로";
+
+            Console.SetCursorPosition(cursorLeft, cursorTop + 2);
+            Console.Write(option1);
+            Console.SetCursorPosition(cursorLeft, cursorTop + 4);
+            Console.Write(option2);
+            Console.SetCursorPosition(cursorLeft, cursorTop + 6);
+            Console.Write(option3);
+            Console.SetCursorPosition(cursorLeft, cursorTop + 8);
+            Console.Write(option4);
+
         }
     }
 }

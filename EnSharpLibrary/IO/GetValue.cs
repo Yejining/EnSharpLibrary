@@ -431,7 +431,7 @@ namespace EnSharpLibrary.IO
             StringBuilder middle = new StringBuilder();
             middle.Append(newPhoneNumber);
             middle.Remove(5, 6);
-            middle.Remove(0, 3); Console.WriteLine(middle); 
+            middle.Remove(0, 3);
             middleNumber = Int32.Parse(middle.ToString());
 
             if (middleNumber >= 0 && middleNumber <= 19 || middleNumber >= 59 && middleNumber <= 61) return true;

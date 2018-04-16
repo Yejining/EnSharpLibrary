@@ -55,7 +55,7 @@ namespace EnSharpLibrary.Function
                         switch (Console.CursorTop)
                         {
                             case 11:     // 내 정보
-                                print.MemberInformation(user);
+                                print.MemberInformation(user, 1);
                                 break;
                             case 13:    // 암호 변경
                                 members = MemberPasswordEdit(usingMemberNumber, members);
@@ -160,7 +160,9 @@ namespace EnSharpLibrary.Function
             Console.SetCursorPosition(30, cursorTop + 2);
             Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
             newPhoneNumber = getValue.SearchWord(12, 1);
-            
+
+            if (string.Compare(newPhoneNumber, "@입력취소@") == 0) return members;
+
             while(getValue.NotValidPhoneNumber(newPhoneNumber, members))
             {
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
@@ -171,6 +173,19 @@ namespace EnSharpLibrary.Function
                 Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
                 newPhoneNumber = getValue.SearchWord(17, 1);
             }
+
+            StringBuilder phoneNumber = new StringBuilder();
+            phoneNumber.Append(newPhoneNumber);
+            phoneNumber.Insert(3, '-');
+            phoneNumber.Insert(8, '-');
+
+            foreach (MemberVO member in members)
+                if (member.IdentificationNumber == usingMemberNumber)
+                {
+                    member.PhoneNumber = phoneNumber.ToString();
+                    break;
+                }
+
             return members;
         }
 
@@ -216,6 +231,40 @@ namespace EnSharpLibrary.Function
             admin.Password = newPassword;
 
             return admin;
+        }
+
+        public LibraryVO RemoveMember(int memberNumber, List<MemberVO> members, List<BookVO> books)
+        {
+            LibraryVO library = new LibraryVO(members, books);
+            int userIndex = 0;
+
+            for (int index = 0; index < members.Count; index++)
+                if (members[index].IdentificationNumber == memberNumber)
+                {
+                    userIndex = index;
+                    break;
+                }
+
+            if (members[userIndex].BorrowedBook.Count != 0)
+            {
+                for (int index = 0; index < members[userIndex].BorrowedBook.Count; index++)
+                {
+                    for (int j = 0; j < books.Count; j++)
+                    {
+                        if (members[userIndex].BorrowedBook[index] == books[j].NumberOfThis)
+                        {
+                            books[j].SetNonRentalMode();
+                            books[j].BookCondition = 2;
+                            break;
+                        }
+                    }    
+                }
+            }
+            
+            members.RemoveAt(userIndex);
+            library.Books = books;
+
+            return library;
         }
     }
 }
