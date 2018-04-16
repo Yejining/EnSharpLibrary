@@ -11,6 +11,7 @@ namespace EnSharpLibrary.Function
     class MemberManage
     {
         Print print = new Print();
+        GetValue getValue = new GetValue();
 
         public List<MemberVO> MemberEdit(int usingMemberNumber, List<MemberVO> members)
         {
@@ -95,7 +96,44 @@ namespace EnSharpLibrary.Function
 
         public AdminVO AdminEdit(AdminVO admin)
         {
+            string newPassword;
+            int cursorTop = 10;
+
             print.Title("관리자 암호 수정");
+
+            Console.SetCursorPosition(30, cursorTop);
+            Console.Write("▷ 현재 암호 입력 : ");
+            newPassword = getValue.SearchWord(17, 2);
+
+            if (string.Compare(newPassword, "@입력취소@") == 0) return admin;
+
+            while (admin.Password != newPassword)
+            {
+                print.Announce("암호가 일치하지 않습니다!");
+                Console.SetCursorPosition(30, cursorTop);
+                print.ClearCurrentConsoleLine();
+                Console.SetCursorPosition(30, cursorTop);
+                Console.Write("▷ 현재 암호 입력 : ");
+                newPassword = getValue.SearchWord(17, 2);
+            }
+
+            Console.SetCursorPosition(30, cursorTop + 2);
+            Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
+            newPassword = getValue.SearchWord(17, 2);
+            if (string.Compare(newPassword, "@입력취소@") == 0) return admin;
+            while (getValue.NotValidPassword(newPassword) != 0)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                if (getValue.NotValidPassword(newPassword) == 1) print.Announce("길이에 맞는 암호를 입력하세요!");
+                else if (getValue.NotValidPassword(newPassword) == 2) print.Announce("3자리 연속으로 문자 혹은 숫자가  사용되면 안 됩니다!");
+                Console.SetCursorPosition(30, cursorTop + 2);
+                print.ClearCurrentConsoleLine();
+                Console.SetCursorPosition(30, cursorTop + 2);
+                Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
+                newPassword = getValue.SearchWord(17, 2);
+            }
+
+            admin.Password = newPassword;
 
             return admin;
         }

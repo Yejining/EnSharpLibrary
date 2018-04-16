@@ -133,7 +133,6 @@ namespace EnSharpLibrary.IO
             nonAvailableKey.Add(12);
             nonAvailableKey.Add(19);
             nonAvailableKey.Add(33);
-            nonAvailableKey.Add(118);
             nonAvailableKey.Add(229);
             nonAvailableKey.Add(131);
 
@@ -398,6 +397,19 @@ namespace EnSharpLibrary.IO
                     return index;
 
             return -1;
+        }
+
+        public int NotValidPassword(string newPassword)
+        {
+            if (newPassword.Length < 8 || newPassword.Length > 15) return 1;
+
+            for (int i = 0; i < newPassword.Length - 2; i++)
+            {
+                if (newPassword[i + 2] - newPassword[i + 1] == 1 && newPassword[i + 1] - newPassword[i] == 1)
+                    return 2;
+            }
+
+            return 0;
         }
     }
 }

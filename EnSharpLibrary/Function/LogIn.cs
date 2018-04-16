@@ -101,6 +101,8 @@ namespace EnSharpLibrary.Function
             if (type == 1) print.Title("회원가입   ");
             else print.Title("회원등록   ");
 
+
+
             return members;
         }
     }
