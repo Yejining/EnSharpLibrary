@@ -17,14 +17,14 @@ namespace EnSharpLibrary.Data
         private string password;
 
         // 수정 가능 변수 - 대출 정보
-        private List<int> borrowedBook;
+        private List<float> borrowedBook;
         private int accumulatedOverdueNumber;
         private int overdueNumber;
 
         public MemberVO()
         {
             identificationNumber = -1;
-            borrowedBook = new List<int>();
+            borrowedBook = new List<float>();
             borrowedBook.Clear();
             accumulatedOverdueNumber = 0;
             overdueNumber = 0;
@@ -71,7 +71,7 @@ namespace EnSharpLibrary.Data
             set { password = value; }
         }
 
-        public List<int> BorrowedBook
+        public List<float> BorrowedBook
         {
             get { return borrowedBook; }
             set { borrowedBook = value; }
@@ -87,6 +87,16 @@ namespace EnSharpLibrary.Data
         {
             get { return overdueNumber; }
             set { overdueNumber = value; }
+        }
+
+        public void ReturnBook(float numberOfBook)
+        {
+            for (int index = 0; index < borrowedBook.Count; index++)
+                if (borrowedBook[index] == numberOfBook)
+                {
+                    borrowedBook.RemoveAt(index);
+                    return;
+                }
         }
     }
 }

@@ -241,5 +241,116 @@ namespace EnSharpLibrary.IO
 
             return indexesOfSearchResult;
         }
+
+        public List<int> IndexOfBooks(List<BookVO> books, int numberOfBook)
+        {
+            List<int> indexOfBooks = new List<int>();
+
+            for (int order = 0; order < books.Count; order++)
+                if ((int)Math.Floor(books[order].NumberOfThis) == numberOfBook) indexOfBooks.Add(order);
+
+            return indexOfBooks;
+        }
+
+        public bool DidIOverdue(List<float> borrowedBooks, List<BookVO> books)
+        {
+            TimeSpan date;
+
+            foreach (BookVO book in books)
+                foreach (float number in borrowedBooks)
+                    if (book.NumberOfThis == number)
+                    {
+                        date = DateTime.Now - book.ExpectedToReturn;
+                        if (date.Days > 0) return true;
+                    }
+
+            return false;
+        }
+
+        public int OverdueDate(BookVO book)
+        {
+            TimeSpan date;
+
+            date = DateTime.Now - book.ExpectedToReturn;
+
+            return date.Days;
+        }
+
+        public bool YesOrNoAnswer(int leftCursor, int topCursor)
+        {
+            string chocie1 = "예";
+            string choice2 = "아니오";
+            bool isFirstLoop = true;
+
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    Console.SetCursorPosition(leftCursor + 2, topCursor);
+                    Console.Write(chocie1);
+                    Console.SetCursorPosition(leftCursor + 2, topCursor + 2);
+                    Console.Write(choice2);
+
+                    print.SetCursorAndChoice(leftCursor + 10, 2, '☜');
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    print.ClearOneLetter(leftCursor + 10);
+                    if (Console.CursorTop > topCursor) Console.SetCursorPosition(leftCursor + 10, Console.CursorTop - 2);
+                    Console.Write('☜');
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    print.ClearOneLetter(leftCursor + 10);
+                    if (Console.CursorTop < topCursor + 2) Console.SetCursorPosition(leftCursor + 10, Console.CursorTop + 2);
+                    Console.Write('☜');
+                }
+                else
+                {
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        if (Console.CursorTop == topCursor)
+                        {
+                            return true;
+                        }
+                        else if (Console.CursorTop == topCursor + 2)
+                        {
+                            return false;
+                        }
+                        isFirstLoop = true;
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(leftCursor + 10, Console.CursorTop);
+                        Console.Write("☜ ");
+                        Console.SetCursorPosition(leftCursor + 10, Console.CursorTop);
+                    }
+                }
+            }
+        }
+
+        public bool DidIBorrowedSameBook(int numberOfBook, List<float> borrowedBook)
+        {
+            foreach(float book in borrowedBook)
+            {
+                if (numberOfBook == (int)Math.Floor(book)) return true;
+            }
+
+            return false;
+        }
+
+        public int GetIndex(float numberOfBook, List<BookVO> books)
+        {
+            for (int index = 0; index < books.Count; index++)
+                if (numberOfBook == books[index].NumberOfThis)
+                    return index;
+
+            return -1;
+        }
     }
 }

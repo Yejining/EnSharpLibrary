@@ -115,5 +115,13 @@ namespace EnSharpLibrary.Data
             get { return numberOfRenew; }
             set { numberOfRenew = value; }
         }
+
+        public void SetNonRentalMode()
+        {
+            bookCondition = 0;
+            expectedToReturn = DateTime.Parse("1980/01/01");
+            rental = DateTime.Parse("1980/01/01");
+            numberOfMember = -1;
+        }
     }
 }

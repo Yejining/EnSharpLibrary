@@ -280,7 +280,7 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
         }
 
-        public void BookDetail(int mode, List<BookVO> books, int numberOfBook)
+        public void BookDetail(int mode, List<BookVO> books, List<int> indexOfBooks)
         {
             string categories = "  선택  |                  도서                 |       저자      |     출판사     | 출판년도 |  도서상태  | 청구기호  ";
             string line = "-----------------------------------------------------------------------------------------------------------------------";
@@ -288,36 +288,33 @@ namespace EnSharpLibrary.IO
 
             Console.WriteLine(categories);
             Console.WriteLine(line);
-
-            for (int order = 0; order < books.Count; order++)
+            
+            for (int order = 0; order < indexOfBooks.Count; order++)
             {
-                if ((int)Math.Floor(books[order].NumberOfThis) == numberOfBook)
+                Console.SetCursorPosition(10, Console.CursorTop);
+                Console.Write(books[indexOfBooks[order]].Name);
+                Console.SetCursorPosition(50, Console.CursorTop);
+                Console.Write(books[indexOfBooks[order]].Author);
+                Console.SetCursorPosition(68, Console.CursorTop);
+                Console.Write(books[indexOfBooks[order]].Publisher);
+                Console.SetCursorPosition(87, Console.CursorTop);
+                Console.Write(books[indexOfBooks[order]].PublishingYear);
+                Console.SetCursorPosition(97, Console.CursorTop);
+                if (books[indexOfBooks[order]].BookCondition == 0) Console.Write("대출가능");
+                else if (books[indexOfBooks[order]].BookCondition == 1) Console.Write("대출중");
+                if (mode != 3)
                 {
-                    Console.SetCursorPosition(10, Console.CursorTop);
-                    Console.Write(books[order].Name);
-                    Console.SetCursorPosition(50, Console.CursorTop);
-                    Console.Write(books[order].Author);
-                    Console.SetCursorPosition(68, Console.CursorTop);
-                    Console.Write(books[order].Publisher);
-                    Console.SetCursorPosition(87, Console.CursorTop);
-                    Console.Write(books[order].PublishingYear);
-                    Console.SetCursorPosition(97, Console.CursorTop);
-                    if (books[order].BookCondition == 0) Console.Write("대출가능");
-                    else if (books[order].BookCondition == 1) Console.Write("대출중");
-                    if (mode != 3)
-                    {
-                        if (books[order].BookCondition == 2 || books[order].BookCondition == 3)
-                            Console.Write("대출불가");
-                    }
-                    else
-                    {
-                        if (books[order].BookCondition == 2) Console.Write("분실");
-                        else if (books[order].BookCondition == 3) Console.Write("훼손");
-                    }
-                    Console.SetCursorPosition(109, Console.CursorTop);
-                    Console.Write(books[order].NumberOfThis);
-                    Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    if (books[indexOfBooks[order]].BookCondition == 2 || books[order].BookCondition == 3)
+                        Console.Write("대출불가");
                 }
+                else
+                {
+                    if (books[indexOfBooks[order]].BookCondition == 2) Console.Write("분실");
+                    else if (books[indexOfBooks[order]].BookCondition == 3) Console.Write("훼손");
+                }
+                Console.SetCursorPosition(109, Console.CursorTop);
+                Console.Write(books[indexOfBooks[order]].NumberOfThis);
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
             }
 
             Console.SetCursorPosition(0, Console.CursorTop + 2);

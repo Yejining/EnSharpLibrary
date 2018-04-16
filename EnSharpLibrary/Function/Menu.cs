@@ -68,7 +68,7 @@ namespace EnSharpLibrary.Function
                         switch (Console.CursorTop)
                         {
                             case 8:     // 비회원 도서검색, 도서보기. 도서관리
-                                bookSearch.Run(programMode, usingMemberNumber, books);
+                                bookSearch.Run(programMode, usingMemberNumber, books, members);
                                 break;
                             case 10:    // 로그인, 대출도서 보기, 회원관리
                                 if (programMode == 0 || programMode == 1)
@@ -167,20 +167,20 @@ namespace EnSharpLibrary.Function
 
             member1.SetMember(14010998, "허진규", "940209");
             member1.SetMember("서울특별시 광진구 군자동", "010-4701-8554");
-            member1.BorrowedBook.Add(4);
+            member1.BorrowedBook.Add((float)3.01);
 
             member2.SetMember(16011000, "김예진", "970106");
             member2.SetMember("경기도 남양주시 진접읍", "010-5110-1996");
             member2.BorrowedBook.Add(2);
             member2.BorrowedBook.Add(3);
 
-            member3.SetMember(1601120, "이다인", "970820");
+            member3.SetMember(16011020, "이다인", "970820");
             member3.SetMember("경기도 남양주시 진접읍", "010-8215-8282");
             member3.BorrowedBook.Add(5);
 
             member4.SetMember(16011001, "박수오", "970411");
             member4.SetMember("경기도 의정부시 녹양동", "010-6357-0495");
-            member4.BorrowedBook.Add(7);
+            member4.BorrowedBook.Add((float)6.01);
             member4.AccumulatedOverdueNumber = 3;
             member4.OverdueNumber = 3;
 

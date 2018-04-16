@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="Data\AdminVO.cs" />
     <Compile Include="Data\BookVO.cs" />
+    <Compile Include="Data\LibraryVO.cs" />
     <Compile Include="Data\MemberVO.cs" />
+    <Compile Include="Function\BookManage.cs" />
     <Compile Include="Function\BookSearch.cs" />
     <Compile Include="Function\LogIn.cs" />
     <Compile Include="Function\Menu.cs" />
