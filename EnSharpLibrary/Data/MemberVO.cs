@@ -21,6 +21,10 @@ namespace EnSharpLibrary.Data
         private int accumulatedOverdueNumber;
         private int overdueNumber;
 
+        /// <summary>
+        /// 회원의 정보를 저장하는 MemberVO의 생성자입니다.
+        /// 일반 도서 모드로 만들어줍니다.
+        /// </summary>
         public MemberVO()
         {
             identificationNumber = -1;
@@ -30,6 +34,12 @@ namespace EnSharpLibrary.Data
             overdueNumber = 0;
         }
 
+        /// <summary>
+        /// 회원의 번호와 이름, 암호를 저장하는 메소드입니다.
+        /// </summary>
+        /// <param name="number">회원 번호</param>
+        /// <param name="name">회원 이름</param>
+        /// <param name="password">암호</param>
         public void SetMember(int number, string name, string password)
         {
             identificationNumber = number;
@@ -37,6 +47,11 @@ namespace EnSharpLibrary.Data
             this.password = password;
         }
 
+        /// <summary>
+        /// 회원의 주소와 전화번호를 저장하는 메소드입니다.
+        /// </summary>
+        /// <param name="address">주소</param>
+        /// <param name="phoneNumber">전화번호</param>
         public void SetMember(string address, string phoneNumber)
         {
             this.address = address;
@@ -89,6 +104,11 @@ namespace EnSharpLibrary.Data
             set { overdueNumber = value; }
         }
 
+        /// <summary>
+        /// 도서를 반납하는 메소드입니다.
+        /// 반납할 책의 청구기호를 받아 대여목록에서 삭제합니다.
+        /// </summary>
+        /// <param name="numberOfBook">반납할 책의 청구기호</param>
         public void ReturnBook(float numberOfBook)
         {
             for (int index = 0; index < borrowedBook.Count; index++)

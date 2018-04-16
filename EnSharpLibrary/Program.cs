@@ -9,6 +9,10 @@ namespace EnSharpLibrary
 {
     class Program
     {
+        /// <summary>
+        /// 메뉴클래스를 불러와 
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             Menu menu = new Menu();

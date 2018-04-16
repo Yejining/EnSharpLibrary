@@ -23,6 +23,14 @@ namespace EnSharpLibrary.Data
         private DateTime expectedToReturn;
         private int numberOfRenew;
 
+        /// <summary>
+        /// BookVO의 생성자입니다.
+        /// 책의 이름과 저자, 출판사, 출판년도를 저장합니다.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="author"></param>
+        /// <param name="publisher"></param>
+        /// <param name="publishingYear"></param>
         public BookVO(string name, string author, string publisher, int publishingYear)
         {
             this.name = name;
@@ -40,6 +48,12 @@ namespace EnSharpLibrary.Data
             numberOfRenew = 0;
         }
 
+        /// <summary>
+        /// 도서의 상태를 대출모드로 바꾸어줍니다.
+        /// </summary>
+        /// <param name="rental">대출일</param>
+        /// <param name="expectedToReturn">반납 예정일</param>
+        /// <param name="memberNumber">대출한 회원의 번호</param>
         public void SetRentalMode(DateTime rental, DateTime expectedToReturn, int memberNumber)
         {
             this.rental = rental;
@@ -116,6 +130,9 @@ namespace EnSharpLibrary.Data
             set { numberOfRenew = value; }
         }
 
+        /// <summary>
+        /// 대출도서를 반납모드로 바꾸어줍니다.
+        /// </summary>
         public void SetNonRentalMode()
         {
             bookCondition = 0;
