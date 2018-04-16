@@ -14,6 +14,7 @@ namespace EnSharpLibrary.Function
         GetValue getValue = new GetValue();
         BookSearch bookSearch = new BookSearch();
         LogIn logIn = new LogIn();
+        MemberManage memberManage = new MemberManage();
 
         private AdminVO admin = new AdminVO("970106");
         private List<BookVO> books = new List<BookVO>();
@@ -69,7 +70,11 @@ namespace EnSharpLibrary.Function
                         switch (Console.CursorTop)
                         {
                             case 8:     // 비회원 도서검색, 도서보기. 도서관리
-                                library = bookSearch.Run(programMode, usingMemberNumber, books, members);
+                                {
+                                    library = bookSearch.Run(programMode, usingMemberNumber, books, members);
+                                    books = library.Books;
+                                    members = library.Members;
+                                }
                                 break;
                             case 10:    // 로그인, 대출도서 보기, 회원관리
                                 if (programMode == 0 || programMode == 1)
@@ -78,12 +83,17 @@ namespace EnSharpLibrary.Function
                                     if (usingMemberNumber != -1) programMode = 2;
                                     else programMode = 1;
                                 }
-                                else if (programMode == 2) library = bookSearch.BorrowedBook(usingMemberNumber, members, books);
+                                else if (programMode == 2)
+                                {
+                                    library = bookSearch.BorrowedBook(usingMemberNumber, members, books);
+                                    books = library.Books;
+                                    members = library.Members;
+                                }
                                 //else 회원관리
                                 break;
                             case 12:    // 회원가입, 정보수정, 암호수정
                                 if (programMode == 0 || programMode == 1) logIn.Join(members);
-                                //else if (programMode == 2) 정보수정
+                                else if (programMode == 2)  members = memberManage.MemberEdit(usingMemberNumber, members); 
                                 //else 암호수정
                                 break;
                             case 14:    // 관리자 로그인, 로그아웃, 로그아웃
@@ -93,9 +103,6 @@ namespace EnSharpLibrary.Function
                             case 16:    // 종료
                                 return;
                         }
-
-                        books = library.Books;
-                        members = library.Members;
 
                         isFirtLoop = true;
                     }

@@ -155,6 +155,30 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
         }
 
+        public void MemberEditOption()
+        {
+            string line1 = "┏                     ┓";
+            string line2 = "┣                     ┫";
+            string line3 = "┗                     ┛";
+            string menu1 = "내 정보  ";
+            string menu2 = "암호 변경   ";
+            string menu3 = "주소 변경   ";
+            string menu4 = "전화번호 변경    ";
+            string menu5 = "뒤로  ";
+
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu1.Length / 2)) + "}", menu1));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu2.Length / 2)) + "}", menu2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu3.Length / 2)) + "}", menu3));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu4.Length / 2)) + "}", menu4));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
+        }
+
         public void AllBooks(List<BookVO> books)
         {
             string categories = "  선택  |                    도서                   |          저자         |       출판사       |  출판년도  |  수량  ";
@@ -368,6 +392,44 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(cursorLeft, Console.CursorTop);
             Console.Write(pointer);
             Console.SetCursorPosition(cursorLeft, Console.CursorTop);
+        }
+
+        public void MemberInformation(MemberVO user)
+        {
+            string content1 = "▷ 이름 : ";
+            string content2 = "▷ 학번 : ";
+            string content3 = "▷ 전화번호 : ";
+            string content4 = "▷ 주소 : ";
+            string guide = "나가기(ESC)";
+            
+            Title(user.Name);
+
+            Console.SetCursorPosition(45, Console.CursorTop);
+            Console.Write(content1);
+            Console.Write(user.Name);
+
+            Console.SetCursorPosition(45, Console.CursorTop + 2);
+            Console.Write(content2);
+            Console.Write(user.IdentificationNumber);
+
+            Console.SetCursorPosition(45, Console.CursorTop + 2);
+            Console.Write(content3);
+            Console.Write(user.PhoneNumber);
+
+            Console.SetCursorPosition(45, Console.CursorTop + 2);
+            Console.Write(content4);
+            Console.Write(user.Address);
+
+            Console.SetCursorPosition(55, Console.CursorTop + 4);
+            Console.WriteLine(guide);
+
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo;
+
+                keyInfo = Console.ReadKey();
+                if (keyInfo.Key == ConsoleKey.Escape) return;
+            }
         }
     }
 }
