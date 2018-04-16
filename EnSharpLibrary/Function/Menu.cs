@@ -98,7 +98,7 @@ namespace EnSharpLibrary.Function
                                 }
                                 break;
                             case 12:    // 회원가입, 정보수정, 암호수정
-                                if (programMode == 0 || programMode == 1) logIn.Join(members);
+                                if (programMode == 0 || programMode == 1) members = logIn.Join(members, 1);
                                 else if (programMode == 2) members = memberManage.MemberEdit(usingMemberNumber, members);
                                 else admin = memberManage.AdminEdit(admin); 
                                 break;

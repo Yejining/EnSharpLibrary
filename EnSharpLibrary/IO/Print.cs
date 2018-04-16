@@ -141,8 +141,6 @@ namespace EnSharpLibrary.IO
             string menu3 = "출판사 검색   ";
             string menu4 = "저자 검색   ";
             string menu5 = "뒤로  ";
-            string menu6 = "대출된 도서 목록       ";
-            string menu7 = "연체된 도서 목록       ";
             string menu8 = "도서 등록   ";
 
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
@@ -154,14 +152,13 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu4.Length / 2)) + "}", menu4));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            if (programMode != 3) Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
-            else Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu6.Length / 2)) + "}", menu6));
-            if (programMode != 3) Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
-            else Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            if (programMode == 3)
+            if (programMode != 3)
             {
-                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu7.Length / 2)) + "}", menu7));
-                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
+            }
+            else
+            {
                 Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu8.Length / 2)) + "}", menu8));
                 Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
                 Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
@@ -202,8 +199,6 @@ namespace EnSharpLibrary.IO
             string menu2 = "이름 검색   ";
             string menu3 = "학번 검색   ";
             string menu4 = "주소 검색   ";
-            string menu5 = "대출자 보기   ";
-            string menu6 = "연체자 보기   ";
             string menu7 = "회원 등록   ";
             string menu8 = "뒤로  ";
 
@@ -215,10 +210,6 @@ namespace EnSharpLibrary.IO
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu3.Length / 2)) + "}", menu3));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu4.Length / 2)) + "}", menu4));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu5.Length / 2)) + "}", menu5));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu6.Length / 2)) + "}", menu6));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (menu7.Length / 2)) + "}", menu7));
             Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
@@ -252,6 +243,61 @@ namespace EnSharpLibrary.IO
                     Console.SetCursorPosition(0, Console.CursorTop + 1);
                 }
                 
+            }
+
+            Console.SetCursorPosition(0, Console.CursorTop + 2);
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
+        }
+
+        public void AllMembers(List<BookVO> books, List<MemberVO> members)
+        {
+            string categories = "  선택  |    이름    |   학번   |              주소               |    전화번호    |  대출도서 번호  |  연체도서 번호  ";
+            string line = "-----------------------------------------------------------------------------------------------------------------------";
+            string guide = "나가기(ESC)";
+
+            List<float> overdueBooks = new List<float>();
+            TimeSpan date;
+
+            Console.WriteLine(categories);
+            Console.WriteLine(line);
+
+            for (int order = 0; order < members.Count; order++)
+            {
+                Console.SetCursorPosition(10, Console.CursorTop);
+                Console.Write(members[order].Name);
+                Console.SetCursorPosition(23, Console.CursorTop);
+                Console.Write(members[order].IdentificationNumber);
+                Console.SetCursorPosition(34, Console.CursorTop);
+                Console.Write(members[order].Address);
+                Console.SetCursorPosition(68, Console.CursorTop);
+                Console.Write(members[order].PhoneNumber);
+                Console.SetCursorPosition(85, Console.CursorTop);
+                for (int i = 0; i < members[order].BorrowedBook.Count; i++)
+                {
+                    if (i == 0) Console.Write("{0}", members[order].BorrowedBook[i]);
+                    else Console.Write(",{0}", members[order].BorrowedBook[i]);
+                }
+                Console.SetCursorPosition(103, Console.CursorTop);
+
+                overdueBooks.Clear();
+                for (int i = 0; i < members[order].BorrowedBook.Count; i++)
+                {
+                    for (int j = 0; j < books.Count; j++)
+                    {
+                        if (members[order].BorrowedBook[i] == books[j].NumberOfThis)
+                        {
+                            date = DateTime.Now - books[i].ExpectedToReturn;
+                            if (date.Days > 0) overdueBooks.Add(books[i].NumberOfThis);
+                        }
+                    }
+                }
+
+                for (int i = 0; i < overdueBooks.Count; i++)
+                {
+                    if (i == 0) Console.Write("{0}", overdueBooks[i]);
+                    else Console.Write(",{0}", overdueBooks[i]);
+                }
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
             }
 
             Console.SetCursorPosition(0, Console.CursorTop + 2);
@@ -298,6 +344,75 @@ namespace EnSharpLibrary.IO
                         Console.Write(books[index].PublishingYear);
                         Console.SetCursorPosition(114, Console.CursorTop);
                         Console.Write(books[index].NumberOfBooks);
+                        Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    }
+                }
+            }
+
+            Console.SetCursorPosition(0, Console.CursorTop + 2);
+            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
+        }
+
+        public void MemberSearchResult(List<MemberVO> members, List<BookVO> books, List<int> foundMembers)
+        {
+            List<int> indexesOfSearchResult = foundMembers;
+
+            string categories = "  선택  |    이름    |   학번   |              주소               |    전화번호    |  대출도서 번호  |  연체도서 번호  ";
+            string line = "-----------------------------------------------------------------------------------------------------------------------";
+            string guide = "나가기(ESC)";
+            string message = "찾는 도서가 없습니다!         ";
+
+            Console.SetCursorPosition(0, Console.CursorTop + 1);
+            Console.WriteLine(categories);
+            Console.WriteLine(line);
+
+            List<float> overdueBooks = new List<float>();
+            TimeSpan date;
+
+            if (indexesOfSearchResult.Count == 0)
+            {
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (message.Length / 2)) + "}", message));
+                Console.SetCursorPosition(0, Console.CursorTop + 2);
+                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
+                return;
+            }
+
+            for (int inList = 0; inList < indexesOfSearchResult.Count; inList++)
+            {
+                for (int index = 0; index < members.Count; index++)
+                {
+                    if (indexesOfSearchResult[inList] == members[index].IdentificationNumber)
+                    {
+                        Console.SetCursorPosition(10, Console.CursorTop);
+                        Console.Write(members[index].Name);
+                        Console.SetCursorPosition(23, Console.CursorTop);
+                        Console.Write(members[index].IdentificationNumber);
+                        Console.SetCursorPosition(34, Console.CursorTop);
+                        Console.Write(members[index].Address);
+                        Console.SetCursorPosition(68, Console.CursorTop);
+                        Console.Write(members[index].PhoneNumber);
+                        Console.SetCursorPosition(85, Console.CursorTop);
+                        for (int i = 0; i < members[index].BorrowedBook.Count; i++)
+                        {
+                            if (i == 0) Console.Write("{0}", members[index].BorrowedBook[i]);
+                            else Console.Write(",{0} ", members[index].BorrowedBook[i]);
+                        }
+                        Console.SetCursorPosition(103, Console.CursorTop);
+
+                        overdueBooks.Clear();
+                        foreach (BookVO book in books)
+                            foreach (float number in members[index].BorrowedBook)
+                                if (book.NumberOfThis == number)
+                                {
+                                    date = DateTime.Now - book.ExpectedToReturn;
+                                    if (date.Days > 0) overdueBooks.Add(book.NumberOfThis);
+                                }
+
+                        for (int i = 0; i < overdueBooks.Count; i++)
+                        {
+                            if (i == 0) Console.Write("{0}", overdueBooks[i]);
+                            else Console.Write(",{0} ", overdueBooks[i]);
+                        }
                         Console.SetCursorPosition(0, Console.CursorTop + 1);
                     }
                 }

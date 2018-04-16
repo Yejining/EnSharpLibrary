@@ -242,6 +242,36 @@ namespace EnSharpLibrary.IO
             return indexesOfSearchResult;
         }
 
+        // 1 : 이름 검색
+        // 2 : 학번 검색
+        // 3 : 주소 검색
+        public List<int> FoundMembers(List<MemberVO> members, string searchWord, int mode)
+        {
+            List<int> indexesOfSearchResult = new List<int>();
+            indexesOfSearchResult.Clear();
+
+            switch (mode)
+            {
+                case 1:
+                    for (int i = 0; i < members.Count; i++)
+                        if (System.Text.RegularExpressions.Regex.IsMatch(members[i].Name, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                            indexesOfSearchResult.Add(members[i].IdentificationNumber);
+                    break;
+                case 2:
+                    for (int i = 0; i < members.Count; i++)
+                        if (System.Text.RegularExpressions.Regex.IsMatch(members[i].IdentificationNumber.ToString(), searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                            indexesOfSearchResult.Add(members[i].IdentificationNumber);
+                    break;
+                case 3:
+                    for (int i = 0; i < members.Count; i++)
+                        if (System.Text.RegularExpressions.Regex.IsMatch(members[i].Address, searchWord, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                            indexesOfSearchResult.Add(members[i].IdentificationNumber);
+                    break;
+            }
+
+            return indexesOfSearchResult;
+        }
+
         public List<int> IndexOfBooks(List<BookVO> books, int numberOfBook)
         {
             List<int> indexOfBooks = new List<int>();
@@ -274,6 +304,23 @@ namespace EnSharpLibrary.IO
             date = DateTime.Now - book.ExpectedToReturn;
 
             return date.Days;
+        }
+
+        public List<float> OverdueBooks(List<float> borrowedBooks, List<BookVO> books)
+        {
+            List<float> overdueBooks = new List<float>();
+
+            TimeSpan date;
+
+            foreach (BookVO book in books)
+                foreach (float number in borrowedBooks)
+                    if (book.NumberOfThis == number)
+                    {
+                        date = DateTime.Now - book.ExpectedToReturn;
+                        if (date.Days > 0) overdueBooks.Add(book.NumberOfThis);
+                    }
+
+            return overdueBooks;
         }
 
         public bool YesOrNoAnswer(int leftCursor, int topCursor)

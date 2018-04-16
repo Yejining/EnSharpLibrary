@@ -47,7 +47,7 @@ namespace EnSharpLibrary.Function
                 {
                     print.ClearOneLetter(74);
                     if ((programMode == 1 || programMode == 2) && Console.CursorTop < 19) Console.SetCursorPosition(74, Console.CursorTop + 2);
-                    else if (programMode == 3 && Console.CursorTop < 25) Console.SetCursorPosition(74, Console.CursorTop + 2);
+                    else if (programMode == 3 && Console.CursorTop < 21) Console.SetCursorPosition(74, Console.CursorTop + 2);
                     Console.Write('☜');
                 }
                 else
@@ -68,17 +68,11 @@ namespace EnSharpLibrary.Function
                             case 17:    // 저자명 검색
                                 library = Specifically(programMode, 4, usingMemberNumber, books, members);
                                 break;
-                            case 19:    // 뒤로(비회원 : 메뉴, 회원 : 회원 버전 메뉴), 관리자 : 대출된 도서 보기
+                            case 19:    // 뒤로(비회원 : 메뉴, 회원 : 회원 버전 메뉴), 관리자 : 도서 등록
                                 if (programMode == 1 || programMode == 2) return library;
-                                library = BorrowedBook(-1, members, books);
-                                break;
-                            case 21:    // 관리자 : 연체된 도서 보기
-                                library = BorrowedBook(-2, members, books);
-                                break;
-                            case 23:    // 도서 등록
                                 library = bookManage.AddBook(members, books);
                                 break;
-                            case 25:    // 관리자 뒤로
+                            case 21:    // 관리자 뒤로
                                 return library;
                         }
 

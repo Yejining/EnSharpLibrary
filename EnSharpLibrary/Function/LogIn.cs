@@ -94,9 +94,14 @@ namespace EnSharpLibrary.Function
             return 3;
         }
 
-        public void Join(List<MemberVO> members)
+        // 1 : 회원가입
+        // 2 : 회원등록
+        public List<MemberVO> Join(List<MemberVO> members, int type)
         {
-            print.Title("회원가입   ");
+            if (type == 1) print.Title("회원가입   ");
+            else print.Title("회원등록   ");
+
+            return members;
         }
     }
 }
