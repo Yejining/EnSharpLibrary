@@ -7,21 +7,17 @@ namespace EnSharpLibrary.Data
 {
     class BookVO
     {
-        // 전체 공개 가능 변수
+        // 수정 불가능 변수
         private string name;
         private string author;
         private string publisher;
         private int publishingYear;
-        private int bookCondition;
-        private int numberOfMember;
-        private int numberOfBooks;  // 같은 책들의 숫자
-        private int orderOfBooks;   // 같은 책들 중 자신의 순서, 0부터 시작
-        private float numberOfThis; // 자신의 청구기호. 고유기호.orderOfBooks
+        private float bookID;           // 청구기호
 
-        // 관리자 및 대출자 공개 가능 변수
-        private DateTime rental;
-        private DateTime expectedToReturn;
-        private int numberOfRenew;
+        // 수정 가능 변수
+        private int bookCondition;
+        private int borrowedMemberID;
+        private int price; 
 
         /// <summary>
         /// BookVO의 생성자입니다.
@@ -38,28 +34,8 @@ namespace EnSharpLibrary.Data
             this.publisher = publisher;
             this.publishingYear = publishingYear;
             bookCondition = 0;
-            numberOfMember = -1;
-            numberOfBooks = 1;
-            orderOfBooks = 0;
-            numberOfThis = 0;
-
-            rental = DateTime.Parse("1980/01/01");
-            expectedToReturn = DateTime.Parse("1980/01/01");
-            numberOfRenew = 0;
-        }
-
-        /// <summary>
-        /// 도서의 상태를 대출모드로 바꾸어줍니다.
-        /// </summary>
-        /// <param name="rental">대출일</param>
-        /// <param name="expectedToReturn">반납 예정일</param>
-        /// <param name="memberNumber">대출한 회원의 번호</param>
-        public void SetRentalMode(DateTime rental, DateTime expectedToReturn, int memberNumber)
-        {
-            this.rental = rental;
-            this.expectedToReturn = expectedToReturn;
-            numberOfMember = memberNumber;
-            bookCondition = 1;
+            borrowedMemberID = -1;
+            bookID = 0;
         }
 
         public string Name
@@ -82,52 +58,39 @@ namespace EnSharpLibrary.Data
             get { return publishingYear; }
         }
 
+        public float BookID
+        {
+            get { return bookID; }
+            set { bookID = value; }
+        }
+
         public int BookCondition
         {
             get { return bookCondition; }
             set { bookCondition = value; }
         }
 
-        public int NumberOfMember
+        public int BorrowedMemberID
         {
-            get { return numberOfMember; }
-            set { numberOfMember = value; }
+            get { return borrowedMemberID; }
+            set { borrowedMemberID = value; }
         }
 
-        public int NumberOfBooks
+        public int Price
         {
-            get { return numberOfBooks; }
-            set { numberOfBooks = value; }
+            get { return price; }
+            set { price = value; }
         }
 
-        public int OrderOfBooks
+        /// <summary>
+        /// 도서의 상태를 대출모드로 바꾸어줍니다.
+        /// </summary>
+        /// <param name="rental">대출일</param>
+        /// <param name="expectedToReturn">반납 예정일</param>
+        /// <param name="memberNumber">대출한 회원의 번호</param>
+        public void SetRentalMode(DateTime rental, DateTime expectedToReturn, int memberNumber)
         {
-            get { return orderOfBooks; }
-            set { orderOfBooks = value; }
-        }
 
-        public float NumberOfThis
-        {
-            get { return numberOfThis; }
-            set { numberOfThis = value; }
-        }
-
-        public DateTime Rental
-        {
-            get { return rental; }
-            set { rental = value; }
-        }
-
-        public DateTime ExpectedToReturn
-        {
-            get { return expectedToReturn; }
-            set { expectedToReturn = value; }
-        }
-
-        public int NumberOfRenew
-        {
-            get { return numberOfRenew; }
-            set { numberOfRenew = value; }
         }
 
         /// <summary>
@@ -135,10 +98,7 @@ namespace EnSharpLibrary.Data
         /// </summary>
         public void SetNonRentalMode()
         {
-            bookCondition = 0;
-            expectedToReturn = DateTime.Parse("1980/01/01");
-            rental = DateTime.Parse("1980/01/01");
-            numberOfMember = -1;
+
         }
     }
 }
