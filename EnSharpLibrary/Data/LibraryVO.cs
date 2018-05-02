@@ -7,8 +7,14 @@ namespace EnSharpLibrary.Data
 {
     class LibraryVO
     {
+        private int usingMemberId;
         private List<MemberVO> members;
         private List<BookVO> books;
+
+        public LibraryVO()
+        {
+
+        }
 
         /// <summary>
         /// 프로그램의 회원 정보와 책 정보를 저장한 LibraryVO의 생성자입니다.
@@ -19,6 +25,12 @@ namespace EnSharpLibrary.Data
         {
             this.members = members;
             this.books = books;
+        }
+
+        public int UsingMemberId
+        {
+            get { return usingMemberId; }
+            set { usingMemberId = value; }
         }
 
         public List<MemberVO> Members

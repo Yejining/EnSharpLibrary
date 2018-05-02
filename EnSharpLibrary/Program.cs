@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using EnSharpLibrary.Data;
 using EnSharpLibrary.Function;
 
 namespace EnSharpLibrary
@@ -16,7 +17,7 @@ namespace EnSharpLibrary
         static void Main(string[] args)
         {
             Menu menu = new Menu();
-            menu.Start(0);
+            menu.Start(Constant.NON_MEMBER_MODE);
         }
     }
 }

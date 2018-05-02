@@ -13,6 +13,15 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
 
+        /// <summary>
+        /// 사용자 모드에서 사용자가 도서를 선택했을 때 실행되는 메소드입니다.
+        /// 도서의 기본정보를 알려주고, 사용자는 대출/반납/연장 등의 기능을 수행할 수 있습니다.
+        /// </summary>
+        /// <param name="usingMemberNumber">로그인한 사용자의 번호</param>
+        /// <param name="indexOfBook">사용자가 선택한 책의 인덱스</param>
+        /// <param name="books">책 정보</param>
+        /// <param name="members">회원 정보</param>
+        /// <returns>변경된 책 정보 및 회원 정보</returns>
         public LibraryVO MemberMode(int usingMemberNumber, int indexOfBook, List<BookVO> books, List<MemberVO> members)
         {
             LibraryVO library = new LibraryVO(members, books);
@@ -24,6 +33,7 @@ namespace EnSharpLibrary.Function
             string guide = "나가기(ESC)";
             bool endOfProcess = false;
 
+            // 도서 기본정보 알림
             print.Title(books[indexOfBook].Name);
             bookInformation1.AppendFormat("▷ {0}/{1}/{2}/{3}", books[indexOfBook].Name, books[indexOfBook].Author,
                 books[indexOfBook].Publisher, books[indexOfBook].PublishingYear);
@@ -160,11 +170,65 @@ namespace EnSharpLibrary.Function
             return library;
         }
 
+
         public LibraryVO AddBook(List<MemberVO> members, List<BookVO> books)
         {
             LibraryVO library = new LibraryVO(members, books);
+            string content1 = "▷ 도서명 : ";
+            string content2 = "▷ 출판사 : ";
+            string content3 = "▷ 저자 : ";
+            string content4 = "▷ 출판년도 : ";
+            string name;
+            string publisher;
+            string author;
+            string publishingYear;
+            int cursor = 0;
 
             print.Title("도서 등록");
+
+            // 도서명
+            Console.SetCursorPosition(40, Console.CursorTop);
+            Console.Write(content1);
+            name = getValue.SearchWord(23, 0);
+            if (string.Compare(name, "@입력취소@") == 0) return library;
+
+            // 출판사
+            Console.SetCursorPosition(40, Console.CursorTop + 2);
+            Console.Write(content2);
+            publisher = getValue.SearchWord(15, 0);
+            if (string.Compare(publisher, "@입력취소@") == 0) return library;
+
+            // 저자
+            Console.SetCursorPosition(40, Console.CursorTop + 2);
+            Console.Write(content3);
+            author = getValue.SearchWord(10, 0);
+            if (string.Compare(author, "@입력취소@") == 0) return library;
+
+            // 출판년도
+            Console.SetCursorPosition(40, Console.CursorTop + 2);
+            Console.Write(content4);
+            publishingYear = getValue.SearchWord(6, 1);
+            if (string.Compare(publishingYear, "@입력취소@") == 0) return library;
+
+            while (true)
+            {
+                int year = DateTime.Now.Year;
+                Console.SetCursorPosition(40, Console.CursorTop + 1);
+                if (Int32.Parse(publishingYear) < year) print.Announce("잘못된 출판년도입니다!");
+                Console.SetCursorPosition(40, cursor);
+                print.ClearCurrentConsoleLine();
+                Console.SetCursorPosition(40, cursor);
+                Console.Write(content4);
+                publishingYear = getValue.SearchWord(6, 1);
+                if (string.Compare(publishingYear, "@입력취소@") == 0) return library;
+                else break;
+
+            }
+
+            BookVO newBook = new BookVO(name, author, publisher, Int32.Parse(publishingYear));
+            books.Add(newBook);
+
+            library.Books = books;
 
             return library;
         }

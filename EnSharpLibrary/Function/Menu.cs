@@ -17,6 +17,7 @@ namespace EnSharpLibrary.Function
         MemberManage memberManage = new MemberManage();
         MemberSearch memberSearch = new MemberSearch();
 
+        private LibraryVO library = new LibraryVO();
         private AdminVO admin = new AdminVO("970106");
         private List<BookVO> books = new List<BookVO>();
         private List<MemberVO> members = new List<MemberVO>();
@@ -26,9 +27,8 @@ namespace EnSharpLibrary.Function
         public void Start(int mode)
         {
             bool isFirtLoop = true;
-            LibraryVO library = new LibraryVO(members, books);
 
-            if (mode == 0)
+            if (mode == Constant.NON_MEMBER_MODE)
             {
                 InitBooks();
                 InitMembers();
