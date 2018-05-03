@@ -61,7 +61,64 @@ namespace EnSharpLibrary.Function
         {
             int usingMemberID = 0;
 
-            return usingMemberID;
+            string name;
+            string userID;
+            string password;
+            int address1;
+            int address2;
+            StringBuilder address = new StringBuilder();
+            string phoneNumber;
+            int year, month, day;
+            DateTime birthdate;
+
+            print.SetWindowsizeAndPrintTitle(45, 30, "회원가입");
+
+            while (true)
+            {
+                print.SearchCategoryAndGuideline(Constant.JOIN_IN);
+
+                // 정보 수집
+                // - 이름
+                name = getValue.Information(17, 11, 5, Constant.ONLY_KOREAN, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
+                int errorMode = tool.IsValidAnswer(Constant.ANSWER_NAME, name);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return Constant.NONE;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
+
+                // - 학번
+                userID = getValue.Information(17, 13, 8, Constant.ONLY_NUMBER, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
+                errorMode = tool.IsValidAnswer(Constant.ANSWER_USER_ID, userID);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return Constant.NONE;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
+
+                // - 암호
+                password = getValue.Information(17, 15, 15, Constant.NO_KOREAN, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[5]);
+                errorMode = tool.IsValidAnswer(Constant.ANSWER_PASSWORD, password);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return Constant.NONE;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
+
+                // - 주소
+                address1 = getValue.DropBox(17, 17, Constant.ANSWER_ADDRESS);
+                Console.SetCursorPosition(17, 17);
+                Console.Write(Constant.DISTRICT[0][address1]);
+                address2 = getValue.DropBox(Console.CursorLeft + 1, 17, Constant.ANSWER_ADDRESS_DEEPLY + address1);
+                address.Append(Constant.DISTRICT[0][address1] + " " + Constant.DISTRICT[address1 + 1][address2]);
+
+                // 전화번호
+                phoneNumber = getValue.PhoneNumber(21, 19);
+                if (string.Compare(phoneNumber, "@입력취소@") == 0) return Constant.NONE;
+
+                // 생일
+                year = getValue.DropBox(17, 21, Constant.ANSWER_BIRTHDATE_YEAR); if (year == -1) return Constant.NONE;
+                month = getValue.DropBox(24, 21, Constant.ANSWER_BIRTHDATE_MONTH); if (month == -1) return Constant.NONE;
+                day = getValue.DropBox(29, 21, Constant.ANSWER_BIRTHDATE_DAY); if (day == -1) return Constant.NONE;
+                birthdate = getValue.Birthdate(year, month, day);
+
+                break;
+            }
+
+            tool.RegisterMember(name, Int32.Parse(userID), password, address.ToString(), phoneNumber, birthdate);
+
+            return Int32.Parse(userID);
         }
 
         public void ChangeUserInformation(int usingMemberID)

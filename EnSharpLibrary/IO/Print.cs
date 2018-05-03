@@ -135,6 +135,7 @@ namespace EnSharpLibrary.IO
             {
                 case Constant.BOOK_SEARCH_MODE: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 case Constant.LOG_IN_MODE: categoryAndGuideline = Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
+                case Constant.JOIN_IN: categoryAndGuideline = Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 default: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
             }
 

@@ -57,16 +57,25 @@ namespace EnSharpLibrary.Function
             if (keyInfo.Key == ConsoleKey.Tab) return false;
 
             // 숫자
-            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.NUMBER_PATTERN)) return true;
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.NUMBER_PATTERN))
+            {
+                if (mode == Constant.ONLY_KOREAN) return false;
+                else return true;
+            }
             if (mode == Constant.ONLY_NUMBER) return false;
 
             // 한글, 영어
-            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.ENGLISH_PATTERN)) return true;
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.ENGLISH_PATTERN))
+            {
+                if (mode == Constant.ONLY_KOREAN) return false;
+                else return true;
+            }
             if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.KOREAN_PATTERN))
             {
                 if (mode == Constant.NO_KOREAN) return false;
                 else return true;
             }
+            if (mode == Constant.ONLY_KOREAN) return false;
 
             // 특수기호
             if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.SPECIAL_LETTER)) return true;
@@ -124,6 +133,54 @@ namespace EnSharpLibrary.Function
 
             if (string.Compare(password, userInputPassword) == 0) return true;
             else return false;
+        }
+
+        public void RegisterMember(string name, int userID, string password, string address, string phoneNumber, DateTime birthdate)
+        {
+            StringBuilder sql = new StringBuilder("INSERT INTO member (member_id, name, address, phone_number, password, accumulated_overdue_number, overdue_number, birthdate)");
+            sql.Append("VALUES (" + userID + ",\'" + name + "\',\'" + address + "\',\'" + phoneNumber + "\',\'" + password + "\',0,0,\'" + birthdate.ToShortDateString() + "\');");
+            
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            command.ExecuteReader();
+
+            connect.Close();
+        }
+
+        public int IsValidAnswer(int mode, string userInputAnswer)
+        {
+            if (string.Compare(userInputAnswer, "@입력취소@") == 0) return Constant.ESCAPE_KEY_ERROR;
+
+            switch (mode)
+            {
+                case Constant.ANSWER_NAME: if (userInputAnswer.Length < 3) return Constant.LENGTH_ERROR; break;
+                case Constant.ANSWER_USER_ID: if (userInputAnswer.Length != 8) return Constant.LENGTH_ERROR; return IsValidID(userInputAnswer);
+                case Constant.ANSWER_PASSWORD: if (userInputAnswer.Length < 8) return Constant.LENGTH_ERROR; break;
+            }
+
+            return Constant.VALID;
+        }
+
+        public int IsValidID(string userInputID)
+        {
+            int thisYear = DateTime.Now.Year - 2000;
+
+            // 90년대~현재 년도까지
+            StringBuilder year = new StringBuilder(userInputID);
+            year.Remove(2, 6);
+            if (Int32.Parse(year.ToString()) > thisYear && Int32.Parse(year.ToString()) < 90) return Constant.YEAR_ERROR;
+
+            // 이미 등록된 학번인지 확인
+            if (IsExist(userInputID)) return Constant.OVERRIDE_ERROR;
+
+            return Constant.VALID;
         }
 
         /// <summary>

@@ -46,8 +46,7 @@ namespace EnSharpLibrary.IO
                 else if (isValid) answer = ValidInput(currentCursor, limit, keyInfo.KeyChar, answer);                                             // 올바른 입력
                 else if (keyInfo.Key != ConsoleKey.Enter && keyInfo.Key != ConsoleKey.Tab) print.InvalidInput(keyInfo, currentCursor, cursorTop); // 입력 무시
                 else if (keyInfo.Key == ConsoleKey.Enter || keyInfo.Key == ConsoleKey.Tab) return answer.ToString();      // 검색 완료
-
-
+                
                 // 검색어 글자가 0자일 경우 가이드라인 출력
                 if (answer.Length == 0) print.GuidelineForBookSearch(guideline, cursorLeft, cursorTop);
             }
@@ -152,6 +151,133 @@ namespace EnSharpLibrary.IO
             connect.Close();
 
             return password;
+        }
+
+        /// <summary>
+        /// 드롭박스에서 원하는 옵션을 선택하는 메소드입니다.
+        /// </summary>
+        /// <param name="mode">사용자가 선택한 검색 모드</param>
+        /// <param name="cursorLeft">커서 설정 변수(들여쓰기)</param>
+        /// <param name="cursorTop">커서 설정 변수(줄)</param>       
+        /// <returns>사용자가 선택한 옵션</returns>
+        public int DropBox(int cursorLeft, int cursorTop, int mode)
+        {
+            ConsoleKeyInfo keyInfo;
+
+            int index = 0;
+            string[] option = Constant.DISTRICT[0];
+
+            // 드롭박스 선택
+            if (mode == Constant.ANSWER_ADDRESS) option = Constant.DISTRICT[0];
+            else if (mode > 10) option = Constant.DISTRICT[mode - 9];
+            else if (mode == Constant.ANSWER_BIRTHDATE_YEAR) option = YEAR();
+            else if (mode == Constant.ANSWER_BIRTHDATE_MONTH) option = Constant.MONTH;
+            else if (mode == Constant.ANSWER_BIRTHDATE_DAY) option = Constant.DAY;
+
+            // 방향키 및 엔터, ESC키 통해 정보 선택 혹은 나가기
+            while (true)
+            {
+                Console.SetCursorPosition(cursorLeft, cursorTop);
+                Console.Write(new string(' ', Console.WindowWidth - cursorLeft));
+                Console.SetCursorPosition(cursorLeft, cursorTop);
+                Console.Write(option[index]);
+
+                keyInfo = Console.ReadKey();
+
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.Escape:
+                        return -1;
+                    case ConsoleKey.Enter:
+                        return index;
+                    case ConsoleKey.Tab:
+                        return index;
+                    case ConsoleKey.UpArrow:
+                        if (index == 0) index = option.Length - 1;
+                        else index--;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        if (index == option.Length - 1) index = 0;
+                        else index++;
+                        break;
+                    default:
+                        print.BlockCursorMove(cursorLeft + 4, "");
+                        keyInfo = Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+        public string[] YEAR()
+        {
+            string[] years = new string[DateTime.Now.Year - 1990 + 1];
+
+            for (int year = 1990; year <= DateTime.Now.Year; year++)
+                years.SetValue(year + "년", year - 1990);
+
+            return years;
+        }
+
+        public DateTime Birthdate(int yearIndex, int monthIndex, int dayIndex)
+        {
+            string year = YEAR()[yearIndex].Remove(4, 1);
+            string month = Constant.MONTH[monthIndex].Remove(2, 1);
+            string day = Constant.DAY[dayIndex].Remove(2, 1);
+
+            return new DateTime(Int32.Parse(year), Int32.Parse(month), Int32.Parse(day));
+        }
+
+        public string PhoneNumber(int cursorLeft, int cursorTop)
+        {
+            StringBuilder phoneNumber = new StringBuilder("010-");
+            StringBuilder middleNumber = new StringBuilder();
+            StringBuilder endNumber = new StringBuilder();
+            int currentCursor;
+            bool isValid;
+            ConsoleKeyInfo keyInfo;
+            
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.Write(phoneNumber);
+            
+            for (int count = 0; count < 4; count++)
+            {
+                currentCursor = Console.CursorLeft;
+
+                keyInfo = Console.ReadKey();
+
+                isValid = tool.IsValid(keyInfo, Constant.ONLY_NUMBER);
+
+                if (middleNumber.Length == 0) print.DeleteGuideLine(cursorLeft + 4, isValid, keyInfo);
+
+                if (keyInfo.Key == ConsoleKey.Escape) return "@입력취소@";                                                        // 나가기
+                else if (keyInfo.Key == ConsoleKey.Backspace) middleNumber = BackspaceInput(cursorLeft, cursorTop, middleNumber); // 지우기
+                else if (isValid) middleNumber = ValidInput(currentCursor, 4, keyInfo.KeyChar, middleNumber);                     // 올바른 입력
+                else print.InvalidInput(keyInfo, currentCursor, cursorTop);                                                       // 입력 무시
+            }
+
+            Console.Write('-');
+            phoneNumber.Append(middleNumber + "-");
+
+            for (int count = 0; count < 4; count++)
+            {
+                currentCursor = Console.CursorLeft;
+
+                keyInfo = Console.ReadKey();
+
+                isValid = tool.IsValid(keyInfo, Constant.ONLY_NUMBER);
+
+                if (endNumber.Length == 0) print.DeleteGuideLine(currentCursor, isValid, keyInfo);
+
+                if (keyInfo.Key == ConsoleKey.Escape) return "@입력취소@";                                                        // 나가기
+                else if (keyInfo.Key == ConsoleKey.Backspace) endNumber = BackspaceInput(currentCursor, cursorTop, endNumber);    // 지우기
+                else if (isValid) endNumber = ValidInput(currentCursor, 4, keyInfo.KeyChar, endNumber);                           // 올바른 입력
+                else print.InvalidInput(keyInfo, currentCursor, cursorTop);                                                       // 입력 무시
+            }
+            phoneNumber.Append(endNumber);
+
+            Console.WriteLine();
+
+            return phoneNumber.ToString();
         }
 
         /// <summary>
