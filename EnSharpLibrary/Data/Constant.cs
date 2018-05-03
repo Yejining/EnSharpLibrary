@@ -79,6 +79,13 @@ namespace EnSharpLibrary.Data
             "저      자 | "
         };
 
+        public static string[] LOG_IN_TITLE =
+        {
+            "",
+            "로그인",
+            "관리자 로그인"
+        };
+
         public static string[] LOGIN_SEARCH_CATEGORY_AND_GUIDELINE =
         {
             "학번 | ",

@@ -62,7 +62,7 @@ namespace EnSharpLibrary.Function
 
         public void BorrowBook(List<BookVO> searchedBook, int usingMemberID)
         {
-
+            tool.WaitUntilGetEscapeKey();
         }
 
         public void ManageBorrowedBook(int usingMemberID)

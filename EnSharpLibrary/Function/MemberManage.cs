@@ -16,25 +16,31 @@ namespace EnSharpLibrary.Function
 
         public int LogInOrLogOut(int usingMemberID)
         {
-            return usingMemberID;
+            if (usingMemberID == Constant.PUBLIC) return LogIn(Constant.ADMIN_MODE);
+            else return LogOut();
         }
 
-        public int LogIn()
+        public int LogIn(int mode)
         {
             string memberID;
             string userInputPassword;
 
-            print.SetWindowsizeAndPrintTitle(45, 30, "로그인");
+            print.SetWindowsizeAndPrintTitle(45, 30, Constant.LOG_IN_TITLE[mode]);
 
             while (true)
             {   
                 print.SearchCategoryAndGuideline(Constant.LOG_IN_MODE);
+                if (mode == Constant.ADMIN_MODE) { Console.SetCursorPosition(0, 11); print.ClearCurrentConsoleLine(); }
 
                 // 학번
-                memberID = getValue.Information(17, 11, 8, Constant.ONLY_NUMBER, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
-                if (string.Compare(memberID, "@입력취소@") == 0) return 0;
-                else if (memberID.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 17); continue; }
-                else if (!tool.IsExist(memberID)) { print.ErrorMessage(Constant.THERE_IS_NO_SUCH_ID, 17); continue; }
+                if (mode == Constant.MEMBER_MODE)
+                {
+                    memberID = getValue.Information(17, 11, 8, Constant.ONLY_NUMBER, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
+                    if (string.Compare(memberID, "@입력취소@") == 0) return 0;
+                    else if (memberID.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 17); continue; }
+                    else if (!tool.IsExist(memberID)) { print.ErrorMessage(Constant.THERE_IS_NO_SUCH_ID, 17); continue; }
+                }
+                else memberID = Constant.ADMIN.ToString();
 
                 // 암호
                 userInputPassword = getValue.Information(17, 13, 15, Constant.NO_KOREAN, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
@@ -44,6 +50,11 @@ namespace EnSharpLibrary.Function
 
                 return Int32.Parse(memberID);   
             }
+        }
+
+        public int LogOut()
+        {
+            return Constant.PUBLIC;
         }
 
         public int JoinIn()

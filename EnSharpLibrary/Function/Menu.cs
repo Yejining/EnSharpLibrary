@@ -74,7 +74,7 @@ namespace EnSharpLibrary.Function
                     else bookManage.ManageBook();
                     break;
                 case Constant.LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER:    // 로그인,          대출도서 보기, 회원관리
-                    if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.LogIn();
+                    if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.LogIn(Constant.MEMBER_MODE);
                     else if (usingMemberID != Constant.ADMIN) bookManage.ManageBorrowedBook(usingMemberID);
                     else memberManage.ManageMember();
                     break;
