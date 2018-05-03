@@ -10,23 +10,72 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
-        //GetValue getValueInPrintClass = new GetValue();
-
-        public void Title(string title)
+        /// <summary>
+        /// 인자로 받은 문자을 가운데정렬하여 출력하는 메소드입니다.
+        /// </summary>
+        /// <param name="sentence">출력할 문자열</param>
+        /// <param name="cursorTop">출력할 줄 정보</param>
+        public void PrintSentence(string sentence, int cursorTop)
         {
-            string title1 = "┏                     ┓";
-            string title2 = "  En# Library";
-            string title3 = "┗                     ┛";
+            int leftCursor = GetLeftCursorForCenterArrangeMent(sentence);
+            Console.SetCursorPosition(leftCursor, Console.CursorTop);
+            Console.WriteLine(sentence);
+        }
 
-            Console.SetWindowSize(120, 30);
+        /// <summary>
+        /// 인자로 받은 문자열 배열들을 가운데정렬하여 출력하는 메소드입니다.
+        /// </summary>
+        /// <param name="sentences">출력할 문자열 배열</param>
+        /// <param name="cursorTop">출력할 줄 정보</param>
+        public void PrintSentences(string[] sentences, int cursorTop)
+        {
+            foreach(string sentence in sentences) { PrintSentence(sentence, cursorTop); cursorTop++; }
+        }
+
+        /// <summary>
+        /// 윈도우 사이즈를 설정하고 타이틀을 출력하는 메소드입니다.
+        /// </summary>
+        /// <param name="windowWidth">윈도우 너비</param>
+        /// <param name="windowHeight">윈도우 높이</param>
+        /// <param name="title">타이틀</param>
+        public void SetWindowsizeAndPrintTitle(int windowWidth, int windowHeight, string title)
+        {
+            // 윈도우 설정
+            Console.SetWindowSize(windowWidth, windowHeight);
             Console.Clear();
-            Console.SetCursorPosition(0, 0);
 
-            Console.WriteLine(String.Format("\n\n{0," + ((Console.WindowWidth / 2) + (title1.Length / 2)) + "}", title1));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (title2.Length / 2)) + "}", title2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (title3.Length / 2)) + "}\n\n", title3));
+            // 타이틀 출력
+            PrintSentences(Constant.ENSHARP_TITLE, 2);
+            if (string.Compare(title, "") > 0) PrintSentence(title, Console.CursorTop);
+        }
 
-            if (string.Compare(title, "") > 0) Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (title.Length / 2)) + "}\n\n", title));
+        /// <summary>
+        /// Menu Class에서 옵션을 출력하는 메소드입니다.
+        /// </summary>
+        /// <param name="mode">프로그램 사용 모드</param>
+        /// <param name="cursorTop">출력할 줄 정보</param>
+        public void MenuOption(int mode, int cursorTop)
+        {
+            string[] option;
+
+            switch (mode)
+            {
+                case Constant.NON_MEMBER_MODE: option = Constant.NON_MEMBER_OPTION; break;
+                case Constant.ADMIN_MODE: option = Constant.ADMIN_OPTION; break;
+                case Constant.MEMBER_MODE: option = Constant.MEMBER_OPTION; break;
+                default: option = Constant.NON_MEMBER_OPTION; break;
+            }
+
+            PrintSentence(Constant.LINE_FOR_OPTION[0], cursorTop);
+            PrintSentence(option[0], cursorTop + 1);
+            PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 2);
+            PrintSentence(option[1], cursorTop + 3);
+            PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 4);
+            PrintSentence(option[2], cursorTop + 5);
+            PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 6);
+            PrintSentence(option[3], cursorTop + 7);
+            PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 8);
+            PrintSentence(option[4], cursorTop + 9);
         }
 
         public void BookSearchTitle(int mode)
@@ -92,43 +141,6 @@ namespace EnSharpLibrary.IO
             }
 
             Title(title.ToString());
-        }
-
-        public void MenuOption(int mode)
-        {
-            string line1 = "┏                     ┓";
-            string line2 = "┣                     ┫";
-            string line3 = "┗                     ┛";
-            string menu1 = "비회원 도서검색     ";
-            string menu2 = "로그인   ";
-            string menu3 = "회원가입   ";
-            string menu4 = "관리자 로그인      ";
-            string menu5 = "종료  ";
-            string menu6 = "도서 보기  ";
-            string menu7 = "대출도서 보기     ";
-            string menu8 = "정보수정   ";
-            string menu9 = "로그아웃   ";
-            string menu10 = "도서 관리   ";
-            string menu11 = "회원 관리   ";
-            string menu12 = "암호 수정   ";
-            string[] member = { menu6, menu7, menu8, menu9, menu5 };
-            string[] admin = { menu10, menu11, menu12, menu9, menu5 };
-            string[] toPrint = new string[] { menu1, menu2, menu3, menu4, menu5 };
-
-            if (mode == 2) toPrint = member;
-            else if (mode == 3) toPrint = admin;
-           
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line1.Length / 2)) + "}", line1));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[0].Length / 2)) + "}", toPrint[0]));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[1].Length / 2)) + "}", toPrint[1]));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[2].Length / 2)) + "}", toPrint[2]));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[3].Length / 2)) + "}", toPrint[3]));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line2.Length / 2)) + "}", line2));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (toPrint[4].Length / 2)) + "}", toPrint[4]));
-            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (line3.Length / 2)) + "}", line3));
         }
 
         public void BookSearchOption(int programMode)
@@ -528,6 +540,10 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(0, currentLineCursor);
         }
 
+        /// <summary>
+        /// 콘솔에서 한 글자만을 삭제하는 메소드입니다.
+        /// </summary>
+        /// <param name="spaces">삭제할 글자의 왼쪽 커서 위치</param>
         public void ClearOneLetter(int spaces)
         {
             Console.SetCursorPosition(spaces, Console.CursorTop);
@@ -798,6 +814,24 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(cursorLeft, cursorTop + 8);
             Console.Write(option4);
 
+        }
+
+        /// <summary>
+        /// 가운데 정렬로 충렬하기 위해 들여쓰기할 공간을 계산하는 메소드입니다.
+        /// </summary>
+        /// <param name="sentence">출력할 문장</param>
+        /// <returns>가운데 정렬을 위한 들여쓰기 공백</returns>
+        public int GetLeftCursorForCenterArrangeMent(string sentence)
+        {
+            int leftCursor;
+
+            if (sentence.Length == 0) return 0;
+
+            Console.Write(sentence);
+            leftCursor = Console.WindowWidth / 2 - Console.CursorLeft / 2;
+            ClearCurrentConsoleLine();
+
+            return leftCursor;
         }
     }
 }

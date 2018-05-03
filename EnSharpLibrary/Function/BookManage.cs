@@ -13,6 +13,21 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
 
+        public void ManageBook()
+        {
+
+        }
+
+        public void SearchBook(int usingMemberID)
+        {
+
+        }
+
+        public void ManageBorrowedBook(int usingMemberID)
+        {
+
+        }
+
         /// <summary>
         /// 사용자 모드에서 사용자가 도서를 선택했을 때 실행되는 메소드입니다.
         /// 도서의 기본정보를 알려주고, 사용자는 대출/반납/연장 등의 기능을 수행할 수 있습니다.

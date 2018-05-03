@@ -8,8 +8,9 @@ namespace EnSharpLibrary.Data
     class MemberVO
     {
         // 수정 불가능 변수
-        private int identificationNumber;
+        private int memberID;
         private string name;
+        private DateTime birthdate;
 
         // 수정 가능 변수 - 개인 정보
         private string address;
@@ -17,7 +18,6 @@ namespace EnSharpLibrary.Data
         private string password;
 
         // 수정 가능 변수 - 대출 정보
-        private List<float> borrowedBook;
         private int accumulatedOverdueNumber;
         private int overdueNumber;
 
@@ -27,9 +27,7 @@ namespace EnSharpLibrary.Data
         /// </summary>
         public MemberVO()
         {
-            identificationNumber = -1;
-            borrowedBook = new List<float>();
-            borrowedBook.Clear();
+            memberID = -1;
             accumulatedOverdueNumber = 0;
             overdueNumber = 0;
         }
@@ -42,7 +40,7 @@ namespace EnSharpLibrary.Data
         /// <param name="password">암호</param>
         public void SetMember(int number, string name, string password)
         {
-            identificationNumber = number;
+            memberID = number;
             this.name = name;
             this.password = password;
         }
@@ -58,14 +56,19 @@ namespace EnSharpLibrary.Data
             this.phoneNumber = phoneNumber;
         }
 
-        public int IdentificationNumber
+        public int MemberID
         {
-            get { return identificationNumber; }
+            get { return memberID; }
         }
 
         public string Name
         {
             get { return name; }
+        }
+
+        public DateTime Birthdate
+        {
+            get { return birthdate; }
         }
 
         public string Address
@@ -84,12 +87,6 @@ namespace EnSharpLibrary.Data
         {
             get { return password; }
             set { password = value; }
-        }
-
-        public List<float> BorrowedBook
-        {
-            get { return borrowedBook; }
-            set { borrowedBook = value; }
         }
 
         public int AccumulatedOverdueNumber
@@ -111,12 +108,7 @@ namespace EnSharpLibrary.Data
         /// <param name="numberOfBook">반납할 책의 청구기호</param>
         public void ReturnBook(float numberOfBook)
         {
-            for (int index = 0; index < borrowedBook.Count; index++)
-                if (borrowedBook[index] == numberOfBook)
-                {
-                    borrowedBook.RemoveAt(index);
-                    return;
-                }
+            
         }
     }
 }

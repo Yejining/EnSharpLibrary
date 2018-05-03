@@ -13,6 +13,33 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
 
+        public int LogInOrLogOut(int usingMemberID)
+        {
+            return usingMemberID;
+        }
+
+        public int LogIn()
+        {
+            return usingMemberID;
+        }
+
+        public int JoinIn()
+        {
+            int usingMemberID = 0;
+
+            return usingMemberID;
+        }
+
+        public void ChangeUserInformation(int usingMemberID)
+        {
+
+        }
+
+        public void ManageMember()
+        {
+
+        }
+
         public List<MemberVO> MemberEdit(int usingMemberNumber, List<MemberVO> members)
         {
             bool isFirstLoop = true;

@@ -14,7 +14,22 @@ namespace EnSharpLibrary.Function
         {
             LibraryVO library = new LibraryVO();
 
+            string id;
+            string password;
+            string name;
 
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_libarary;Uid=ensharpstudy;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open(); // open MySQL      
+
+            //sql = "select * from member;";
+            
+            //reader.Close();
+            connect.Close();
 
             return library;
         }

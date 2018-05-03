@@ -13,6 +13,11 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
 
+        public int LogInOrLogOut(int usingMemberNumber)
+        {
+            return usingMemberNumber;
+        }
+
         public int Member(AdminVO admin, List<MemberVO> members, List<BookVO>books)
         {
             string studentNumber = "";

@@ -17,7 +17,7 @@ namespace EnSharpLibrary
         static void Main(string[] args)
         {
             Menu menu = new Menu();
-            menu.Start(Constant.NON_MEMBER_MODE);
+            menu.RunLibraryProgram(Constant.NON_MEMBER_MODE);
         }
     }
 }
