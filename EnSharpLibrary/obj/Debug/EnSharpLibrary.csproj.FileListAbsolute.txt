@@ -6,3 +6,8 @@ C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\obj\Debug\EnSharpLi
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\obj\Debug\EnSharpLibrary.pdb
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\obj\Debug\EnSharpLibrary.csproj.CopyComplete
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\EnSharpLibrary.exe.config
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Google.Protobuf.dll
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\MySql.Data.dll
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Google.Protobuf.xml
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\MySql.Data.xml

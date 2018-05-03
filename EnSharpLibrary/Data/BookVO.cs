@@ -15,9 +15,10 @@ namespace EnSharpLibrary.Data
         private float bookID;           // 청구기호
 
         // 수정 가능 변수
-        private int bookCondition;
+        private string bookCondition;
         private int borrowedMemberID;
-        private int price; 
+        private int price;
+        private int numberOfBooks;
 
         /// <summary>
         /// BookVO의 생성자입니다.
@@ -33,9 +34,17 @@ namespace EnSharpLibrary.Data
             this.author = author;
             this.publisher = publisher;
             this.publishingYear = publishingYear;
-            bookCondition = 0;
+            bookCondition = "대출 가능";
             borrowedMemberID = -1;
             bookID = 0;
+        }
+
+        public void AppendInformation(float bookID, string bookCondition, int borrowedMemberID, int price)
+        {
+            this.bookID = bookID;
+            this.bookCondition = bookCondition;
+            this.borrowedMemberID = borrowedMemberID;
+            this.price = price;
         }
 
         public string Name
@@ -64,7 +73,7 @@ namespace EnSharpLibrary.Data
             set { bookID = value; }
         }
 
-        public int BookCondition
+        public string BookCondition
         {
             get { return bookCondition; }
             set { bookCondition = value; }
@@ -80,6 +89,12 @@ namespace EnSharpLibrary.Data
         {
             get { return price; }
             set { price = value; }
+        }
+
+        public int NumberOfBooks
+        {
+            get { return numberOfBooks; }
+            set { numberOfBooks = value; }
         }
 
         /// <summary>

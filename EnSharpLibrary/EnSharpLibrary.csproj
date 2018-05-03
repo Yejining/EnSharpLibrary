@@ -65,6 +65,7 @@
     <Compile Include="Data\AdminVO.cs" />
     <Compile Include="Data\BookVO.cs" />
     <Compile Include="Data\Constant.cs" />
+    <Compile Include="Data\HistoryVO.cs" />
     <Compile Include="Data\LibraryVO.cs" />
     <Compile Include="Data\MemberVO.cs" />
     <Compile Include="Function\BookManage.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Function\MemberManage.cs" />
     <Compile Include="Function\MemberSearch.cs" />
     <Compile Include="Function\Menu.cs" />
+    <Compile Include="Function\Tool.cs" />
     <Compile Include="IO\GetValue.cs" />
     <Compile Include="IO\Print.cs" />
     <Compile Include="Program.cs" />

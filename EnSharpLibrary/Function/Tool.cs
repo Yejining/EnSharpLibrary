@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using EnSharpLibrary.Data;
 using EnSharpLibrary.IO;
 
 namespace EnSharpLibrary.Function
@@ -41,6 +42,65 @@ namespace EnSharpLibrary.Function
             if (Console.CursorTop < startingLine + (interval * (countOfOption - 1))) Console.SetCursorPosition(cursorLocation, Console.CursorTop + interval);
             else if (Console.CursorTop == startingLine + (interval * (countOfOption - 1))) Console.SetCursorPosition(cursorLocation, startingLine);
             Console.Write(pointer);
+        }
+
+        /// <summary>
+        /// 입력받은 키가 유호한지 검사하는 메소드입니다.
+        /// </summary>
+        /// <param name="keyInfo">입력받은 키</param>
+        /// <returns>입력받은 키의 유효성</returns>
+        public bool IsValid(ConsoleKeyInfo keyInfo)
+        {
+            // 엔터, 탭
+            if (keyInfo.Key == ConsoleKey.Enter) return false;
+            if (keyInfo.Key == ConsoleKey.Tab) return false;
+
+            // 숫자
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.NUMBER_PATTERN)) return true;
+
+            // 한글, 영어
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.ENGLISH_PATTERN)) return true;
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.KOREAN_PATTERN)) return true;
+
+            // 특수기호
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.SPECIAL_LETTER)) return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// 사용자로부터 엔터 혹은 탭키를 받을 때까지 기다리는 메소드입니다.
+        /// </summary>
+        /// <returns></returns>
+        public int EnterOrTab()
+        {
+            ConsoleKeyInfo keyInfo;
+
+            while (true)
+            {
+                keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.Enter) return Constant.ENTER;
+                else if (keyInfo.Key == ConsoleKey.Tab) return Constant.TAB;
+                else if (keyInfo.Key == ConsoleKey.Escape) return Constant.ESCAPE;
+            }
+        }
+
+        /// <summary>
+        /// ESC키를 받을 때까지 키를 입력받는 메소드입니다.
+        /// </summary>
+        public void WaitUntilGetEscapeKey()
+        {
+            ConsoleKeyInfo keyInfo;
+
+            while (true)
+            {
+                keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.Escape) return;
+                else if (Console.CursorLeft == 0) print.BlockCursorMove(Console.CursorLeft, " ");
+                else print.BlockCursorMove(Console.CursorLeft - 1, " ");
+            }
         }
     }
 }

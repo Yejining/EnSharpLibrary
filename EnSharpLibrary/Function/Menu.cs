@@ -24,22 +24,22 @@ namespace EnSharpLibrary.Function
         /// <param name="mode">프로그램 사용자</param>
         public void RunLibraryProgram(int mode)
         {
-            bool isFirtLoop = true;
+            bool isFirstLoop = true;
 
             if (mode == Constant.NON_MEMBER_MODE) usingMemberID = Constant.PUBLIC;
             
             while (true)
             {
-                if (isFirtLoop)
+                if (isFirstLoop)
                 {
                     // 메뉴 출력
-                    print.SetWindowsizeAndPrintTitle(120, 30, "");
+                    print.SetWindowsizeAndPrintTitle(45, 30, "");
                     print.MenuOption(mode, Console.CursorTop + 2);
 
                     // 기능 선택
-                    print.SetCursorAndChoice(74, 10, '◁');
-                    
-                    isFirtLoop = false;
+                    print.SetCursorAndChoice(38, 10, '◁');
+
+                    isFirstLoop = false;
                 }
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
@@ -47,10 +47,11 @@ namespace EnSharpLibrary.Function
                 // 기능 선택
                 switch(keyInfo.Key)
                 {
-                    case ConsoleKey.UpArrow: tool.UpArrow(74, 10, 5, 2, '◁'); break;
-                    case ConsoleKey.DownArrow: tool.DownArrow(74, 10, 5, 2, '◁'); break;
-                    case ConsoleKey.Enter: GoNextFunction(Console.CursorTop); break;
-                    default: print.BlockCursorMove(74, "◁"); break;
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, 5, 2, '◁'); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, 5, 2, '◁'); break;
+                    case ConsoleKey.Enter: isFirstLoop = GoNextFunction(Console.CursorTop);
+                        if (Console.CursorTop == Constant.CLOSE_PROGRAM) return; break;
+                    default: print.BlockCursorMove(38, "◁"); break;
                 }
             }
         }
@@ -59,7 +60,7 @@ namespace EnSharpLibrary.Function
         /// 사용자가 다음 기능을 선택하면 해당 메소드를 실행시키는 메소드입니다.
         /// </summary>
         /// <param name="cursorTop">사용자가 선택한 기능</param>
-        public void GoNextFunction(int cursorTop)
+        public bool GoNextFunction(int cursorTop)
         {
             switch (Console.CursorTop)                                           // 비회원,          회원,          관리자
             {
@@ -80,8 +81,10 @@ namespace EnSharpLibrary.Function
                     usingMemberID = memberManage.LogInOrLogOut(usingMemberID);
                     break;
                 case Constant.CLOSE_PROGRAM:                                     // 종료
-                    return;
+                    return true;
             }
+
+            return true;
         }
     }
 }
