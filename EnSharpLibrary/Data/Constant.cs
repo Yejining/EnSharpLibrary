@@ -39,8 +39,8 @@ namespace EnSharpLibrary.Data
 
         public static string[] MEMBER_OPTION =
         {
-            "도서 관리",
             "도서 보기",
+            "대출도서 관리",
             "정보수정",
             "로그아웃",
             "종료"
@@ -79,9 +79,20 @@ namespace EnSharpLibrary.Data
             "저      자 | "
         };
 
+        public static string[] LOGIN_SEARCH_CATEGORY_AND_GUIDELINE =
+        {
+            "학번 | ",
+            "8자리 숫자 입력",
+            "암호 | ",
+            "입력"
+        };
+
         public static string[] ERROR_MESSAGE =
         {
-            "검색 조건과 일치하는 도서가 없습니다!"
+            "검색 조건과 일치하는 도서가 없습니다!",
+            "등록되지 않은 학번입니다!",
+            "잘못된 암호 입력입니다!",
+            "값을 입력하세요!"
         };
 
         public static string[] SEARCHED_BOOK_GUIDELINE =
@@ -109,6 +120,10 @@ namespace EnSharpLibrary.Data
         public const int MEMBER_MODE = 1;
         public const int ADMIN_MODE = 2;
 
+        // Print Class의 SearchCategoryAndGuideline에서 사용
+        public const int BOOK_SEARCH_MODE = 0;
+        public const int LOG_IN_MODE = 1;
+
         // Menu Class의 cursorTop 정보
         public const int RELEVANT_TO_BOOK = 10;
         public const int LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER = 12;
@@ -117,6 +132,7 @@ namespace EnSharpLibrary.Data
         public const int CLOSE_PROGRAM = 18;
 
         // BookManage SearchBook에서 사용
+        // Menu에서 사용
         public const int NONE = 0;
 
         // Tool.EnterOrTab return값
@@ -127,6 +143,14 @@ namespace EnSharpLibrary.Data
 
         // ERROR_MESSAGE의 인덱스와 연결해 사용
         public const int THERE_IS_NO_BOOK = 0;
+        public const int THERE_IS_NO_SUCH_ID = 1;
+        public const int PASSWORD_IS_WRONG = 2;
+        public const int THERE_IS_NO_SEARCHWORD = 3;
+
+        // GetValue.Information 에서 입력받는 문자 조건
+        public const int ONLY_NUMBER = 0;
+        public const int ALL_CHARACTER = 1;
+        public const int NO_KOREAN = 2;
 
         public const ConsoleColor FOREGROUND_COLOR = ConsoleColor.White;
     }

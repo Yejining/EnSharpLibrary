@@ -118,23 +118,39 @@ namespace EnSharpLibrary.IO
         }
 
         /// <summary>
-        /// 도서 검색시 검색 항목과 항목별 입력 조건을 출력해주는 메소드입니다.
+        /// 검색 항목과 항목별 입력 조건을 출력해주는 메소드입니다.
         /// </summary>
-        public void BookSearchCategoryAndGuideline()
+        public void SearchCategoryAndGuideline(int mode)
         {
+            string[] categoryAndGuideline;
+
+            Console.SetCursorPosition(0, 11);
+            for (int count = 0; count < Console.WindowHeight - 12; count++)
+            {
+                ClearCurrentConsoleLine();
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+            }
+
+            switch (mode)
+            {
+                case Constant.BOOK_SEARCH_MODE: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
+                case Constant.LOG_IN_MODE: categoryAndGuideline = Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
+                default: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
+            }
+
             Console.SetCursorPosition(10, 11);
 
-            for (int sentence = 0; sentence < Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE.Length; sentence++)
+            for (int sentence = 0; sentence < categoryAndGuideline.Length; sentence++)
             {
                 if (sentence % 2 == 0)  // 조건 출력
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.Write(Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[sentence]);
+                    Console.Write(categoryAndGuideline[sentence]);
                 }
                 else                     // 가이드라인 출력
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine(Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[sentence]);
+                    Console.WriteLine(categoryAndGuideline[sentence]);
                     Console.SetCursorPosition(10, Console.CursorTop + 1);
                 }
             }

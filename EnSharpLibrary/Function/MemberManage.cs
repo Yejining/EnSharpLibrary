@@ -12,6 +12,7 @@ namespace EnSharpLibrary.Function
     {
         Print print = new Print();
         GetValue getValue = new GetValue();
+        Tool tool = new Tool();
 
         public int LogInOrLogOut(int usingMemberID)
         {
@@ -20,7 +21,29 @@ namespace EnSharpLibrary.Function
 
         public int LogIn()
         {
-            return 1;
+            string memberID;
+            string userInputPassword;
+
+            print.SetWindowsizeAndPrintTitle(45, 30, "로그인");
+
+            while (true)
+            {   
+                print.SearchCategoryAndGuideline(Constant.LOG_IN_MODE);
+
+                // 학번
+                memberID = getValue.Information(17, 11, 8, Constant.ONLY_NUMBER, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
+                if (string.Compare(memberID, "@입력취소@") == 0) return 0;
+                else if (memberID.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 17); continue; }
+                else if (!tool.IsExist(memberID)) { print.ErrorMessage(Constant.THERE_IS_NO_SUCH_ID, 17); continue; }
+
+                // 암호
+                userInputPassword = getValue.Information(17, 13, 15, Constant.NO_KOREAN, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
+                if (string.Compare(userInputPassword, "@입력취소@") == 0) return 0;
+                else if (userInputPassword.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 17); continue; }
+                else if (!tool.IsPasswordCorrespond(memberID, userInputPassword)) { print.ErrorMessage(Constant.PASSWORD_IS_WRONG, 17); continue; }
+
+                return Int32.Parse(memberID);   
+            }
         }
 
         public int JoinIn()

@@ -26,6 +26,7 @@ namespace EnSharpLibrary.Function
             string bookName;
             string publisher;
             string author;
+            string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
 
             if (usingMemberID == Constant.PUBLIC) mode = Constant.NON_MEMBER_MODE;
             else mode = Constant.MEMBER_MODE; 
@@ -33,12 +34,15 @@ namespace EnSharpLibrary.Function
             while (true)
             {
                 print.SetWindowsizeAndPrintTitle(45, 30, Constant.SEARCH_BOOK_TITLE[mode]);
-                print.BookSearchCategoryAndGuideline();
+                print.SearchCategoryAndGuideline(Constant.BOOK_SEARCH_MODE);
                 
-                // - 정보 수집
-                bookName = getValue.Information(19, 11, 10); if (string.Compare(bookName, "@입력취소@") == 0) return;
-                publisher = getValue.Information(19, 13, 10); if (string.Compare(publisher, "@입력취소@") == 0) return;
-                author = getValue.Information(19, 15, 10); if (string.Compare(author, "@입력취소@") == 0) return;
+                // 정보 수집
+                bookName = getValue.Information(19, 11, 10, Constant.ALL_CHARACTER, guideline);
+                if (string.Compare(bookName, "@입력취소@") == 0) return;
+                publisher = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, guideline);
+                if (string.Compare(publisher, "@입력취소@") == 0) return;
+                author = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, guideline);
+                if (string.Compare(author, "@입력취소@") == 0) return;
 
                 // 조건 검색
                 searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);

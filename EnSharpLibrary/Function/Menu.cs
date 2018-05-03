@@ -27,11 +27,16 @@ namespace EnSharpLibrary.Function
             bool isFirstLoop = true;
 
             if (mode == Constant.NON_MEMBER_MODE) usingMemberID = Constant.PUBLIC;
-            
+
             while (true)
             {
                 if (isFirstLoop)
                 {
+                    // 모드 설정
+                    if (usingMemberID == Constant.ADMIN) mode = Constant.ADMIN_MODE;
+                    else if (usingMemberID != Constant.PUBLIC) mode = Constant.MEMBER_MODE;
+                    else mode = Constant.NON_MEMBER_MODE;
+
                     // 메뉴 출력
                     print.SetWindowsizeAndPrintTitle(45, 30, "");
                     print.MenuOption(mode, Console.CursorTop + 2);

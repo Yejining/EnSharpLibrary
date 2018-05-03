@@ -21,11 +21,10 @@ namespace EnSharpLibrary.IO
         /// <param name="cursorTop">커서 설정 변수(줄)</param>
         /// <param name="limit">검색 입력 최대 길이</param>
         /// <returns>사용자가 입력한 검색어</returns>
-        public string Information(int cursorLeft, int cursorTop, int limit)
+        public string Information(int cursorLeft, int cursorTop, int limit, int mode, string guideline)
         {
             int currentCursor = 0;
             bool isValid = false;
-            string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
             StringBuilder answer = new StringBuilder();
             ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
 
@@ -38,7 +37,7 @@ namespace EnSharpLibrary.IO
                 keyInfo = Console.ReadKey();
 
                 // 키값이 유효한지 검사
-                isValid = tool.IsValid(keyInfo);
+                isValid = tool.IsValid(keyInfo, mode);
 
                 if (answer.Length == 0) print.DeleteGuideLine(cursorLeft, isValid, keyInfo);
 
@@ -128,6 +127,31 @@ namespace EnSharpLibrary.IO
             connect.Close();
 
             return searchedBook;
+        }
+
+        public string Password(int memberID)
+        {
+            string password = "";
+
+            StringBuilder sql = new StringBuilder("SELECT password FROM member WHERE member_id=" + memberID + ";");
+
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read()) password = reader["password"].ToString();
+
+            reader.Close();
+            connect.Close();
+
+            return password;
         }
 
         /// <summary>
