@@ -118,7 +118,8 @@ namespace EnSharpLibrary.Data
             "값을 입력하세요!",
             "올바르지 않은 입력 길이입니다!",
             "90년부터 현재 년도의 학번만 가입 가능합니다!",
-            "이미 등록된 학번입니다!"
+            "이미 등록된 학번입니다!",
+            "8자 이상 15자 이하로 입력하세요!"
         };
         
         public static string[] SEARCHED_BOOK_GUIDELINE =
@@ -159,6 +160,19 @@ namespace EnSharpLibrary.Data
             "21일", "22일", "23일", "24일", "25일", "26일", "27일", "28일", "29일", "30일", "31일"
         };
 
+        public static string[] MEMBER_EDIT_OPTION =
+        {
+            "주소",
+            "전화번호",
+            "암호"
+        };
+
+        public static string[] MANAGE_MEMBER_OPTION =
+        {
+            "회원 등록",
+            "등록된 회원 관리"
+        };
+
         public static string OUT = "나가기(ESC)";
 
         public const string NUMBER_PATTERN = "[0-9]";
@@ -177,6 +191,7 @@ namespace EnSharpLibrary.Data
         public const int NON_MEMBER_MODE = 0;
         public const int MEMBER_MODE = 1;
         public const int ADMIN_MODE = 2;
+        public const int MANAGE_MEMBER_MODE = 3;
 
         // Print Class의 SearchCategoryAndGuideline에서 사용
         public const int BOOK_SEARCH_MODE = 0;
@@ -189,6 +204,9 @@ namespace EnSharpLibrary.Data
         public const int JOIN_IN_OR_UPDATE_USER_INFORMATION = 14;
         public const int LOG_IN_OR_LOG_OUT = 16;
         public const int CLOSE_PROGRAM = 18;
+
+        public const int APPEND_MEMBER = 12;
+        public const int MANAGE_REGISTERED_MEMBER = 14;
 
         // BookManage SearchBook에서 사용
         // Menu에서 사용
@@ -222,6 +240,7 @@ namespace EnSharpLibrary.Data
         public const int ANSWER_BIRTHDATE_YEAR = 5;
         public const int ANSWER_BIRTHDATE_MONTH = 6;
         public const int ANSWER_BIRTHDATE_DAY = 7;
+        public const int ANSWER_WHAT_TO_EDIT = 8;
 
         // Tools.IsValidAnswer에서 사용
         // ERROR_MESSAGE와 연동
@@ -230,6 +249,12 @@ namespace EnSharpLibrary.Data
         public const int LENGTH_ERROR = 4;
         public const int YEAR_ERROR = 5;
         public const int OVERRIDE_ERROR = 6;
+        public const int WRONG_LENGTH_ERROR = 7;
+
+        // MemberMabage.ChangeUserInformation에서 사용
+        public const int EDIT_ADDRESS = 0;
+        public const int EDIT_PHONE_NUMBER = 1;
+        public const int EDIT_PASSWORD = 2;
 
         public const ConsoleColor FOREGROUND_COLOR = ConsoleColor.White;
     }

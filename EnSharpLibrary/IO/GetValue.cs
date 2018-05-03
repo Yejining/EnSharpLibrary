@@ -29,7 +29,7 @@ namespace EnSharpLibrary.IO
             ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
 
             // 입력 조건 출력
-            print.GuidelineForBookSearch(guideline, cursorLeft, cursorTop);
+            print.GuidelineForSearch(guideline, cursorLeft, cursorTop);
 
             while (true)
             {
@@ -48,7 +48,7 @@ namespace EnSharpLibrary.IO
                 else if (keyInfo.Key == ConsoleKey.Enter || keyInfo.Key == ConsoleKey.Tab) return answer.ToString();      // 검색 완료
                 
                 // 검색어 글자가 0자일 경우 가이드라인 출력
-                if (answer.Length == 0) print.GuidelineForBookSearch(guideline, cursorLeft, cursorTop);
+                if (answer.Length == 0) print.GuidelineForSearch(guideline, cursorLeft, cursorTop);
             }
         }
 
@@ -169,10 +169,11 @@ namespace EnSharpLibrary.IO
 
             // 드롭박스 선택
             if (mode == Constant.ANSWER_ADDRESS) option = Constant.DISTRICT[0];
-            else if (mode > 10) option = Constant.DISTRICT[mode - 9];
+            else if (mode >= 10) option = Constant.DISTRICT[mode - 9];
             else if (mode == Constant.ANSWER_BIRTHDATE_YEAR) option = YEAR();
             else if (mode == Constant.ANSWER_BIRTHDATE_MONTH) option = Constant.MONTH;
             else if (mode == Constant.ANSWER_BIRTHDATE_DAY) option = Constant.DAY;
+            else if (mode == Constant.ANSWER_WHAT_TO_EDIT) option = Constant.MEMBER_EDIT_OPTION;
 
             // 방향키 및 엔터, ESC키 통해 정보 선택 혹은 나가기
             while (true)
@@ -238,8 +239,9 @@ namespace EnSharpLibrary.IO
             
             Console.SetCursorPosition(cursorLeft, cursorTop);
             Console.Write(phoneNumber);
-            
-            for (int count = 0; count < 4; count++)
+            print.GuidelineForSearch("xxxx-xxxx", Console.CursorLeft, cursorTop);
+
+            while (true)
             {
                 currentCursor = Console.CursorLeft;
 
@@ -249,16 +251,21 @@ namespace EnSharpLibrary.IO
 
                 if (middleNumber.Length == 0) print.DeleteGuideLine(cursorLeft + 4, isValid, keyInfo);
 
-                if (keyInfo.Key == ConsoleKey.Escape) return "@입력취소@";                                                        // 나가기
-                else if (keyInfo.Key == ConsoleKey.Backspace) middleNumber = BackspaceInput(cursorLeft, cursorTop, middleNumber); // 지우기
-                else if (isValid) middleNumber = ValidInput(currentCursor, 4, keyInfo.KeyChar, middleNumber);                     // 올바른 입력
-                else print.InvalidInput(keyInfo, currentCursor, cursorTop);                                                       // 입력 무시
-            }
+                if (keyInfo.Key == ConsoleKey.Escape) return "@입력취소@";                                                            // 나가기
+                else if (keyInfo.Key == ConsoleKey.Backspace) middleNumber = BackspaceInput(cursorLeft + 4, cursorTop, middleNumber); // 지우기
+                else if (isValid) middleNumber = ValidInput(currentCursor, 4, keyInfo.KeyChar, middleNumber);                         // 올바른 입력
+                else print.InvalidInput(keyInfo, currentCursor, cursorTop);                                                           // 입력 무시
 
+                if (middleNumber.Length == 0) print.GuidelineForSearch("xxxx-xxxx", cursorLeft + 4, cursorTop);
+                else if (middleNumber.Length == 4) break;
+            }
+ 
             Console.Write('-');
             phoneNumber.Append(middleNumber + "-");
 
-            for (int count = 0; count < 4; count++)
+            print.GuidelineForSearch("xxxx", Console.CursorLeft, cursorTop);
+
+            while (true)
             {
                 currentCursor = Console.CursorLeft;
 
@@ -269,9 +276,12 @@ namespace EnSharpLibrary.IO
                 if (endNumber.Length == 0) print.DeleteGuideLine(currentCursor, isValid, keyInfo);
 
                 if (keyInfo.Key == ConsoleKey.Escape) return "@입력취소@";                                                        // 나가기
-                else if (keyInfo.Key == ConsoleKey.Backspace) endNumber = BackspaceInput(currentCursor, cursorTop, endNumber);    // 지우기
+                else if (keyInfo.Key == ConsoleKey.Backspace) endNumber = BackspaceInput(cursorLeft + 9, cursorTop, endNumber);    // 지우기
                 else if (isValid) endNumber = ValidInput(currentCursor, 4, keyInfo.KeyChar, endNumber);                           // 올바른 입력
                 else print.InvalidInput(keyInfo, currentCursor, cursorTop);                                                       // 입력 무시
+
+                if (endNumber.Length == 0) print.GuidelineForSearch("xxxx", cursorLeft + 9, cursorTop);
+                if (endNumber.Length == 4 && keyInfo.Key == ConsoleKey.Enter) break;
             }
             phoneNumber.Append(endNumber);
 

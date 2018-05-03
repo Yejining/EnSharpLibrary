@@ -135,6 +135,22 @@ namespace EnSharpLibrary.Function
             else return false;
         }
 
+        public void MakeQuerry(string sql)
+        {
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            command.ExecuteReader();
+
+            connect.Close();
+        }
+
         public void RegisterMember(string name, int userID, string password, string address, string phoneNumber, DateTime birthdate)
         {
             StringBuilder sql = new StringBuilder("INSERT INTO member (member_id, name, address, phone_number, password, accumulated_overdue_number, overdue_number, birthdate)");

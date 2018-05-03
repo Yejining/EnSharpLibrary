@@ -101,6 +101,7 @@ namespace EnSharpLibrary.IO
                 case Constant.NON_MEMBER_MODE: option = Constant.NON_MEMBER_OPTION; break;
                 case Constant.MEMBER_MODE: option = Constant.MEMBER_OPTION; break;
                 case Constant.ADMIN_MODE: option = Constant.ADMIN_OPTION; break;
+                case Constant.MANAGE_MEMBER_MODE: option = Constant.MANAGE_MEMBER_OPTION; break;
                 default: option = Constant.NON_MEMBER_OPTION; break;
             }
 
@@ -108,6 +109,7 @@ namespace EnSharpLibrary.IO
             PrintSentence(option[0], cursorTop + 1, Constant.FOREGROUND_COLOR);
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 2, Constant.FOREGROUND_COLOR);
             PrintSentence(option[1], cursorTop + 3, Constant.FOREGROUND_COLOR);
+            if (mode == Constant.MANAGE_MEMBER_MODE) { PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 4, Constant.FOREGROUND_COLOR); return; }
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 4, Constant.FOREGROUND_COLOR);
             PrintSentence(option[2], cursorTop + 5, Constant.FOREGROUND_COLOR);
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 6, Constant.FOREGROUND_COLOR);
@@ -163,7 +165,7 @@ namespace EnSharpLibrary.IO
         /// <param name="guideline">안내멘트</param>
         /// <param name="cursorLeft">커서 설정 변수(들여쓰기)</param>
         /// <param name="cursorTop">커서 설정 변수(줄)</param>
-        public void GuidelineForBookSearch(string guideline, int cursorLeft, int cursorTop)
+        public void GuidelineForSearch(string guideline, int cursorLeft, int cursorTop)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.SetCursorPosition(cursorLeft, cursorTop);
@@ -784,13 +786,13 @@ namespace EnSharpLibrary.IO
         //    Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (guide.Length / 2)) + "}", guide));
         //}
 
-        public void Announce(string content)
+        public void Announce(string content, int cursorTop)
         {
-            // 에러 메시지 출력
-            Console.Write(String.Format("\n{0," + ((Console.WindowWidth / 2) + ((content.Length - 3) / 2)) + "}", content));
+            // 메시지 출력
+            PrintSentence(content, cursorTop, Constant.FOREGROUND_COLOR);
 
-            // 메시지 출력 1초 후 콘솔에서 지우기
-            System.Threading.Thread.Sleep(1000);
+            // 메시지 출력 2초 후 콘솔에서 지우기
+            System.Threading.Thread.Sleep(2000);
             ClearCurrentConsoleLine();
             Console.SetCursorPosition(0, Console.CursorTop - 1);
         }

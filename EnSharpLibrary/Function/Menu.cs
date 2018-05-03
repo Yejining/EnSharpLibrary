@@ -79,7 +79,7 @@ namespace EnSharpLibrary.Function
                     else memberManage.ManageMember();
                     break;
                 case Constant.JOIN_IN_OR_UPDATE_USER_INFORMATION:                // 회원가입,        정보수정,      암호수정
-                    if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.JoinIn();
+                    if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.JoinIn("회원가입");
                     else memberManage.ChangeUserInformation(usingMemberID);
                     break;
                 case Constant.LOG_IN_OR_LOG_OUT:                                 // 관리자 로그인,   로그아웃,      로그아웃

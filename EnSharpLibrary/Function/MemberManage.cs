@@ -57,10 +57,8 @@ namespace EnSharpLibrary.Function
             return Constant.PUBLIC;
         }
 
-        public int JoinIn()
+        public int JoinIn(string title)
         {
-            int usingMemberID = 0;
-
             string name;
             string userID;
             string password;
@@ -71,7 +69,7 @@ namespace EnSharpLibrary.Function
             int year, month, day;
             DateTime birthdate;
 
-            print.SetWindowsizeAndPrintTitle(45, 30, "회원가입");
+            print.SetWindowsizeAndPrintTitle(45, 30, title);
 
             while (true)
             {
@@ -123,12 +121,123 @@ namespace EnSharpLibrary.Function
 
         public void ChangeUserInformation(int usingMemberID)
         {
+            int informationToEdit;
+            int currentCursor;
+            StringBuilder sql = new StringBuilder();
 
+            if (usingMemberID == Constant.ADMIN) print.SetWindowsizeAndPrintTitle(45, 30, "암호수정");
+            else print.SetWindowsizeAndPrintTitle(45, 30, "정보수정");
+
+            if (usingMemberID != Constant.ADMIN)
+            {
+                Console.SetCursorPosition(10, 12);
+                Console.Write("수정할 정보 | ");
+                informationToEdit = getValue.DropBox(Console.CursorLeft, 12, Constant.ANSWER_WHAT_TO_EDIT);
+            }
+            else informationToEdit = Constant.EDIT_PASSWORD;
+            
+            Console.SetCursorPosition(10, 14);
+            if (informationToEdit == Constant.EDIT_PASSWORD) Console.Write("현재 ");
+            Console.Write(Constant.MEMBER_EDIT_OPTION[informationToEdit] + " | ");
+
+            currentCursor = Console.CursorLeft;
+
+            while (true)
+            {
+                Console.SetCursorPosition(currentCursor, 14); print.ClearSearchBar(currentCursor, "", 1);
+                for (int clear = 1; clear < 5; clear++) { print.ClearCurrentConsoleLine(); Console.SetCursorPosition(0, 14 + clear); }
+                Console.SetCursorPosition(0, 14);
+                sql.Clear();
+
+                if (informationToEdit == Constant.EDIT_ADDRESS)
+                {
+                    int address1 = getValue.DropBox(currentCursor, 14, Constant.ANSWER_ADDRESS);
+                    if (address1 == -1) return;
+                    Console.SetCursorPosition(currentCursor, 14);
+                    Console.Write(Constant.DISTRICT[0][address1]);
+                    int address2 = getValue.DropBox(Console.CursorLeft + 1, 14, Constant.ANSWER_ADDRESS_DEEPLY + address1);
+                    if (address2 == -1) return;
+                    StringBuilder address = new StringBuilder(Constant.DISTRICT[0][address1] + " " + Constant.DISTRICT[address1 + 1][address2]);
+                    sql.Append("UPDATE member SET address=\'"+address+"\' WHERE member_id="+usingMemberID+";");
+                }
+                else if (informationToEdit == Constant.EDIT_PHONE_NUMBER)
+                {
+                    string phoneNumber = getValue.PhoneNumber(currentCursor, 14);
+                    if (string.Compare(phoneNumber, "@입력취소@") == 0) return;
+                    sql.Append("UPDATE member SET phone_number=\'" + phoneNumber + "\' WHERE member_id=" + usingMemberID + ";");
+                }
+                else if (informationToEdit == Constant.EDIT_PASSWORD)
+                {
+                    print.GuidelineForSearch("입력", currentCursor, 14);
+                    string password = getValue.Information(currentCursor, 14, 15, Constant.NO_KOREAN, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
+                    if (string.Compare(password, "@입력취소@") == 0) return;
+                    else if (password.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 16); continue; }
+                    else if (!tool.IsPasswordCorrespond(usingMemberID.ToString(), password)) { print.ErrorMessage(Constant.PASSWORD_IS_WRONG, 16); continue; }
+
+                    Console.SetCursorPosition(10, 16);
+                    Console.Write("새 암호 입력 | ");
+                    print.GuidelineForSearch("입력", Console.CursorLeft, 16);
+                    string newPassword = getValue.Information(Console.CursorLeft, 16, 15, Constant.NO_KOREAN, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
+                    if (string.Compare(newPassword, "@입력취소@") == 0) return;
+                    else if (newPassword.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 18); continue; }
+                    else if (newPassword.Length < 8) { print.ErrorMessage(Constant.WRONG_LENGTH_ERROR, 18); continue; }
+                    sql.Append("UPDATE member SET password=\'" + newPassword + "\' WHERE member_id=" + usingMemberID + ";");
+                }
+                tool.MakeQuerry(sql.ToString());
+
+                break;
+            }
+
+            print.Announce("변경이 완료되었습니다!", Console.CursorTop + 2);
         }
 
         public void ManageMember()
         {
+            bool isFirstLoop = true;
+            
 
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    // 메뉴 출력
+                    print.SetWindowsizeAndPrintTitle(45, 30, "회원 관리");
+                    print.MenuOption(Constant.MANAGE_MEMBER_MODE, Console.CursorTop + 2);
+
+                    // 기능 선택
+                    print.SetCursorAndChoice(38, 12, '◁');
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                // 기능 선택
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, '◁'); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, '◁'); break;
+                    case ConsoleKey.Enter: isFirstLoop = GoNextFunction(Console.CursorTop); break;
+                    case ConsoleKey.Escape: return;
+                    default: print.BlockCursorMove(38, "◁"); break;
+                }
+            }
+        }
+
+        public bool GoNextFunction(int cursorTop)
+        {
+            switch (Console.CursorTop)                                    
+            {
+                case Constant.APPEND_MEMBER: JoinIn("회원 등록"); return true;
+                case Constant.MANAGE_REGISTERED_MEMBER: SearchMember(); return true;
+            }
+
+            return true;
+        }
+
+        public void SearchMember()
+        {
+            tool.WaitUntilGetEscapeKey();
         }
 
         //public List<MemberVO> MemberEdit(int usingMemberNumber, List<MemberVO> members)
