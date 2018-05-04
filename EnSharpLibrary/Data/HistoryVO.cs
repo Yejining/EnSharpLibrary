@@ -12,6 +12,12 @@ namespace EnSharpLibrary.Data
         private DateTime dateDeadlineForReturn;
         private int numberOfRenew;
 
+        /// <summary>
+        /// HistoryVO의 생성자입니다. 어느 도서의 대출일, 예상 반납일, 연장 횟수를 저장합니다.
+        /// </summary>
+        /// <param name="dateBorrowed">대출일</param>
+        /// <param name="dateDeadlineForReturn">예상 반납일</param>
+        /// <param name="numberOfRenew">연장 횟수</param>
         public HistoryVO(DateTime dateBorrowed, DateTime dateDeadlineForReturn, int numberOfRenew)
         {
             this.dateBorrowed = dateBorrowed;
