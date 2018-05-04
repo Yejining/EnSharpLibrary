@@ -58,11 +58,12 @@ namespace EnSharpLibrary.IO
         /// <param name="bookName">사용자가 검색시 입력한 도서명</param>
         /// <param name="publisher">사용자가 검색시 입력한 출판사</param>
         /// <param name="author">사용자가 검색시 입력한 작가</param>
-        public void SearchedBookTitle(string bookName, string publisher, string author)
+        public void SearchedTitle(int mode, string bookName, string publisher, string author)
         {
             List<string> searchingCondition = new List<string>();
 
             Console.SetCursorPosition(85, 2);
+            
             foreach (string title in Constant.ENSHARP_TITLE_IN_SEARCH_MODE)
             {
                 Console.WriteLine(title);
@@ -72,17 +73,22 @@ namespace EnSharpLibrary.IO
             // 검색 조건이 '전체'로 설정되어있거나 입력값이 없는 경우
             if (string.Compare(bookName, "") == 0) bookName = string.Copy("전체");
             if (string.Compare(publisher, "") == 0) publisher = string.Copy("전체");
+            if (mode == Constant.MEMBER_SEARCH_MODE && string.Compare(publisher, "0") == 0) publisher = string.Copy("전체");
             if (string.Compare(author, "") == 0) author = string.Copy("전체");
             searchingCondition.Add(bookName);
             searchingCondition.Add(publisher);
             searchingCondition.Add(author);
-            
+
+            string[] searchingMenu;
+            if (mode == Constant.BOOK_SEARCH_MODE) searchingMenu = Constant.SEARCHING_BOOK_MENU_IN_SEARCHING_MODE;
+            else searchingMenu = Constant.SEARCHING_MEMBER_MENU_IN_SEARCHING_MODE;
+
             // 배경 출력
             Console.SetCursorPosition(7, 1);
-            for (int item = 1; item < Constant.SEARCHING_MENU_IN_SEARCHING_MODE.Count(); item++)
+            for (int item = 1; item < searchingMenu.Count(); item++)
             {
                 Console.SetCursorPosition(7, Console.CursorTop + 2);
-                Console.Write(Constant.SEARCHING_MENU_IN_SEARCHING_MODE[item]);
+                Console.Write(searchingMenu[item]);
                 Console.Write(searchingCondition[item - 1]);
             }
         }
@@ -138,6 +144,7 @@ namespace EnSharpLibrary.IO
                 case Constant.BOOK_SEARCH_MODE: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 case Constant.LOG_IN_MODE: categoryAndGuideline = Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 case Constant.JOIN_IN: categoryAndGuideline = Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
+                case Constant.MEMBER_SEARCH_MODE: categoryAndGuideline = Constant.MEMBER_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 default: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
             }
 
@@ -201,11 +208,23 @@ namespace EnSharpLibrary.IO
             Console.SetWindowSize(130, 35);
             Console.Clear();
 
-            SearchedBookTitle(bookName, publisher, author);
+            SearchedTitle(Constant.BOOK_SEARCH_MODE, bookName, publisher, author);
             Console.SetCursorPosition(0, 11);
             foreach (string guideline in Constant.SEARCHED_BOOK_GUIDELINE) Console.WriteLine(guideline);
 
             Books(searchedBook, Console.CursorTop);
+        }
+
+        public void SearchedMember(List<MemberVO> searchedMember, string name, string age, string address)
+        {
+            Console.SetWindowSize(120, 35);
+            Console.Clear();
+
+            SearchedTitle(Constant.MEMBER_SEARCH_MODE, name, age, address);
+            Console.SetCursorPosition(0, 11);
+            foreach (string guidline in Constant.SEARCHED_MEMBER_GUIDELINE) Console.WriteLine(guidline);
+
+            Members(searchedMember, Console.CursorTop);
         }
 
         public void Books(List<BookVO> books, int cursorTop)
@@ -232,6 +251,27 @@ namespace EnSharpLibrary.IO
                 }
             }
             
+            PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
+        }
+
+        public void Members(List<MemberVO> members, int cursorTop)
+        {
+            Console.SetCursorPosition(0, cursorTop);
+
+            for (int order = 0; order < members.Count; order++)
+            {
+                Console.SetCursorPosition(10, Console.CursorTop);
+                Console.Write(members[order].Name);
+                Console.SetCursorPosition(23, Console.CursorTop);
+                Console.Write(members[order].MemberID);
+                Console.SetCursorPosition(34, Console.CursorTop);
+                Console.Write(members[order].Address);
+                Console.SetCursorPosition(68, Console.CursorTop);
+                Console.Write(members[order].PhoneNumber);
+                Console.SetCursorPosition(85, Console.CursorTop);
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+            }
+
             PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
         }
 

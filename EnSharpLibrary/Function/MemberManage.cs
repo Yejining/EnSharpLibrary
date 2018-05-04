@@ -237,7 +237,41 @@ namespace EnSharpLibrary.Function
 
         public void SearchMember()
         {
+            List<MemberVO> searchedMember;
+            string name;
+            int age;
+
+            print.SearchCategoryAndGuideline(Constant.MEMBER_SEARCH_MODE);
+
+            // 정보 수집
+            name = getValue.Information(22, 11, 10, Constant.ONLY_KOREAN, Constant.MEMBER_SEARCH_CATEGORY_AND_GUIDELINE[1]);
+            if (string.Compare(name, "@입력취소@") == 0) return;
+            age = getValue.DropBox(22, 13, Constant.ANSWER_BIRTHDATE_YEAR_INCLUDE_ALL_OPTION);
+            if (age == -1) return;
+
+            // - 주소
+            int currentCursor = 22;
+            int address1 = getValue.DropBox(currentCursor, 15, Constant.ANSWER_ADDRESS_INCLUDE_ALL_OPTION);
+            if (address1 == -1) return;
+            Console.SetCursorPosition(currentCursor, 15);
+            Console.Write(Constant.DISTRICT_INCLUDE_ALL_OPTION[address1]);
+            StringBuilder address = new StringBuilder(Constant.DISTRICT_INCLUDE_ALL_OPTION[address1]);
+            if (address1 != 0)
+            {
+                int address2 = getValue.DropBox(Console.CursorLeft + 1, 15, Constant.ANSWER_ADDRESS_DEEPLY + address1 - 1);
+                if (address2 == -1) return;
+                address.Append(" " + Constant.DISTRICT[address1][address2]);
+                if (string.Compare(address.ToString(), "@입력취소@") == 0) return;
+            }
+
+            searchedMember = getValue.SearchMemberByCondition(name, age, address.ToString());
+            CheckMemberAndDelete(searchedMember, name, age.ToString(), address.ToString());
             tool.WaitUntilGetEscapeKey();
+        }
+
+        public void CheckMemberAndDelete(List<MemberVO> searchedMember, string name, string age, string address)
+        {
+            print.SearchedMember(searchedMember, name, age, address);
         }
 
         //public List<MemberVO> MemberEdit(int usingMemberNumber, List<MemberVO> members)

@@ -32,6 +32,26 @@ namespace EnSharpLibrary.Data
             overdueNumber = 0;
         }
 
+        public MemberVO(int number, string name, string password)
+        {
+            memberID = number;
+            this.name = name;
+            this.password = password;
+        }
+
+        public void AppendInformation(string address, string phoneNumber, DateTime birthdate)
+        {
+            this.address = address;
+            this.phoneNumber = phoneNumber;
+            this.birthdate = birthdate;
+        }
+
+        public void AppendInformation(int accumulatedOverdueNumber, int overdueNumber)
+        {
+            this.accumulatedOverdueNumber = accumulatedOverdueNumber;
+            this.overdueNumber = overdueNumber;
+        }
+
         /// <summary>
         /// 회원의 번호와 이름, 암호를 저장하는 메소드입니다.
         /// </summary>

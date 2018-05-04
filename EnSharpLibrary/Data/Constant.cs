@@ -71,12 +71,20 @@ namespace EnSharpLibrary.Data
             "10글자 이내 입력"
         };
 
-        public static string[] SEARCHING_MENU_IN_SEARCHING_MODE =
+        public static string[] SEARCHING_BOOK_MENU_IN_SEARCHING_MODE =
         {
             " | 검 색 |",
             "도  서  명 | ",
             "출  판  사 | ",
             "저      자 | "
+        };
+
+        public static string[] SEARCHING_MEMBER_MENU_IN_SEARCHING_MODE =
+        {
+            " | 검 색 |",
+            "이      름 | ",
+            "출생  년도 | ",
+            "주      소 | "
         };
 
         public static string[] LOG_IN_TITLE =
@@ -128,6 +136,12 @@ namespace EnSharpLibrary.Data
             "---------------------------------------------------------------------------------------------------------------------------------"
         };
 
+        public static string[] SEARCHED_MEMBER_GUIDELINE =
+        {
+            "  선택  |    이름    |   학번   |              주소               |    전화번호    |  대출도서 번호  |  연체도서 번호  ",
+            "-----------------------------------------------------------------------------------------------------------------------"
+        };
+
         public static string[][] DISTRICT =
         {
             new string[] {"강원도", "경기도", "경상남도", "경상북도", "광주광역시", "대구광역시", "대전광역시", "부산광역시", "서울특별시", "세종특별자치시", "울산광역시", "인천광역시", "제주특별자치도", "충청남도", "충청북도" },
@@ -146,6 +160,11 @@ namespace EnSharpLibrary.Data
             new string[] { "제주시", "서귀포시" },
             new string[] { "천안시", "아산시", "보령시", "공주시", "서산시", "논산시", "계롱시", "당진시", "금산군", "부여군", "서천군", "청양군", "홍성군", "예산군", "태안군" },
             new string[] { "청주시", "충주시", "제천시", "단양군", "괴산군", "보은군", "옥천군", "영동군", "음성군", "진천군", "증평군" }
+        };
+
+        public static string[] DISTRICT_INCLUDE_ALL_OPTION =
+        {
+            "전체", "강원도", "경기도", "경상남도", "경상북도", "광주광역시", "대구광역시", "대전광역시", "부산광역시", "서울특별시", "세종특별자치시", "울산광역시", "인천광역시", "제주특별자치도", "충청남도", "충청북도"
         };
 
         public static string[] MONTH =
@@ -173,6 +192,18 @@ namespace EnSharpLibrary.Data
             "등록된 회원 관리"
         };
 
+        public static string[] MEMBER_SEARCH_CATEGORY_AND_GUIDELINE =
+        {
+            "회원 이름 | ",
+            "5글자 이내 한글 입력",
+            "회원 생년 | ",
+            "선택",
+            "회원 주소 | ",
+            "선택"
+        };
+
+        public static string SEARCH_MEMBER_TITLE = "등록된 회원 관리";
+
         public static string OUT = "나가기(ESC)";
 
         public const string NUMBER_PATTERN = "[0-9]";
@@ -197,6 +228,7 @@ namespace EnSharpLibrary.Data
         public const int BOOK_SEARCH_MODE = 0;
         public const int LOG_IN_MODE = 1;
         public const int JOIN_IN = 2;
+        public const int MEMBER_SEARCH_MODE = 3;
 
         // Menu Class의 cursorTop 정보
         public const int RELEVANT_TO_BOOK = 10;
@@ -235,12 +267,17 @@ namespace EnSharpLibrary.Data
         public const int ANSWER_USER_ID = 1;
         public const int ANSWER_PASSWORD = 2;
         public const int ANSWER_ADDRESS = 3;
-        public const int ANSWER_ADDRESS_DEEPLY = 10;
+        public const int ANSWER_ADDRESS_DEEPLY = 20;
+        public const int ANSWER_ADDRESS_INCLUDE_ALL_OPTION = 9;
         public const int ANSWER_PHONE_NUMBER = 4;
         public const int ANSWER_BIRTHDATE_YEAR = 5;
+        public const int ANSWER_BIRTHDATE_YEAR_INCLUDE_ALL_OPTION = 11;
         public const int ANSWER_BIRTHDATE_MONTH = 6;
         public const int ANSWER_BIRTHDATE_DAY = 7;
         public const int ANSWER_WHAT_TO_EDIT = 8;
+
+        public const int GENERAL_MODE = 0;
+        public const int INCLUDE_ALL_OPTION = 1;
 
         // Tools.IsValidAnswer에서 사용
         // ERROR_MESSAGE와 연동

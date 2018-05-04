@@ -128,6 +128,73 @@ namespace EnSharpLibrary.IO
             return searchedBook;
         }
 
+        public List<MemberVO> SearchMemberByCondition(string name, int age, string address)
+        {
+            List<MemberVO> searchedMember = new List<MemberVO>();
+            StringBuilder sql = new StringBuilder("SELECT * FROM member ");
+            int memberID;
+            string memberName;
+            string memberAddress;
+            string phoneNumber;
+            string password;
+            int accumulatedOverdueNumber;
+            int overdueNumber;
+            string birthdate;
+            string[] date;
+            int year, month, day;
+
+            if (name.Length != 0) sql.Append("WHERE member_name REGEXP \'" + name + "\'");
+            if (age != 0)
+            {
+                if (name.Length == 0) sql.Append("WHERE member_age=" + age + 1989);
+                else sql.Append(" AND member_age=" + age + 1989);
+            }
+            if (string.Compare(address, "전체") != 0)
+            {
+                if (name.Length == 0 || age == 0) sql.Append("WHERE member_address REGEXP \'" + address + "\'");
+                else sql.Append(" AND member_address REGEXP \'" + address + "\'");
+            }
+            sql.Append(";");
+
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+            
+            while (reader.Read())
+            {
+                memberID = Int32.Parse(reader["member_id"].ToString());
+                memberName = reader["name"].ToString();
+                memberAddress = reader["address"].ToString();
+                phoneNumber = reader["phone_number"].ToString();
+                password = reader["password"].ToString();
+                accumulatedOverdueNumber = Int32.Parse(reader["accumulated_overdue_number"].ToString());
+                overdueNumber = Int32.Parse(reader["overdue_number"].ToString());
+                birthdate = reader["birthdate"].ToString().Remove(10, 12);
+                date = birthdate.Split('-');
+                year = Int32.Parse(date[0]);
+                month = Int32.Parse(date[1]);
+                day = Int32.Parse(date[2]);
+
+                MemberVO member = new MemberVO(memberID, memberName, password);
+                member.AppendInformation(memberAddress, phoneNumber, new DateTime(year, month, day));
+                member.AppendInformation(accumulatedOverdueNumber, overdueNumber);
+
+                searchedMember.Add(member); 
+            }
+            
+            reader.Close();
+            connect.Close();
+
+            return searchedMember;
+        }
+
         public string Password(int memberID)
         {
             string password = "";
@@ -169,11 +236,13 @@ namespace EnSharpLibrary.IO
 
             // 드롭박스 선택
             if (mode == Constant.ANSWER_ADDRESS) option = Constant.DISTRICT[0];
-            else if (mode >= 10) option = Constant.DISTRICT[mode - 9];
-            else if (mode == Constant.ANSWER_BIRTHDATE_YEAR) option = YEAR();
+            else if (mode >= 20) option = Constant.DISTRICT[mode - 9];
+            else if (mode == Constant.ANSWER_BIRTHDATE_YEAR) option = YEAR(Constant.GENERAL_MODE);
             else if (mode == Constant.ANSWER_BIRTHDATE_MONTH) option = Constant.MONTH;
             else if (mode == Constant.ANSWER_BIRTHDATE_DAY) option = Constant.DAY;
             else if (mode == Constant.ANSWER_WHAT_TO_EDIT) option = Constant.MEMBER_EDIT_OPTION;
+            else if (mode == Constant.ANSWER_ADDRESS_INCLUDE_ALL_OPTION) option = Constant.DISTRICT_INCLUDE_ALL_OPTION;
+            else if (mode == Constant.ANSWER_BIRTHDATE_YEAR_INCLUDE_ALL_OPTION) option = YEAR(Constant.INCLUDE_ALL_OPTION);
 
             // 방향키 및 엔터, ESC키 통해 정보 선택 혹은 나가기
             while (true)
@@ -209,19 +278,29 @@ namespace EnSharpLibrary.IO
             }
         }
 
-        public string[] YEAR()
+        public string[] YEAR(int mode)
         {
-            string[] years = new string[DateTime.Now.Year - 1990 + 1];
+            string[] years;
+
+            if (mode == Constant.INCLUDE_ALL_OPTION)
+            {
+                years = new string[DateTime.Now.Year - 1990 + 2];
+                years.SetValue("전체", 0);
+            }
+            else years = new string[DateTime.Now.Year - 1990 + 1];
 
             for (int year = 1990; year <= DateTime.Now.Year; year++)
-                years.SetValue(year + "년", year - 1990);
+            {
+                if (mode == Constant.GENERAL_MODE) years.SetValue(year + "년", year - 1990);
+                else years.SetValue(year + "년", year - 1989);
+            }
 
             return years;
         }
 
         public DateTime Birthdate(int yearIndex, int monthIndex, int dayIndex)
         {
-            string year = YEAR()[yearIndex].Remove(4, 1);
+            string year = YEAR(Constant.GENERAL_MODE)[yearIndex].Remove(4, 1);
             string month = Constant.MONTH[monthIndex].Remove(2, 1);
             string day = Constant.DAY[dayIndex].Remove(2, 1);
 
@@ -289,6 +368,7 @@ namespace EnSharpLibrary.IO
 
             return phoneNumber.ToString();
         }
+
 
         /// <summary>
         /// 사용자가 검색창 입력시 백스페이스 키를 누르면 한글자 지우기를 실행한 후
