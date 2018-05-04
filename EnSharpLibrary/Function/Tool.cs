@@ -286,6 +286,23 @@ namespace EnSharpLibrary.Function
             MakeQuerry(sql.ToString());
         }
 
+        public void Extend(float bookID)
+        {
+            StringBuilder sql = new StringBuilder("UPDATE history SET date_deadline_for_return=ADDDATE(date_deadline_for_return, INTERVAL 6 DAY), number_of_renew=number_of_renew+1");
+            sql.Append(" WHERE book_id=" + bookID + ";");
+
+            MakeQuerry(sql.ToString());
+        }
+
+        public void Return(float bookID)
+        {
+            StringBuilder sql1 = new StringBuilder("UPDATE history SET date_return=NOW() WHERE book_id="+bookID+";");
+            StringBuilder sql2 = new StringBuilder("UPDATE book SET borrowed_member_id=0 WHERE book_id=" + bookID + ";");
+
+            MakeQuerry(sql1.ToString());
+            MakeQuerry(sql2.ToString());
+        }
+
         /// <summary>
         /// 사용자로부터 엔터 혹은 탭키를 받을 때까지 기다리는 메소드입니다.
         /// </summary>

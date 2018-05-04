@@ -69,11 +69,11 @@ namespace EnSharpLibrary.Function
         {
             switch (Console.CursorTop)                                           // 비회원,          회원,          관리자
             {
-                case Constant.RELEVANT_TO_BOOK:                                  // 비회원 도서검색, 도서보기.      도서관리
+                case Constant.RELEVANT_TO_BOOK:                                  // 비회원 도서검색, 도서대출.      도서관리
                     if (usingMemberID != Constant.ADMIN) bookManage.SearchBook(usingMemberID);
                     else bookManage.ManageBook();
                     break;
-                case Constant.LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER:    // 로그인,          대출도서 보기, 회원관리
+                case Constant.LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER:    // 로그인,          연장 및 반납,  회원관리
                     if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.LogIn(Constant.MEMBER_MODE);
                     else if (usingMemberID != Constant.ADMIN) bookManage.ManageBorrowedBook(usingMemberID);
                     else memberManage.ManageMember();

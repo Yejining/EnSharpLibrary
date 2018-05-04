@@ -93,6 +93,23 @@ namespace EnSharpLibrary.IO
             }
         }
 
+        public void ManageBorrowedBookTitle()
+        {
+            Console.SetWindowSize(128, 30);
+            Console.Clear();
+
+            Console.SetCursorPosition(85, 2);
+
+            foreach (string title in Constant.ENSHARP_TITLE_IN_SEARCH_MODE)
+            {
+                Console.WriteLine(title);
+                Console.SetCursorPosition(85, Console.CursorTop);
+            }
+
+            Console.SetCursorPosition(0, 6);
+            foreach (string guideline in Constant.MANAGE_BORROWED_BOOK_GUIDELINE) Console.WriteLine(guideline);
+        }
+
         /// <summary>
         /// Menu Class에서 옵션을 출력하는 메소드입니다.
         /// </summary>
@@ -219,8 +236,8 @@ namespace EnSharpLibrary.IO
         {
             Console.SetCursorPosition(0, 11);
             foreach (string guideline in Constant.SEARCHED_BOOK_DETAILED_GUIDLINE) Console.WriteLine(guideline);
-            
             Console.SetCursorPosition(0, 13);
+
             for (int order = 0; order < books.Count; order++)
             {
                 Console.SetCursorPosition(10, Console.CursorTop);
@@ -239,8 +256,26 @@ namespace EnSharpLibrary.IO
                 Console.Write(books[order].Price + "원");
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
             }
+        }
 
-
+        public void BorrowedBook(List<BookVO> books, List<HistoryVO> histories)
+        {
+            for (int order = 0; order < books.Count; order++)
+            {
+                Console.SetCursorPosition(18, Console.CursorTop);
+                Console.Write(books[order].Name);
+                Console.SetCursorPosition(58, Console.CursorTop);
+                Console.Write(books[order].Author);
+                Console.SetCursorPosition(80, Console.CursorTop);
+                Console.Write(histories[order].DateBorrowed.ToShortDateString());
+                Console.SetCursorPosition(95, Console.CursorTop);
+                Console.Write(histories[order].NumberOfRenew + "회");
+                Console.SetCursorPosition(104, Console.CursorTop);
+                Console.Write(histories[order].DateDeadlineForReturn.ToShortDateString());
+                Console.SetCursorPosition(118, Console.CursorTop);
+                Console.Write(books[order].BookID);
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+            }
         }
 
         public void SearchedMember(List<MemberVO> searchedMember, string name, string age, string address)

@@ -52,10 +52,13 @@ namespace EnSharpLibrary.IO
             }
         }
 
-        public List<BookVO> SearchBookByBookID(int bookID)
+        public List<BookVO> SearchBookByID(int mode, int ID)
         {
             List<BookVO> searchedBook = new List<BookVO>();
-            StringBuilder sql = new StringBuilder("SELECT * FROM book WHERE FLOOR(book_id)="+bookID+";");
+            StringBuilder sql = new StringBuilder();
+
+            if (mode == Constant.BOOK_ID) sql.Append("SELECT * FROM book WHERE FLOOR(book_id)=" + ID + ";");
+            else sql.Append("SELECT * FROM book WHERE FLOOR(borrowed_member_id)=" + ID + ";");
 
             string nameForVO;
             string authorForVO;
@@ -265,6 +268,42 @@ namespace EnSharpLibrary.IO
             connect.Close();
 
             return password;
+        }
+
+        public List<HistoryVO> BookHistory(int memberID)
+        {
+            List<HistoryVO> histories = new List<HistoryVO>();
+            StringBuilder sql = new StringBuilder("SELECT * FROM history WHERE member_id=" + memberID + " AND date_return IS NULL;");
+
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string date1 = reader["date_borrowed"].ToString().Remove(10, 12);
+                string[] date2 = date1.Split('-');
+                string date3 = reader["date_deadline_for_return"].ToString().Remove(10, 12);
+                string[] date4 = date3.Split('-');
+                int numberOfRenew = Int32.Parse(reader["number_of_renew"].ToString());
+
+                HistoryVO history = new HistoryVO(new DateTime(Int32.Parse(date2[0]), Int32.Parse(date2[1]), Int32.Parse(date2[2])),
+                    new DateTime(Int32.Parse(date4[0]), Int32.Parse(date4[1]), Int32.Parse(date4[2])), numberOfRenew);
+
+                histories.Add(history);
+            }
+
+            reader.Close();
+            connect.Close();
+
+            return histories;
         }
 
         /// <summary>

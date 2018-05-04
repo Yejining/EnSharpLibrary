@@ -142,6 +142,12 @@ namespace EnSharpLibrary.Data
             "-----------------------------------------------------------------------------------------------------------------------"
         };
 
+        public static string[] MANAGE_BORROWED_BOOK_GUIDELINE =
+        {
+            " 연장(Q)반납(W) |                  도서                 |       저자      |     대출일     | 연장횟수 |  반납예정  | 청구기호  ",
+            "-------------------------------------------------------------------------------------------------------------------------------"
+        };
+
         public static string[] SEARCHED_MEMBER_GUIDELINE =
         {
             "  선택  |    이름    |   학번   |              주소               |    전화번호    |  대출도서 번호  |  연체도서 번호  ",
@@ -235,6 +241,7 @@ namespace EnSharpLibrary.Data
         public const int LOG_IN_MODE = 1;
         public const int JOIN_IN = 2;
         public const int MEMBER_SEARCH_MODE = 3;
+        public const int MANAGE_BORROWED_BOOK = 4;
 
         // Menu Class의 cursorTop 정보
         public const int RELEVANT_TO_BOOK = 10;
@@ -303,6 +310,9 @@ namespace EnSharpLibrary.Data
         public const int EXTEND = 1;
         public const int RETURN = 2;
         public const int FAIL = 3;
+
+        public const int BOOK_ID = 0;
+        public const int MEMBER_ID = 1;
 
         public const ConsoleColor FOREGROUND_COLOR = ConsoleColor.White;
     }
