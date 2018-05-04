@@ -32,6 +32,12 @@ namespace EnSharpLibrary.Data
             overdueNumber = 0;
         }
 
+        /// <summary>
+        /// MemberVO의 생성자입니다. 회원의 학번과 이름, 암호를 저장합니다.
+        /// </summary>
+        /// <param name="number">학번</param>
+        /// <param name="name">이름</param>
+        /// <param name="password">암호</param>
         public MemberVO(int number, string name, string password)
         {
             memberID = number;
@@ -39,6 +45,12 @@ namespace EnSharpLibrary.Data
             this.password = password;
         }
 
+        /// <summary>
+        /// MemberVO의 정보를 더해주는 메소드입니다. 주소와 전화번호, 생일을 저장합니다.
+        /// </summary>
+        /// <param name="address">주소</param>
+        /// <param name="phoneNumber">전화번호</param>
+        /// <param name="birthdate">생일</param>
         public void AppendInformation(string address, string phoneNumber, DateTime birthdate)
         {
             this.address = address;
@@ -46,34 +58,15 @@ namespace EnSharpLibrary.Data
             this.birthdate = birthdate;
         }
 
+        /// <summary>
+        /// MemberVO의 정보를 더해주는 메소드입니다. 누적연체횟수와 연체횟수를 저장합니다.
+        /// </summary>
+        /// <param name="accumulatedOverdueNumber">누적연체횟수</param>
+        /// <param name="overdueNumber">연체횟수</param>
         public void AppendInformation(int accumulatedOverdueNumber, int overdueNumber)
         {
             this.accumulatedOverdueNumber = accumulatedOverdueNumber;
             this.overdueNumber = overdueNumber;
-        }
-
-        /// <summary>
-        /// 회원의 번호와 이름, 암호를 저장하는 메소드입니다.
-        /// </summary>
-        /// <param name="number">회원 번호</param>
-        /// <param name="name">회원 이름</param>
-        /// <param name="password">암호</param>
-        public void SetMember(int number, string name, string password)
-        {
-            memberID = number;
-            this.name = name;
-            this.password = password;
-        }
-
-        /// <summary>
-        /// 회원의 주소와 전화번호를 저장하는 메소드입니다.
-        /// </summary>
-        /// <param name="address">주소</param>
-        /// <param name="phoneNumber">전화번호</param>
-        public void SetMember(string address, string phoneNumber)
-        {
-            this.address = address;
-            this.phoneNumber = phoneNumber;
         }
 
         public int MemberID
@@ -119,16 +112,6 @@ namespace EnSharpLibrary.Data
         {
             get { return overdueNumber; }
             set { overdueNumber = value; }
-        }
-
-        /// <summary>
-        /// 도서를 반납하는 메소드입니다.
-        /// 반납할 책의 청구기호를 받아 대여목록에서 삭제합니다.
-        /// </summary>
-        /// <param name="numberOfBook">반납할 책의 청구기호</param>
-        public void ReturnBook(float numberOfBook)
-        {
-            
         }
     }
 }
