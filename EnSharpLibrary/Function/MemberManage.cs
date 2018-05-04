@@ -14,12 +14,22 @@ namespace EnSharpLibrary.Function
         GetValue getValue = new GetValue();
         Tool tool = new Tool();
 
+        /// <summary>
+        /// 사용자의 ID에 따라 로그인 혹은 로그아웃 작업을 진행하는 메소드입니다.
+        /// </summary>
+        /// <param name="usingMemberID">사용자 ID</param>
+        /// <returns>갱신된 사용자 ID</returns>
         public int LogInOrLogOut(int usingMemberID)
         {
             if (usingMemberID == Constant.PUBLIC) return LogIn(Constant.ADMIN_MODE);
             else return LogOut();
         }
 
+        /// <summary>
+        /// 로그인 기능을 수행하는 메소드입니다.
+        /// </summary>
+        /// <param name="mode">일반/관리자</param>
+        /// <returns>로그인한 사용자 ID</returns>
         public int LogIn(int mode)
         {
             string memberID;
@@ -52,11 +62,21 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        /// <summary>
+        /// 로그아웃 기능을 수행하는 메소드입니다.
+        /// </summary>
+        /// <returns>공용 사용자 ID</returns>
         public int LogOut()
         {
             return Constant.PUBLIC;
         }
 
+        /// <summary>
+        /// 회원가입 기능을 수행하는 메소드입니다.
+        /// 사용자로부터 정보를 입력받고, 데이터베이스에 정보를 등록합니다.
+        /// </summary>
+        /// <param name="title">"회원가입"</param>
+        /// <returns>새로 만들어진 사용자 ID</returns>
         public int JoinIn(string title)
         {
             string name;
@@ -119,12 +139,17 @@ namespace EnSharpLibrary.Function
             return Int32.Parse(userID);
         }
 
+        /// <summary>
+        /// 사용자의 정보를 수정하는 메소드입니다.
+        /// </summary>
+        /// <param name="usingMemberID">사용자 ID</param>
         public void ChangeUserInformation(int usingMemberID)
         {
             int informationToEdit;
             int currentCursor;
             StringBuilder sql = new StringBuilder();
 
+            // 배경 출력
             if (usingMemberID == Constant.ADMIN) print.SetWindowsizeAndPrintTitle(45, 30, "암호수정");
             else print.SetWindowsizeAndPrintTitle(45, 30, "정보수정");
 
@@ -149,7 +174,7 @@ namespace EnSharpLibrary.Function
                 Console.SetCursorPosition(0, 14);
                 sql.Clear();
 
-                if (informationToEdit == Constant.EDIT_ADDRESS)
+                if (informationToEdit == Constant.EDIT_ADDRESS)                                         // 주소 수정
                 {
                     int address1 = getValue.DropBox(currentCursor, 14, Constant.ANSWER_ADDRESS);
                     if (address1 == -1) return;
@@ -160,13 +185,13 @@ namespace EnSharpLibrary.Function
                     StringBuilder address = new StringBuilder(Constant.DISTRICT[0][address1] + " " + Constant.DISTRICT[address1 + 1][address2]);
                     sql.Append("UPDATE member SET address=\'" + address + "\' WHERE member_id=" + usingMemberID + ";");
                 }
-                else if (informationToEdit == Constant.EDIT_PHONE_NUMBER)
+                else if (informationToEdit == Constant.EDIT_PHONE_NUMBER)                               // 전화번호 수정
                 {
                     string phoneNumber = getValue.PhoneNumber(currentCursor, 14);
                     if (string.Compare(phoneNumber, "@입력취소@") == 0) return;
                     sql.Append("UPDATE member SET phone_number=\'" + phoneNumber + "\' WHERE member_id=" + usingMemberID + ";");
                 }
-                else if (informationToEdit == Constant.EDIT_PASSWORD)
+                else if (informationToEdit == Constant.EDIT_PASSWORD)                                   // 암호 수정
                 {
                     print.GuidelineForSearch("입력", currentCursor, 14);
                     string password = getValue.Information(currentCursor, 14, 15, Constant.NO_KOREAN, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
@@ -191,6 +216,9 @@ namespace EnSharpLibrary.Function
             print.Announce("변경이 완료되었습니다!", Console.CursorTop + 2);
         }
 
+        /// <summary>
+        /// 관리자가 회원을 관리하는 메소드입니다.
+        /// </summary>
         public void ManageMember()
         {
             bool isFirstLoop = true;
@@ -223,6 +251,11 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        /// <summary>
+        /// 관리자가 회원 관리시 다음으로 수행할 메소드를 고르는 메소드입니다.
+        /// </summary>
+        /// <param name="cursorTop">현재 커서 위치</param>
+        /// <returns></returns>
         public bool GoNextFunction(int cursorTop)
         {
             switch (Console.CursorTop)
@@ -234,6 +267,9 @@ namespace EnSharpLibrary.Function
             return true;
         }
 
+        /// <summary>
+        /// 관리자가 회원 정보를 검색하는 메소드입니다.
+        /// </summary>
         public void SearchMember()
         {
             List<MemberVO> searchedMember;
@@ -243,6 +279,7 @@ namespace EnSharpLibrary.Function
             print.SearchCategoryAndGuideline(Constant.MEMBER_SEARCH_MODE);
 
             // 정보 수집
+            // -이름
             name = getValue.Information(22, 11, 10, Constant.ONLY_KOREAN, Constant.MEMBER_SEARCH_CATEGORY_AND_GUIDELINE[1]);
             if (string.Compare(name, "@입력취소@") == 0) return;
             age = getValue.DropBox(22, 13, Constant.ANSWER_BIRTHDATE_YEAR_INCLUDE_ALL_OPTION);
@@ -263,11 +300,21 @@ namespace EnSharpLibrary.Function
                 if (string.Compare(address.ToString(), "@입력취소@") == 0) return;
             }
 
+            // 검색
             searchedMember = getValue.SearchMemberByCondition(name, age, address.ToString());
+
+            // 열람
             CheckMemberAndDelete(searchedMember, name, age.ToString(), address.ToString());
             tool.WaitUntilGetEscapeKey();
         }
 
+        /// <summary>
+        /// 관리자가 검색한 회원 정보를 열람하는 메소드입니다.
+        /// </summary>
+        /// <param name="searchedMember">검색된 회원 정보</param>
+        /// <param name="name">관리자가 검색한 회원 이름</param>
+        /// <param name="age">관리자가 검색한 회원 출생년도</param>
+        /// <param name="address">관리자가 검색한 회원 주소</param>
         public void CheckMemberAndDelete(List<MemberVO> searchedMember, string name, string age, string address)
         {
             bool isFirstLoop = true;
@@ -293,7 +340,7 @@ namespace EnSharpLibrary.Function
                 if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedMember.Count, 1, '▷');          // 위로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedMember.Count, 1, '▷'); // 밑으로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                     // 나가기
-                else if (keyInfo.Key == ConsoleKey.Enter)                                                                  // 해당 도서 선택
+                else if (keyInfo.Key == ConsoleKey.Enter)                                                                  // 해당 회원 선택
                 {
                     // db에서 삭제
 
@@ -307,279 +354,7 @@ namespace EnSharpLibrary.Function
                 }
                 else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 
             }
-        }
-
-            //public List<MemberVO> MemberEdit(int usingMemberNumber, List<MemberVO> members)
-            //{
-            //    bool isFirstLoop = true;
-            //    MemberVO user = new MemberVO();
-
-            //    foreach (MemberVO member in members)
-            //        if (member.IdentificationNumber == usingMemberNumber) user = member;
-
-            //    while (true)
-            //    {
-            //        if (isFirstLoop)
-            //        {
-            //            // 타이틀 및 옵션 출력하고 커서 조절
-            //            print.Title("정보수정  ");
-            //            print.MemberEditOption();
-
-            //            print.SetCursorAndChoice(74, 10, '☜');
-
-            //            isFirstLoop = false;
-            //        }
-
-            //        ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-            //        if (keyInfo.Key == ConsoleKey.UpArrow)
-            //        {
-            //            print.ClearOneLetter(74);
-            //            if (Console.CursorTop > 11) Console.SetCursorPosition(74, Console.CursorTop - 2);
-            //            Console.Write('☜');
-            //        }
-            //        else if (keyInfo.Key == ConsoleKey.DownArrow)
-            //        {
-            //            print.ClearOneLetter(74);
-            //            if (Console.CursorTop < 19) Console.SetCursorPosition(74, Console.CursorTop + 2);
-            //            Console.Write('☜');
-            //        }
-            //        else
-            //        {
-            //            if (keyInfo.Key == ConsoleKey.Enter)
-            //            {
-            //                switch (Console.CursorTop)
-            //                {
-            //                    case 11:     // 내 정보
-            //                        print.MemberInformation(user, 1);
-            //                        break;
-            //                    case 13:    // 암호 변경
-            //                        members = MemberPasswordEdit(usingMemberNumber, members);
-            //                        break;
-            //                    case 15:    // 주소 변경
-            //                        members = MemberInformationEdit(1, usingMemberNumber, members);
-            //                        break;
-            //                    case 17:    // 전화번호 변경
-            //                        members = MemberInformationEdit(2, usingMemberNumber, members);
-            //                        break;
-            //                    case 19:    // 뒤로
-            //                        return members;
-            //                }
-
-            //                isFirstLoop = true;
-            //            }
-            //            else print.BlockCursorMove(74, "☜ ");
-            //        }
-            //    }
-            //}
-
-            //public List<MemberVO> MemberPasswordEdit(int usingMemberNumber, List<MemberVO> members)
-            //{
-            //    string userPassword = "";
-
-            //    foreach (MemberVO member in members)
-            //        if (member.IdentificationNumber == usingMemberNumber)
-            //        {
-            //            userPassword = member.Password;
-            //            break;
-            //        }
-
-            //    string newPassword;
-            //    int cursorTop = 10;
-
-            //    print.Title("암호변경");
-
-            //    Console.SetCursorPosition(30, cursorTop);
-            //    Console.Write("▷ 현재 암호 입력 : ");
-            //    newPassword = getValue.SearchWord(17, 2);
-
-            //    if (string.Compare(newPassword, "@입력취소@") == 0) return members;
-
-            //    while (string.Compare(userPassword, newPassword) != 0)
-            //    {
-            //        Console.SetCursorPosition(0, Console.CursorTop + 1);
-            //        print.Announce("암호가 일치하지 않습니다!");
-            //        Console.SetCursorPosition(30, cursorTop);
-            //        print.ClearCurrentConsoleLine();
-            //        Console.SetCursorPosition(30, cursorTop);
-            //        Console.Write("▷ 현재 암호 입력 : ");
-            //        newPassword = getValue.SearchWord(17, 2);
-            //    }
-
-            //    Console.SetCursorPosition(30, cursorTop + 2);
-            //    Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
-            //    newPassword = getValue.SearchWord(17, 2);
-            //    if (string.Compare(newPassword, "@입력취소@") == 0) return members;
-            //    while (getValue.NotValidPassword(newPassword) != 0)
-            //    {
-            //        Console.SetCursorPosition(0, Console.CursorTop + 1);
-            //        if (getValue.NotValidPassword(newPassword) == 1) print.Announce("길이에 맞는 암호를 입력하세요!");
-            //        else if (getValue.NotValidPassword(newPassword) == 2) print.Announce("3자리 연속으로 문자 혹은 숫자가  사용되면 안 됩니다!");
-            //        Console.SetCursorPosition(30, cursorTop + 2);
-            //        print.ClearCurrentConsoleLine();
-            //        Console.SetCursorPosition(30, cursorTop + 2);
-            //        Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
-            //        newPassword = getValue.SearchWord(17, 2);
-            //    }
-
-            //    foreach (MemberVO member in members)
-            //        if (member.IdentificationNumber == usingMemberNumber)
-            //        {
-            //            member.Password = newPassword;
-            //            break;
-            //        }
-
-            //    return members;
-            //}
-
-            //// 1 : 주소 변경
-            //// 2 : 전화번호 변경
-            //public List<MemberVO> MemberInformationEdit(int mode, int usingMemberNumber, List<MemberVO> members)
-            //{
-            //    int cursorTop = 10;
-            //    StringBuilder newPhone = new StringBuilder();
-            //    string newPhoneNumber;
-            //    string newAddress;
-
-            //    MemberVO user = new MemberVO();
-            //    foreach (MemberVO member in members)
-            //        if (member.IdentificationNumber == usingMemberNumber)
-            //        {
-            //            user = member;
-            //            break;
-            //        }
-
-            //    if (mode == 1)
-            //    {
-            //        print.Title("주소 변경");
-            //        Console.SetCursorPosition(20, cursorTop);
-            //        Console.Write("▷ 현재 주소 : {0}", user.Address);
-            //        Console.SetCursorPosition(20, cursorTop + 2);
-            //        Console.Write("▷ 변경할 주소 입력(○○도 ○○시 ○○동 형식) : ");
-            //        newAddress = getValue.SearchWord(20, 0);
-
-            //        foreach (MemberVO member in members)
-            //            if (member.IdentificationNumber == usingMemberNumber)
-            //            {
-            //                member.Address = newAddress;
-            //                break;
-            //            }
-            //    }
-            //    else
-            //    {
-            //        print.Title("전화번호 변경");
-            //        Console.SetCursorPosition(30, cursorTop);
-            //        Console.Write("▷ 현재 전화번호 : {0}", user.PhoneNumber);
-            //        Console.SetCursorPosition(30, cursorTop + 2);
-            //        Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
-            //        newPhoneNumber = getValue.SearchWord(12, 1);
-
-            //        if (string.Compare(newPhoneNumber, "@입력취소@") == 0) return members;
-
-            //        while (getValue.NotValidPhoneNumber(newPhoneNumber, members))
-            //        {
-            //            Console.SetCursorPosition(0, Console.CursorTop + 1);
-            //            print.Announce("유효하지 않은 전화번호입니다!");
-            //            Console.SetCursorPosition(30, cursorTop + 2);
-            //            print.ClearCurrentConsoleLine();
-            //            Console.SetCursorPosition(30, cursorTop + 2);
-            //            Console.Write("▷ 변경할 전화번호 입력('-'없이 입력) : ");
-            //            newPhoneNumber = getValue.SearchWord(17, 1);
-            //        }
-
-            //        StringBuilder phoneNumber = new StringBuilder();
-            //        phoneNumber.Append(newPhoneNumber);
-            //        phoneNumber.Insert(3, '-');
-            //        phoneNumber.Insert(8, '-');
-
-            //        foreach (MemberVO member in members)
-            //            if (member.IdentificationNumber == usingMemberNumber)
-            //            {
-            //                member.PhoneNumber = phoneNumber.ToString();
-            //                break;
-            //            }
-            //    }
-            //    return members;
-            //}
-
-            //public AdminVO AdminEdit(AdminVO admin)
-            //{
-            //    string newPassword;
-            //    int cursorTop = 10;
-
-            //    print.Title("관리자 암호 수정");
-
-            //    Console.SetCursorPosition(30, cursorTop);
-            //    Console.Write("▷ 현재 암호 입력 : ");
-            //    newPassword = getValue.SearchWord(17, 2);
-
-            //    if (string.Compare(newPassword, "@입력취소@") == 0) return admin;
-
-            //    while (admin.Password != newPassword)
-            //    {
-            //        print.Announce("암호가 일치하지 않습니다!");
-            //        Console.SetCursorPosition(30, cursorTop);
-            //        print.ClearCurrentConsoleLine();
-            //        Console.SetCursorPosition(30, cursorTop);
-            //        Console.Write("▷ 현재 암호 입력 : ");
-            //        newPassword = getValue.SearchWord(17, 2);
-            //    }
-
-            //    Console.SetCursorPosition(30, cursorTop + 2);
-            //    Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
-            //    newPassword = getValue.SearchWord(17, 2);
-            //    if (string.Compare(newPassword, "@입력취소@") == 0) return admin;
-            //    while (getValue.NotValidPassword(newPassword) != 0)
-            //    {
-            //        Console.SetCursorPosition(0, Console.CursorTop + 1);
-            //        if (getValue.NotValidPassword(newPassword) == 1) print.Announce("길이에 맞는 암호를 입력하세요!");
-            //        else if (getValue.NotValidPassword(newPassword) == 2) print.Announce("3자리 연속으로 문자 혹은 숫자가  사용되면 안 됩니다!");
-            //        else if (getValue.NotValidPassword(newPassword) == 3) print.Announce("암호는 영어와 숫자만 가능합니다!");
-            //        Console.SetCursorPosition(30, cursorTop + 2);
-            //        print.ClearCurrentConsoleLine();
-            //        Console.SetCursorPosition(30, cursorTop + 2);
-            //        Console.Write("▷ 변경할 암호 입력(8자 이상 15자 이하) : ");
-            //        newPassword = getValue.SearchWord(17, 2);
-            //    }
-
-            //    admin.Password = newPassword;
-
-            //    return admin;
-            //}
-
-            //public LibraryVO RemoveMember(int memberNumber, List<MemberVO> members, List<BookVO> books)
-            //{
-            //    LibraryVO library = new LibraryVO(members, books);
-            //    int userIndex = 0;
-
-            //    for (int index = 0; index < members.Count; index++)
-            //        if (members[index].IdentificationNumber == memberNumber)
-            //        {
-            //            userIndex = index;
-            //            break;
-            //        }
-
-            //    if (members[userIndex].BorrowedBook.Count != 0)
-            //    {
-            //        for (int index = 0; index < members[userIndex].BorrowedBook.Count; index++)
-            //        {
-            //            for (int j = 0; j < books.Count; j++)
-            //            {
-            //                if (members[userIndex].BorrowedBook[index] == books[j].NumberOfThis)
-            //                {
-            //                    books[j].SetNonRentalMode();
-            //                    books[j].BookCondition = 2;
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //    }
-
-            //    members.RemoveAt(userIndex);
-            //    library.Books = books;
-
-            //    return library;
-            //}
-        }
+        }    
     }
+}
 
