@@ -211,7 +211,7 @@ namespace EnSharpLibrary.IO
             SearchedTitle(Constant.BOOK_SEARCH_MODE, bookName, publisher, author);
             Console.SetCursorPosition(0, 11);
             foreach (string guideline in Constant.SEARCHED_BOOK_GUIDELINE) Console.WriteLine(guideline);
-
+            
             Books(searchedBook, Console.CursorTop);
         }
 
