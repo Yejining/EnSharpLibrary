@@ -143,16 +143,16 @@ namespace EnSharpLibrary.IO
             string[] date;
             int year, month, day;
 
-            if (name.Length != 0) sql.Append("WHERE member_name REGEXP \'" + name + "\'");
+            if (name.Length != 0) sql.Append("WHERE name REGEXP \'" + name + "\'");
             if (age != 0)
             {
-                if (name.Length == 0) sql.Append("WHERE member_age=" + age + 1989);
-                else sql.Append(" AND member_age=" + age + 1989);
+                if (name.Length == 0) sql.Append("WHERE birthdate=" + age + 1989);
+                else sql.Append(" AND birthdate=" + age + 1989);
             }
             if (string.Compare(address, "전체") != 0)
             {
-                if (name.Length == 0 || age == 0) sql.Append("WHERE member_address REGEXP \'" + address + "\'");
-                else sql.Append(" AND member_address REGEXP \'" + address + "\'");
+                if (name.Length == 0 || age == 0) sql.Append("WHERE address REGEXP \'" + address + "\'");
+                else sql.Append(" AND address REGEXP \'" + address + "\'");
             }
             sql.Append(";");
 
@@ -236,7 +236,7 @@ namespace EnSharpLibrary.IO
 
             // 드롭박스 선택
             if (mode == Constant.ANSWER_ADDRESS) option = Constant.DISTRICT[0];
-            else if (mode >= 20) option = Constant.DISTRICT[mode - 9];
+            else if (mode >= 20) option = Constant.DISTRICT[mode - 19];
             else if (mode == Constant.ANSWER_BIRTHDATE_YEAR) option = YEAR(Constant.GENERAL_MODE);
             else if (mode == Constant.ANSWER_BIRTHDATE_MONTH) option = Constant.MONTH;
             else if (mode == Constant.ANSWER_BIRTHDATE_DAY) option = Constant.DAY;

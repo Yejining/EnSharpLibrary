@@ -224,7 +224,8 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(0, 11);
             foreach (string guidline in Constant.SEARCHED_MEMBER_GUIDELINE) Console.WriteLine(guidline);
 
-            Members(searchedMember, Console.CursorTop);
+            if (searchedMember.Count != 0) Members(searchedMember, Console.CursorTop);
+            PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
         }
 
         public void Books(List<BookVO> books, int cursorTop)
@@ -271,8 +272,6 @@ namespace EnSharpLibrary.IO
                 Console.SetCursorPosition(85, Console.CursorTop);
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
             }
-
-            PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
         }
 
         /// <summary>
