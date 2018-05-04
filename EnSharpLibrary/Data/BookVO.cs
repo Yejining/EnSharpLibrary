@@ -39,6 +39,13 @@ namespace EnSharpLibrary.Data
             bookID = 0;
         }
 
+        /// <summary>
+        /// BookVO 객체에 정보를 더해주는 메소드입니다.
+        /// </summary>
+        /// <param name="bookID">도서 청구기호</param>
+        /// <param name="bookCondition">도서 상태</param>
+        /// <param name="borrowedMemberID">해당 도서를 빌린 회원 학번</param>
+        /// <param name="price">가격</param>
         public void AppendInformation(float bookID, string bookCondition, int borrowedMemberID, int price)
         {
             this.bookID = bookID;
@@ -95,25 +102,6 @@ namespace EnSharpLibrary.Data
         {
             get { return numberOfBooks; }
             set { numberOfBooks = value; }
-        }
-
-        /// <summary>
-        /// 도서의 상태를 대출모드로 바꾸어줍니다.
-        /// </summary>
-        /// <param name="rental">대출일</param>
-        /// <param name="expectedToReturn">반납 예정일</param>
-        /// <param name="memberNumber">대출한 회원의 번호</param>
-        public void SetRentalMode(DateTime rental, DateTime expectedToReturn, int memberNumber)
-        {
-
-        }
-
-        /// <summary>
-        /// 대출도서를 반납모드로 바꾸어줍니다.
-        /// </summary>
-        public void SetNonRentalMode()
-        {
-
         }
     }
 }
