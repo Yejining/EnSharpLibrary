@@ -42,7 +42,7 @@ namespace EnSharpLibrary.Function
                     print.MenuOption(mode, Console.CursorTop + 2);
 
                     // 기능 선택
-                    print.SetCursorAndChoice(38, 10, '◁');
+                    print.SetCursorAndChoice(38, 10, "◁");
 
                     isFirstLoop = false;
                 }

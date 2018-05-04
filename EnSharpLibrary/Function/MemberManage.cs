@@ -204,7 +204,7 @@ namespace EnSharpLibrary.Function
                     print.MenuOption(Constant.MANAGE_MEMBER_MODE, Console.CursorTop + 2);
 
                     // 기능 선택
-                    print.SetCursorAndChoice(38, 12, '◁');
+                    print.SetCursorAndChoice(38, 12, "◁");
 
                     isFirstLoop = false;
                 }
@@ -293,7 +293,7 @@ namespace EnSharpLibrary.Function
                 if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedMember.Count, 1, '▷');          // 위로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedMember.Count, 1, '▷'); // 밑으로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                     // 나가기
-                else if (keyInfo.Key == ConsoleKey.Enter)                                                                  // 해당 강의 선택
+                else if (keyInfo.Key == ConsoleKey.Enter)                                                                  // 해당 도서 선택
                 {
                     // db에서 삭제
 
@@ -307,6 +307,7 @@ namespace EnSharpLibrary.Function
                 }
                 else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 
             }
+        }
 
             //public List<MemberVO> MemberEdit(int usingMemberNumber, List<MemberVO> members)
             //{
@@ -581,4 +582,4 @@ namespace EnSharpLibrary.Function
             //}
         }
     }
-}
+

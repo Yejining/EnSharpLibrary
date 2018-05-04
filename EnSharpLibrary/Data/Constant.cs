@@ -39,8 +39,8 @@ namespace EnSharpLibrary.Data
 
         public static string[] MEMBER_OPTION =
         {
-            "도서 보기",
-            "대출도서 관리",
+            "도서 대출",
+            "연장 및 반납",
             "정보수정",
             "로그아웃",
             "종료"
@@ -136,6 +136,12 @@ namespace EnSharpLibrary.Data
             "---------------------------------------------------------------------------------------------------------------------------------"
         };
 
+        public static string[] SEARCHED_BOOK_DETAILED_GUIDLINE =
+        {
+            "  선택  |                  도서                 |       저자      |     출판사     | 출판년도 |  도서상태  | 청구기호  ",
+            "-----------------------------------------------------------------------------------------------------------------------"
+        };
+
         public static string[] SEARCHED_MEMBER_GUIDELINE =
         {
             "  선택  |    이름    |   학번   |              주소               |    전화번호    |  대출도서 번호  |  연체도서 번호  ",
@@ -189,7 +195,7 @@ namespace EnSharpLibrary.Data
         public static string[] MANAGE_MEMBER_OPTION =
         {
             "회원 등록",
-            "등록된 회원 관리"
+            "회원 삭제"
         };
 
         public static string[] MEMBER_SEARCH_CATEGORY_AND_GUIDELINE =
@@ -292,6 +298,11 @@ namespace EnSharpLibrary.Data
         public const int EDIT_ADDRESS = 0;
         public const int EDIT_PHONE_NUMBER = 1;
         public const int EDIT_PASSWORD = 2;
+
+        public const int BORROW = 0;
+        public const int EXTEND = 1;
+        public const int RETURN = 2;
+        public const int FAIL = 3;
 
         public const ConsoleColor FOREGROUND_COLOR = ConsoleColor.White;
     }

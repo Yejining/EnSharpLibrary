@@ -14,6 +14,8 @@ namespace EnSharpLibrary.Function
         GetValue getValue = new GetValue();
         Tool tool = new Tool();
 
+        int usingMemberID;
+
         public void ManageBook()
         {
 
@@ -27,6 +29,8 @@ namespace EnSharpLibrary.Function
             string publisher;
             string author;
             string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
+
+            this.usingMemberID = usingMemberID;
 
             if (usingMemberID == Constant.PUBLIC) mode = Constant.NON_MEMBER_MODE;
             else mode = Constant.MEMBER_MODE; 
@@ -48,16 +52,102 @@ namespace EnSharpLibrary.Function
                 searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);
 
                 if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
-                else break;
-            }
+                else SelectSearchedBook(searchedBook, bookName, publisher, author);
+            }            
+        }
+
+        public void SelectSearchedBook(List<BookVO> searchedBook, string bookName, string publisher, string author)
+        {
+            bool isFirstLoop = true;
+            int cursorTop;
 
             // 검색된 도서 출력
+            cursorTop = Console.CursorTop - 2;
             print.SearchedBook(searchedBook, bookName, publisher, author);
 
-            if (mode == Constant.NON_MEMBER_MODE) tool.WaitUntilGetEscapeKey();
-            else BorrowBook(searchedBook, usingMemberID);
+            // 방향키 및 엔터, ESC키를 이용해 기능 수행
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    Console.SetCursorPosition(4, cursorTop);
+                    Console.Write('▷');
+                    Console.SetCursorPosition(4, cursorTop);
+                    isFirstLoop = false;
+                }
 
-            return;
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedBook.Count, 1, '▷');          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedBook.Count, 1, '▷'); // 밑으로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                     // 나가기
+                else if (keyInfo.Key == ConsoleKey.Enter)                                                                  // 해당 도서 자세히 보기
+                {
+                    int index = Console.CursorTop - cursorTop;
+                    print.SearchedBook(searchedBook, bookName, publisher, author);
+                    Console.SetCursorPosition(45, 3);
+                    Console.Write("|" + searchedBook[index].Name + "|");
+                    print.ClearBoard(cursorTop, searchedBook.Count + 4);
+                    CheckDetailInformationWhichUserSelected((int)Math.Floor(searchedBook[index].BookID));
+                    return;
+                }
+                else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 
+            }
+        }
+
+        public void CheckDetailInformationWhichUserSelected(int bookID)
+        {
+            bool isFirstLoop = true;
+            bool isValidBook = true;
+            bool isValidUser = true;
+            int cursorTop = 13;
+
+            List<BookVO> books = new List<BookVO>();
+
+            books = getValue.SearchBookByBookID(bookID);
+            print.SearchedBookWithMoreDetail(books);
+            print.PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
+            
+            if (usingMemberID == Constant.PUBLIC || books.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
+
+            // 방향키 및 엔터, ESC키를 이용해 기능 수행
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    print.ClearBoard(cursorTop, books.Count + 4);
+                    books = getValue.SearchBookByBookID(bookID);
+                    print.SearchedBookWithMoreDetail(books);
+                    print.PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
+
+                    Console.SetCursorPosition(4, cursorTop);
+                    Console.Write('▷');
+                    Console.SetCursorPosition(4, cursorTop);
+                    isFirstLoop = false;
+                }
+
+                isValidBook = tool.IsValidBook(books[Console.CursorTop - cursorTop].BookID);
+                isValidUser = tool.IsValidUser(usingMemberID);
+                if (!isValidBook || !isValidUser) print.NonAvailableLectureMark(4, Console.CursorTop);
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, books.Count, 1, '▷');          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, books.Count, 1, '▷'); // 밑으로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }            // 나가기
+                else if (keyInfo.Key == ConsoleKey.Enter)                                                         // 해당 도서 선택
+                {
+                    // 대출
+                    if (isValidBook && isValidUser)
+                    {
+                        tool.Borrow(usingMemberID, books[Console.CursorTop - cursorTop].BookID);
+                        print.CompleteOrFaildProcess(4, cursorTop, Constant.BORROW);
+                    }
+                    else print.CompleteOrFaildProcess(4, cursorTop, Constant.FAIL);
+                    isFirstLoop = true;
+                }
+                else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 
+            }
         }
 
         public void BorrowBook(List<BookVO> searchedBook, int usingMemberID)

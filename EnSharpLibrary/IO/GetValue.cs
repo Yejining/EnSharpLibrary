@@ -52,6 +52,53 @@ namespace EnSharpLibrary.IO
             }
         }
 
+        public List<BookVO> SearchBookByBookID(int bookID)
+        {
+            List<BookVO> searchedBook = new List<BookVO>();
+            StringBuilder sql = new StringBuilder("SELECT * FROM book WHERE FLOOR(book_id)="+bookID+";");
+
+            string nameForVO;
+            string authorForVO;
+            string publisherForVO;
+            int publishingYearForVO;
+            float bookIDForVO;
+            string bookConditionForVO;
+            int borrowedMemberIDForVO;
+            int priceForVO;
+
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                nameForVO = reader["name"].ToString();
+                authorForVO = reader["author"].ToString();
+                publisherForVO = reader["publisher"].ToString();
+                publishingYearForVO = Int32.Parse(reader["publishing_year"].ToString());
+                bookIDForVO = float.Parse(reader["book_id"].ToString());
+                bookConditionForVO = reader["book_condition"].ToString();
+                borrowedMemberIDForVO = Int32.Parse(reader["borrowed_member_id"].ToString());
+                priceForVO = Int32.Parse(reader["price"].ToString());
+
+                BookVO book = new BookVO(nameForVO, authorForVO, publisherForVO, publishingYearForVO);
+                book.AppendInformation(bookIDForVO, bookConditionForVO, borrowedMemberIDForVO, priceForVO);
+
+                searchedBook.Add(book);
+            }
+
+            reader.Close();
+
+            return searchedBook;
+        }
+
         public List<BookVO> SearchBookByCondition(string bookName, string publisher, string author)
         {
             string nameForVO;
@@ -740,7 +787,7 @@ namespace EnSharpLibrary.IO
                     Console.SetCursorPosition(leftCursor + 2, topCursor + 2);
                     Console.Write(choice2);
 
-                    print.SetCursorAndChoice(leftCursor + 10, 2, '☜');
+                    print.SetCursorAndChoice(leftCursor + 10, 2, "☜");
 
                     isFirstLoop = false;
                 }

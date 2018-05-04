@@ -215,6 +215,34 @@ namespace EnSharpLibrary.IO
             Books(searchedBook, Console.CursorTop);
         }
 
+        public void SearchedBookWithMoreDetail(List<BookVO> books)
+        {
+            Console.SetCursorPosition(0, 11);
+            foreach (string guideline in Constant.SEARCHED_BOOK_DETAILED_GUIDLINE) Console.WriteLine(guideline);
+            
+            Console.SetCursorPosition(0, 13);
+            for (int order = 0; order < books.Count; order++)
+            {
+                Console.SetCursorPosition(10, Console.CursorTop);
+                Console.Write(books[order].Name);
+                Console.SetCursorPosition(50, Console.CursorTop);
+                Console.Write(books[order].Author);
+                Console.SetCursorPosition(68, Console.CursorTop);
+                Console.Write(books[order].Publisher);
+                Console.SetCursorPosition(87, Console.CursorTop);
+                Console.Write(books[order].PublishingYear);
+                Console.SetCursorPosition(97, Console.CursorTop);
+                Console.Write(books[order].BookCondition);
+                Console.SetCursorPosition(109, Console.CursorTop);
+                Console.Write(books[order].BookID);
+                Console.SetCursorPosition(120, Console.CursorTop);
+                Console.Write(books[order].Price + "원");
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+            }
+
+
+        }
+
         public void SearchedMember(List<MemberVO> searchedMember, string name, string age, string address)
         {
             Console.SetWindowSize(120, 35);
@@ -290,6 +318,23 @@ namespace EnSharpLibrary.IO
             ClearCurrentConsoleLine();
         }
 
+        public void NonAvailableLectureMark(int cursorLeft, int cursorTop)
+        {
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.Write(" X");
+            Console.SetCursorPosition(cursorLeft + 1, cursorTop);
+        }
+
+        public void ClearBoard(int cursorTop, int countOfConsoleLine)
+        {
+            Console.SetCursorPosition(0, cursorTop);
+            for (int clear = 1; clear <= countOfConsoleLine; clear++)
+            {
+                ClearCurrentConsoleLine();
+                Console.SetCursorPosition(0, cursorTop + clear);
+            }
+        }
+
         /// <summary>
         /// 콘솔에서 한 글자만을 삭제하는 메소드입니다.
         /// </summary>
@@ -328,6 +373,20 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(currentCursor, cursorTop);
             Console.Write(space);
             Console.SetCursorPosition(currentCursor, cursorTop);
+        }
+
+        public void CompleteOrFaildProcess(int cursorLeft, int cursorTop, int mode)
+        {
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            if (mode == Constant.BORROW) Console.Write("대출");
+            else if (mode == Constant.EXTEND) Console.Write("연장");
+            else if (mode == Constant.RETURN) Console.Write("반납");
+            else Console.Write(" X");
+            System.Threading.Thread.Sleep(500);
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.Write(new string(' ', 4));
+            Console.SetCursorPosition(cursorLeft + 1, cursorTop);
+            Console.Write('▷');
         }
 
         /// <summary>
@@ -423,7 +482,7 @@ namespace EnSharpLibrary.IO
         //public void BookDetailTitle(int mode, int detailMode)
         //{
         //    StringBuilder title = new StringBuilder();
-            
+
         //    if (mode == 1) title.AppendFormat("비회원 도서검색 -> ");
         //    else if (mode == 2) title.AppendFormat("도서 보기 -> ");
         //    else title.AppendFormat("도서 관리 -> ");
@@ -845,7 +904,7 @@ namespace EnSharpLibrary.IO
             else Console.Write(new string('*', answer.Length));
         }
 
-        public void SetCursorAndChoice(int cursorLeft, int cursorTop, char pointer)
+        public void SetCursorAndChoice(int cursorLeft, int cursorTop, string pointer)
         {
             Console.SetCursorPosition(cursorLeft, cursorTop);
             Console.Write(pointer);
@@ -955,7 +1014,7 @@ namespace EnSharpLibrary.IO
             {
                 if(isFirstLoop)
                 {
-                    SetCursorAndChoice(40, 5, '☜');
+                    SetCursorAndChoice(40, 5, "☜");
                     isFirstLoop = false;
                 }
 
@@ -965,13 +1024,13 @@ namespace EnSharpLibrary.IO
                 {
                     ClearOneLetter(40);
                     if (Console.CursorTop > 18) Console.SetCursorPosition(40, Console.CursorTop - 2);
-                    Console.Write('☜');
+                    Console.Write("☜");
                 }
                 else if (keyInfo.Key == ConsoleKey.DownArrow)
                 {
                     ClearOneLetter(40);
                     if (Console.CursorTop < 22) Console.SetCursorPosition(40, Console.CursorTop + 2);
-                    Console.Write('☜');
+                    Console.Write("☜");
                 }
                 else
                 {
@@ -1029,7 +1088,7 @@ namespace EnSharpLibrary.IO
             {
                 if (isFirstLoop)
                 {
-                    SetCursorAndChoice(cursorLeft + 10, 5, '☜');
+                    SetCursorAndChoice(cursorLeft + 10, 5, "☜");
                     isFirstLoop = false;
                 }
 
@@ -1039,13 +1098,13 @@ namespace EnSharpLibrary.IO
                 {
                     ClearOneLetter(cursorLeft + 10);
                     if (Console.CursorTop > 18) Console.SetCursorPosition(cursorLeft + 10, Console.CursorTop - 2);
-                    Console.Write('☜');
+                    Console.Write("☜");
                 }
                 else if (keyInfo.Key == ConsoleKey.DownArrow)
                 {
                     ClearOneLetter(cursorLeft + 10);
                     if (Console.CursorTop < 24) Console.SetCursorPosition(cursorLeft + 10, Console.CursorTop + 2);
-                    Console.Write('☜');
+                    Console.Write("☜");
                 }
                 else
                 {
