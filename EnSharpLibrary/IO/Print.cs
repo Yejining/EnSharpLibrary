@@ -61,13 +61,16 @@ namespace EnSharpLibrary.IO
         public void SearchedTitle(int mode, string bookName, string publisher, string author)
         {
             List<string> searchingCondition = new List<string>();
+            int space = 0;
 
-            Console.SetCursorPosition(85, 2);
+            if (mode == Constant.MEMBER_SEARCH_MODE) space = -23;
+
+            Console.SetCursorPosition(85 + space, 2);
             
             foreach (string title in Constant.ENSHARP_TITLE_IN_SEARCH_MODE)
             {
                 Console.WriteLine(title);
-                Console.SetCursorPosition(85, Console.CursorTop);
+                Console.SetCursorPosition(85 + space, Console.CursorTop);
             }
 
             // 검색 조건이 '전체'로 설정되어있거나 입력값이 없는 경우
@@ -280,7 +283,7 @@ namespace EnSharpLibrary.IO
 
         public void SearchedMember(List<MemberVO> searchedMember, string name, string age, string address)
         {
-            Console.SetWindowSize(120, 35);
+            Console.SetWindowSize(100, 35);
             Console.Clear();
 
             SearchedTitle(Constant.MEMBER_SEARCH_MODE, name, age, address);
