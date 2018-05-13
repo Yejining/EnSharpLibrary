@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 
 using EnSharpLibrary.Data;
 using EnSharpLibrary.IO;
@@ -13,7 +14,6 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
         Tool tool = new Tool();
-        ConnectDatabase connectDatabase = new ConnectDatabase();
 
         int usingMemberID;
 
@@ -54,7 +54,7 @@ namespace EnSharpLibrary.Function
         {
             switch (Console.CursorTop)
             {
-                case Constant.APPEND_BOOK: AddBook("도서 등록"); return true;
+                case Constant.APPEND_BOOK: AddBook("도서 검색 및 등록"); return true;
                 case Constant.MANAGE_REGISTERED_BOOK: SearchBook(); return true;
             }
 
@@ -64,7 +64,8 @@ namespace EnSharpLibrary.Function
         public void AddBook(string title)
         {
             string name;
-            string count;
+            XmlDocument foundBook;
+            List<BookAPIVO> books;
 
             print.SetWindowsizeAndPrintTitle(45, 30, title);
 
@@ -79,14 +80,13 @@ namespace EnSharpLibrary.Function
                 if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
                 else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 15); continue; }
 
-                // - 수량
-                count = getValue.Information(19, 13, 7, Constant.ONLY_NUMBER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[3]);
-                if (string.Compare(count, "@입력취소@") == 0) return;
-
                 break;
             }
 
-            connectDatabase.ConnectAPI(name);
+            foundBook = ConnectDatabase.BookSearchResult(name);
+            books = getValue.OrganizedFoundBook(foundBook);
+            print.SearchedBook(books, name);
+            SelectSearchedBook(books, name);
 
             return;
         }
@@ -183,6 +183,39 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        public void SelectSearchedBook(List<BookAPIVO> searchedBook, string name)
+        {
+            bool isFirstLoop = true;
+            int cursorTop = 9;
+            int index;
+
+            // 방향키 및 엔터, ESC키를 이용해 기능 수행
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    Console.SetCursorPosition(4, cursorTop);
+                    Console.Write('▷');
+                    Console.SetCursorPosition(4, cursorTop);
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedBook.Count, 1, '▷');          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedBook.Count, 1, '▷'); // 밑으로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                   // 나가기
+                else if (keyInfo.Key == ConsoleKey.Enter)                                                                // 해당 도서 자세히 보기
+                {
+                    index = Console.CursorTop - cursorTop;
+                    CheckDetailInformationWhichUserSelected(searchedBook[index]);
+                    tool.WaitUntilGetEscapeKey();
+                    return;
+                }
+                else print.BlockCursorMove(4, "▷");                                                                      // 입력 무시 
+            }
+        }
+
         /// <summary>
         /// 사용자가 선택한 도서의 상세정보를 보여주는 메소드입니다.
         /// 사용자가 로그인한 경우 대출이 가능합니다.
@@ -241,6 +274,62 @@ namespace EnSharpLibrary.Function
                 }
                 else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 
             }
+        }
+
+        public void CheckDetailInformationWhichUserSelected(BookAPIVO book)
+        {
+            int cursorLeft;
+            int cursorTop;
+            int registeredCount = 0;
+            string count;
+            int countToRenew;
+
+            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
+            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
+            int serialNumber;
+
+            if (result.Count == 0) registeredCount = 0;
+            else registeredCount = Int32.Parse(result[0]);
+            print.BookDetailInBookAddMode(book, registeredCount);
+
+            if (registeredCount == 0) serialNumber = countOfTableData + 1;
+            else serialNumber = Int32.Parse(ConnectDatabase.SelectFromDatabase("serial_number", "book_api", "isbn", book.Isbn)[0]);
+
+            cursorLeft = Console.CursorLeft;
+            cursorTop = Console.CursorTop;
+
+            while (true)
+            {
+                count = getValue.Information(cursorLeft, cursorTop, 3, Constant.ONLY_NUMBER, "숫자 입력(등록 취소:ESC)");
+
+                if (string.Compare(count, "@입력취소@") == 0) return;
+                else if (Int32.Parse(count) == 0) print.ErrorMessage(Constant.EXCEED_INPUT_ERROR, cursorTop + 2);
+                else if (count.Length == 0) print.ErrorMessage(Constant.LENGTH_ERROR, cursorTop + 2);
+                else if (Int32.Parse(count) + registeredCount > 99) print.ErrorMessage(Constant.EXCEED_INPUT_ERROR, cursorTop + 2);
+                else { countToRenew = Int32.Parse(count) + registeredCount; break; }
+            }
+
+            string values1 = "(\"" + book.Title + "\",\"" + book.Author + "\",\"" + book.Publisher + "\"," + book.Price + "," + book.Discount + ",\"";
+            string values2 = book.Pubdate + "\"," + count + ",\"" + book.Isbn + "\",\"" + book.Description + "\"," + serialNumber + ")";
+
+            if (registeredCount == 0) ConnectDatabase.InsertIntoDatabase("book_api", Constant.ADD_BOOK_COLUMNS, values1 + values2);
+            else ConnectDatabase.UpdateToDatabase("book_api", "count", countToRenew.ToString(), "isbn", book.Isbn);
+
+            float applicationNumber;
+            string value;
+
+            for (int create = 0; create < Int32.Parse(count); create++)
+            {
+                applicationNumber = serialNumber +  ((float)(create + registeredCount) / 100);
+                value = "(" + applicationNumber.ToString() + ",\"대출 가능\")";
+                ConnectDatabase.InsertIntoDatabase("book_detail", Constant.INSERT_NEW_APPLICATION_NUMBER, value);
+            }
+
+            Console.SetCursorPosition(4, cursorTop - 2);
+            Console.Write("등 록 된  수 량 | {0}", countToRenew);
+            Console.SetCursorPosition(0, cursorTop);
+            print.ClearCurrentConsoleLine();
+            print.PrintSentence("등록이 완료되었습니다!(나가기:ESC)", cursorTop, Constant.FOREGROUND_COLOR);
         }
 
         /// <summary>

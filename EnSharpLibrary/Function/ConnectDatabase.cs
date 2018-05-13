@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Xml;
+using MySql.Data.MySqlClient;
 
 using EnSharpLibrary.Data;
 using EnSharpLibrary.IO;
@@ -18,72 +19,92 @@ namespace EnSharpLibrary.Function
     class ConnectDatabase
     {
         Tool tool = new Tool();
-        GetValue getValue = new GetValue();
+        static MySqlConnection connect;
+        static MySqlCommand command;
+        static MySqlDataReader reader;
 
-        public void ConnectAPI(string searchingKeyword)
+        public static void ConnectToMySQL()
+        {
+            String databaseConnect;
+            
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+        }
+
+        public static void CloseConnectMySQL()
+        {
+            connect.Close();
+        }
+
+        public static int GetCountFromDatabase(string tableName, string searchCategory, string searchKey)
+        {
+            string sql = "SELECT count(*) FROM " + tableName;
+            if (searchCategory == Constant.BLANK) sql = sql + ";";
+            else sql = sql + " WHERE " + searchCategory + "=\"" + searchKey + "\";";
+
+            int count = 0;
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+
+            while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
+
+            reader.Close();
+
+            return count;
+        }
+
+        public static List<string> SelectFromDatabase(string column, string tableName, string searchCategory, string searchKey)
+        {
+            List<string> data = new List<string>();
+            string sql = "SELECT " + column + " FROM " + tableName + " WHERE " + searchCategory + "=\"" + searchKey + "\";";
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+
+            while (reader.Read()) data.Add(reader[column].ToString());
+
+            reader.Close();
+
+            return data;
+        }
+
+        public static void InsertIntoDatabase(string table, string columns, string values)
+        {
+            string sql = "INSERT INTO " + table + " " + columns + " VALUES " + values + ";";
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+            reader.Close();
+        }
+
+        public static void UpdateToDatabase(string table, string column, string data, string category, string key)
+        {
+            StringBuilder sql = new StringBuilder("UPDATE " + table + " SET " + column + "=" + data);
+            if (category == Constant.BLANK) sql.Append(";");
+            else sql.Append(" WHERE " + category + "=\"" + key + "\";");
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+            reader.Close();
+        }
+
+        public static XmlDocument BookSearchResult(string searchingKeyword)
         {
             string url = Constant.URL + searchingKeyword + "&target=book&display=100";
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Headers.Add("X-Naver-Client-Id", Constant.CLIENT_ID);
             request.Headers.Add("X-Naver-Client-Secret", Constant.CLIENT_SECRET);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            string status = response.StatusCode.ToString();
-            if (status == "OK")
-            {
-                Stream stream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-                string text = reader.ReadToEnd();
-                XmlDocument bookInformation = new XmlDocument();
-                bookInformation.LoadXml(text);
-                //Console.WriteLine(text);
-                //tool.WaitUntilGetEscapeKey();
-                SaveBookToDatabase(bookInformation);
 
-            }
-            else
-            {
-                Console.WriteLine("Error 발생=" + status);
-            }
-        }
-        
-        public void SaveBookToDatabase(XmlDocument bookInformation)
-        {
-            Console.SetWindowSize(155, 35);
-            Console.Clear();
-            Console.WriteLine(Constant.ADD_NEW_BOOK_GUIDELINE[0]);
-            Console.WriteLine(Constant.ADD_NEW_BOOK_GUIDELINE[1]);
-            
-            XmlNodeList title = bookInformation.GetElementsByTagName("title");
-            XmlNodeList author = bookInformation.GetElementsByTagName("author");
-            XmlNodeList price = bookInformation.GetElementsByTagName("price");
-            XmlNodeList discount = bookInformation.GetElementsByTagName("discount");
-            XmlNodeList publisher = bookInformation.GetElementsByTagName("publisher");
-            XmlNodeList pubdate = bookInformation.GetElementsByTagName("pubdate");
-            XmlNodeList isbn = bookInformation.GetElementsByTagName("isbn");
-            XmlNodeList description = bookInformation.GetElementsByTagName("description");
-
-            List<string> bookTitle = getValue.ShortenKeyword(title, 60);
-            List<string> bookAuthor = getValue.ShortenKeyword(author, 20);
-            List<string> bookPublisher = getValue.ShortenKeyword(publisher, 18);
-
-            for (int count = 0; count < title.Count - 1 ; count++)
-            {
-                Console.SetCursorPosition(10, Console.CursorTop);
-                Console.Write(bookTitle[count + 1]);
-                Console.SetCursorPosition(73, Console.CursorTop);
-                Console.Write(bookAuthor[count]);
-                //Console.WriteLine("가격 | " + price[count].InnerText);
-                //Console.WriteLine("할인 가격 | " + discount[count].InnerText);
-                Console.SetCursorPosition(96, Console.CursorTop);
-                Console.Write(bookPublisher[count]);
-                Console.SetCursorPosition(115, Console.CursorTop);
-                Console.Write(pubdate[count].InnerText);
-                Console.SetCursorPosition(126, Console.CursorTop);
-                Console.WriteLine(isbn[count].InnerText);
-                //Console.WriteLine("소개 | " + description[count + 1].InnerText+"\n");
-            }
-
-            tool.WaitUntilGetEscapeKey();
+            Stream stream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+            string text = reader.ReadToEnd();
+            XmlDocument bookInformation = new XmlDocument();
+            bookInformation.LoadXml(text);
+            return bookInformation;
         }
     }
 }

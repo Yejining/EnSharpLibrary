@@ -10,6 +10,50 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
+        public void BookDetailInBookAddMode(BookAPIVO book, int registeredCount)
+        {
+            Console.Clear();
+            Console.SetWindowSize(90, 35);
+            PrintSentences(Constant.ENSHARP_TITLE, 2);
+            PrintSentence("도서 등록", Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
+
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("도  서  명 | ");
+            foreach (char title in book.Title)
+            {
+                Console.Write(title);
+                if (Console.CursorLeft >= 88) Console.SetCursorPosition(17, Console.CursorTop + 1);
+            }
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("저      자 | {0}", book.Author);
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("출  판  사 | ");
+            foreach (char publisher in book.Publisher)
+            {
+                Console.Write(publisher);
+                if (Console.CursorLeft >= 88) Console.SetCursorPosition(17, Console.CursorTop + 1);
+            }
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("출  판  일 | {0}", book.pubdate);
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("I  S  B  N | {0}", book.isbn);
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("가      격 | {0}원", book.Price);
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("할  인  가 | {0}원", book.Discount);
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("책  소  개 | ");
+            foreach (char description in book.Description)
+            {
+                Console.Write(description);
+                if (Console.CursorLeft >= 88) Console.SetCursorPosition(17, Console.CursorTop + 1);
+            }
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("등 록 된  수 량 | {0}권", registeredCount);
+            Console.SetCursorPosition(4, Console.CursorTop + 2);
+            Console.Write("등 록 할  수 량 | ");
+        }
+
         /// <summary>
         /// 인자로 받은 문자을 가운데정렬하여 출력하는 메소드입니다.
         /// </summary>
@@ -64,6 +108,7 @@ namespace EnSharpLibrary.IO
             int space = 0;
 
             if (mode == Constant.MEMBER_SEARCH_MODE) space = -9;
+            if (mode == Constant.ADD_BOOK) space = 32;
 
             Console.SetCursorPosition(85 + space, 2);
             
@@ -79,11 +124,12 @@ namespace EnSharpLibrary.IO
             if (mode == Constant.MEMBER_SEARCH_MODE && string.Compare(publisher, "0") == 0) publisher = string.Copy("전체");
             if (string.Compare(author, "") == 0) author = string.Copy("전체");
             searchingCondition.Add(bookName);
-            searchingCondition.Add(publisher);
-            searchingCondition.Add(author);
+            if (mode != Constant.ADD_BOOK) searchingCondition.Add(publisher);
+            if (mode != Constant.ADD_BOOK) searchingCondition.Add(author);
 
             string[] searchingMenu;
             if (mode == Constant.BOOK_SEARCH_MODE) searchingMenu = Constant.SEARCHING_BOOK_MENU_IN_SEARCHING_MODE;
+            else if (mode == Constant.ADD_BOOK) searchingMenu = Constant.SEARCHING_BOOK_MENU_IN_ADDING_MODE;
             else searchingMenu = Constant.SEARCHING_MEMBER_MENU_IN_SEARCHING_MODE;
 
             // 배경 출력
@@ -238,6 +284,18 @@ namespace EnSharpLibrary.IO
             Books(searchedBook, Console.CursorTop);
         }
 
+        public void SearchedBook(List<BookAPIVO> searchedBook, string bookName)
+        {
+            Console.SetWindowSize(155, 35);
+            Console.Clear();
+
+            SearchedTitle(Constant.ADD_BOOK, bookName, Constant.BLANK, Constant.BLANK);
+            Console.SetCursorPosition(0, 7);
+            foreach (string guideline in Constant.ADD_NEW_BOOK_GUIDELINE) Console.WriteLine(guideline);
+
+            Books(searchedBook, Console.CursorTop);
+        }
+
         public void SearchedBookWithMoreDetail(List<BookVO> books)
         {
             Console.SetCursorPosition(0, 11);
@@ -279,8 +337,7 @@ namespace EnSharpLibrary.IO
                 Console.SetCursorPosition(104, Console.CursorTop);
                 Console.Write(histories[order].DateDeadlineForReturn.ToShortDateString());
                 Console.SetCursorPosition(118, Console.CursorTop);
-                Console.Write(books[order].BookID);
-                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                Console.WriteLine(books[order].BookID);
             }
         }
 
@@ -323,6 +380,58 @@ namespace EnSharpLibrary.IO
             }
             
             PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
+        }
+
+        public string ShortenKeyword(string keyword, int limit)
+        {
+            int cursorTop = Console.CursorTop;
+            int cursorLeft = Console.CursorLeft;
+
+            while (limit != 0)
+            {
+                Console.Write(keyword);
+                if (Console.CursorLeft > cursorLeft + limit)
+                {
+                    keyword = keyword.Remove(keyword.Length - 5);
+                    keyword = keyword.Insert(keyword.Length, "...");
+                }
+                else
+                {
+                    ClearCurrentConsoleLine();
+                    Console.SetCursorPosition(0, cursorTop);
+                    break;
+                }
+
+                ClearCurrentConsoleLine();
+                Console.SetCursorPosition(cursorLeft, cursorTop);
+            }
+
+            return keyword;
+        }
+
+        public void Books(List<BookAPIVO> books, int cursorTop)
+        {
+            string title;
+            string author;
+            string publisher;
+
+            foreach (BookAPIVO book in books)
+            {
+                title = ShortenKeyword(book.Title, 60);
+                author = ShortenKeyword(book.Author, 20);
+                publisher = ShortenKeyword(book.Publisher, 18);
+
+                Console.SetCursorPosition(10, Console.CursorTop);
+                Console.Write(title);
+                Console.SetCursorPosition(73, Console.CursorTop);
+                Console.Write(author);
+                Console.SetCursorPosition(96, Console.CursorTop);
+                Console.Write(publisher);
+                Console.SetCursorPosition(115, Console.CursorTop);
+                Console.Write(book.pubdate);
+                Console.SetCursorPosition(126, Console.CursorTop);
+                Console.WriteLine(book.isbn);
+            }
         }
 
         public void Members(List<MemberVO> members, List<string> borrowedBookForEachMember, int cursorTop)

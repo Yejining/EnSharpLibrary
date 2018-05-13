@@ -17,37 +17,46 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
-        public List<string> ShortenKeyword(XmlNodeList title, int limit)
+        public List<BookAPIVO> OrganizedFoundBook(XmlDocument bookInformation)
+        {
+            List<BookAPIVO> books = new List<BookAPIVO>();
+            List<string> bookTitle;
+            List<string> bookDescription;
+
+            XmlNodeList title = bookInformation.GetElementsByTagName("title");
+            bookTitle = CleareaceKeyword(title);
+            XmlNodeList author = bookInformation.GetElementsByTagName("author");
+            XmlNodeList price = bookInformation.GetElementsByTagName("price");
+            XmlNodeList discount = bookInformation.GetElementsByTagName("discount");
+            XmlNodeList publisher = bookInformation.GetElementsByTagName("publisher");
+            XmlNodeList pubdate = bookInformation.GetElementsByTagName("pubdate");
+            XmlNodeList isbn = bookInformation.GetElementsByTagName("isbn");
+            XmlNodeList description = bookInformation.GetElementsByTagName("description");
+            bookDescription = CleareaceKeyword(description);
+
+            for (int count = 0; count < title.Count - 1; count++)
+            {
+                BookAPIVO book = new BookAPIVO(bookTitle[count + 1], publisher[count].InnerText, pubdate[count].InnerText);
+                book.SaveDetail(Constant.AUTHOR, author[count].InnerText);
+                book.SavePrice(Constant.PRICE, price[count].InnerText);
+                book.SavePrice(Constant.DISCOUNT, discount[count].InnerText);
+                book.SaveDetail(Constant.ISBN, isbn[count].InnerText);
+                book.SaveDetail(Constant.DESCRIPTION, bookDescription[count + 1]);
+
+                books.Add(book);
+            }
+
+            return books;
+        }
+
+        public List<string> CleareaceKeyword(XmlNodeList title)
         {
             List<string> bookTitle = new List<string>();
             String modifiedTitle;
-            int cursorTop;
-            
-            cursorTop = Console.CursorTop;
 
             for (int index = 0; index < title.Count; index++)
             {
-                modifiedTitle = Regex.Replace(title[index].InnerText, @"<[^>]*>", String.Empty);
-
-                while (true)
-                {
-                    Console.Write(modifiedTitle);
-                    if (Console.CursorLeft > limit)
-                    {
-                        modifiedTitle = modifiedTitle.Remove(modifiedTitle.Length - 5);
-                        modifiedTitle = modifiedTitle.Insert(modifiedTitle.Length, "...");
-                    }
-                    else
-                    {
-                        print.ClearCurrentConsoleLine();
-                        Console.SetCursorPosition(0, cursorTop);
-                        break;
-                    }
-
-                    print.ClearCurrentConsoleLine();
-                    Console.SetCursorPosition(0, cursorTop);
-                }
-
+                modifiedTitle = Regex.Replace(title[index].InnerText, @"(<[^>]*>|&lt;|&gt;|&#x0D;)", String.Empty);
                 bookTitle.Add(modifiedTitle);
             }
 

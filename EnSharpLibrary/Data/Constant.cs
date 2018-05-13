@@ -79,6 +79,12 @@ namespace EnSharpLibrary.Data
             "저      자 | "
         };
 
+        public static string[] SEARCHING_BOOK_MENU_IN_ADDING_MODE =
+        {
+            " | 검 색 |",
+            "도  서  명 | ",
+        };
+
         public static string[] SEARCHING_MEMBER_MENU_IN_SEARCHING_MODE =
         {
             " | 검 색 |",
@@ -121,9 +127,7 @@ namespace EnSharpLibrary.Data
         public static string[] ADD_BOOK_CATEGORY_AND_GUILDLINE =
         {
             "도서명 | ",
-            "15자 이내 입력",
-            "수  량 | ",
-            "숫자만 입력"
+            "15자 이내 입력"
         };
 
         public static string[] ERROR_MESSAGE =
@@ -135,7 +139,8 @@ namespace EnSharpLibrary.Data
             "올바르지 않은 입력 길이입니다!",
             "90년부터 현재 년도의 학번만 가입 가능합니다!",
             "이미 등록된 학번입니다!",
-            "8자 이상 15자 이하로 입력하세요!"
+            "8자 이상 15자 이하로 입력하세요!",
+            "같은 도서 등록은 1~99권까지만 가능합니다!"
         };
 
         public static string[] SEARCHED_BOOK_GUIDELINE =
@@ -220,8 +225,8 @@ namespace EnSharpLibrary.Data
 
         public static string[] MANAGE_BOOK_OPTION =
         {
-            "도서 등록",
-            "도서 삭제"
+            "도서 검색 및 등록",
+            "등록된 도서 관리"
         };
 
         public static string[] MEMBER_SEARCH_CATEGORY_AND_GUIDELINE =
@@ -240,12 +245,17 @@ namespace EnSharpLibrary.Data
 
         public static string SEARCH_MEMBER_TITLE = "등록된 회원 관리";
 
+        public static string ADD_BOOK_COLUMNS = "(name, author, publisher, price, discount, publishing_date, count, isbn, description, serial_number)";
+        public static string INSERT_NEW_APPLICATION_NUMBER = "(application_number, book_condition)";
+
         public static string OUT = "나가기(ESC)";
 
         public const string NUMBER_PATTERN = "[0-9]";
         public const string ENGLISH_PATTERN = "[a-zA-Z]";
         public const string KOREAN_PATTERN = "[ㄱ-ㅎㅏ-ㅣ가-힣]";
         public const string SPECIAL_LETTER = "[`~!@#$%^&*()\\-_=+\\{\\}\\[\\]\\\\\\|:;\"\'<>,.?/]";
+
+        public const string BLANK = "";
 
         // Menu Class에서의 usingMemberID
         public const int PUBLIC = 0;
@@ -329,6 +339,7 @@ namespace EnSharpLibrary.Data
         public const int YEAR_ERROR = 5;
         public const int OVERRIDE_ERROR = 6;
         public const int WRONG_LENGTH_ERROR = 7;
+        public const int EXCEED_INPUT_ERROR = 8;
 
         // MemberMabage.ChangeUserInformation에서 사용
         public const int EDIT_ADDRESS = 0;
@@ -342,6 +353,12 @@ namespace EnSharpLibrary.Data
 
         public const int BOOK_ID = 0;
         public const int MEMBER_ID = 1;
+
+        public const int PRICE = 0;
+        public const int DISCOUNT = 1;
+        public const int AUTHOR = 2;
+        public const int ISBN = 3;
+        public const int DESCRIPTION = 4;
 
         public const ConsoleColor FOREGROUND_COLOR = ConsoleColor.White;
     }

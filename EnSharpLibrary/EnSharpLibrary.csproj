@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\BookAPIVO.cs" />
     <Compile Include="Data\BookVO.cs" />
     <Compile Include="Data\Constant.cs" />
     <Compile Include="Data\HistoryVO.cs" />

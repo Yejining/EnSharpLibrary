@@ -22,10 +22,10 @@ namespace EnSharpLibrary
         static void Main(string[] args)
         {
             Menu menu = new Menu();
-            menu.RunLibraryProgram(Constant.NON_MEMBER_MODE);
 
-            //ConnectDatabase connectDatabase = new ConnectDatabase();
-            //connectDatabase.ConnectAPI("나는 아스팔트",5);
+            ConnectDatabase.ConnectToMySQL();
+            menu.RunLibraryProgram(Constant.NON_MEMBER_MODE);
+            ConnectDatabase.CloseConnectMySQL();
         }
     }
 }
