@@ -63,7 +63,7 @@ namespace EnSharpLibrary.IO
             List<string> searchingCondition = new List<string>();
             int space = 0;
 
-            if (mode == Constant.MEMBER_SEARCH_MODE) space = -23;
+            if (mode == Constant.MEMBER_SEARCH_MODE) space = -9;
 
             Console.SetCursorPosition(85 + space, 2);
             
@@ -128,6 +128,7 @@ namespace EnSharpLibrary.IO
                 case Constant.MEMBER_MODE: option = Constant.MEMBER_OPTION; break;
                 case Constant.ADMIN_MODE: option = Constant.ADMIN_OPTION; break;
                 case Constant.MANAGE_MEMBER_MODE: option = Constant.MANAGE_MEMBER_OPTION; break;
+                case Constant.MANAGE_BOOK_MODE: option = Constant.MANAGE_BOOK_OPTION; break;
                 default: option = Constant.NON_MEMBER_OPTION; break;
             }
 
@@ -135,7 +136,8 @@ namespace EnSharpLibrary.IO
             PrintSentence(option[0], cursorTop + 1, Constant.FOREGROUND_COLOR);
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 2, Constant.FOREGROUND_COLOR);
             PrintSentence(option[1], cursorTop + 3, Constant.FOREGROUND_COLOR);
-            if (mode == Constant.MANAGE_MEMBER_MODE) { PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 4, Constant.FOREGROUND_COLOR); return; }
+            if (mode == Constant.MANAGE_MEMBER_MODE || mode == Constant.MANAGE_BOOK_MODE)
+            { PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 4, Constant.FOREGROUND_COLOR); return; }
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 4, Constant.FOREGROUND_COLOR);
             PrintSentence(option[2], cursorTop + 5, Constant.FOREGROUND_COLOR);
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 6, Constant.FOREGROUND_COLOR);
@@ -165,6 +167,7 @@ namespace EnSharpLibrary.IO
                 case Constant.LOG_IN_MODE: categoryAndGuideline = Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 case Constant.JOIN_IN: categoryAndGuideline = Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE; break;
                 case Constant.MEMBER_SEARCH_MODE: categoryAndGuideline = Constant.MEMBER_SEARCH_CATEGORY_AND_GUIDELINE; break;
+                case Constant.ADD_BOOK: categoryAndGuideline = Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE; break;
                 default: categoryAndGuideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE; break;
             }
 
@@ -281,16 +284,16 @@ namespace EnSharpLibrary.IO
             }
         }
 
-        public void SearchedMember(List<MemberVO> searchedMember, string name, string age, string address)
+        public void SearchedMember(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string age, string address)
         {
-            Console.SetWindowSize(100, 35);
+            Console.SetWindowSize(114, 35);
             Console.Clear();
 
             SearchedTitle(Constant.MEMBER_SEARCH_MODE, name, age, address);
             Console.SetCursorPosition(0, 11);
             foreach (string guidline in Constant.SEARCHED_MEMBER_GUIDELINE) Console.WriteLine(guidline);
 
-            if (searchedMember.Count != 0) Members(searchedMember, Console.CursorTop);
+            if (searchedMember.Count != 0) Members(searchedMember, borrowedBookForEachMember, Console.CursorTop);
             PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
         }
 
@@ -314,6 +317,7 @@ namespace EnSharpLibrary.IO
                     Console.Write(books[order].NumberOfBooks);
                     Console.SetCursorPosition(120, Console.CursorTop);
                     Console.Write(books[order].Price + "원");
+                    Console.SetCursorPosition(128, Console.CursorTop);
                     Console.SetCursorPosition(0, Console.CursorTop + 1);
                 }
             }
@@ -321,7 +325,7 @@ namespace EnSharpLibrary.IO
             PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
         }
 
-        public void Members(List<MemberVO> members, int cursorTop)
+        public void Members(List<MemberVO> members, List<string> borrowedBookForEachMember, int cursorTop)
         {
             Console.SetCursorPosition(0, cursorTop);
 
@@ -336,6 +340,7 @@ namespace EnSharpLibrary.IO
                 Console.SetCursorPosition(68, Console.CursorTop);
                 Console.Write(members[order].PhoneNumber);
                 Console.SetCursorPosition(85, Console.CursorTop);
+                Console.Write(borrowedBookForEachMember[order]);
                 Console.SetCursorPosition(0, Console.CursorTop + 1);
             }
         }

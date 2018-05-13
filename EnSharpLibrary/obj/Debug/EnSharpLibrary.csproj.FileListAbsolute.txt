@@ -11,3 +11,5 @@ C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Google.Pr
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\MySql.Data.dll
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Google.Protobuf.xml
 C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\MySql.Data.xml
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Newtonsoft.Json.dll
+C:\Users\User\Documents\GitHub\EnSharpLibrary\EnSharpLibrary\bin\Debug\Newtonsoft.Json.xml

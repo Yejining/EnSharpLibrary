@@ -170,6 +170,14 @@ namespace EnSharpLibrary.Function
             connect.Close();
         }
 
+        public void AddBook(string name, string author, string publisher, int publishingYear, int price, float bookID)
+        {
+            StringBuilder sql = new StringBuilder("INSERT INTO book (name, author, publisher, publishing_year, price, book_condition, borrowed_member_id, book_id)");
+            sql.Append("VALUES (\'" + name + "\', \'" + author + "\',\'" + publisher + "\'," + publishingYear + "," + price + ",\"대출 가능\", 0,"+bookID+");");
+
+            MakeQuerry(sql.ToString());
+        }
+
         public bool IsValidBook(float bookID)
         {
             StringBuilder sql = new StringBuilder("SELECT count(*) FROM history WHERE book_id=" + bookID + " AND date_return IS NULL;");
@@ -253,6 +261,7 @@ namespace EnSharpLibrary.Function
                 case Constant.ANSWER_NAME: if (userInputAnswer.Length < 3) return Constant.LENGTH_ERROR; break;
                 case Constant.ANSWER_USER_ID: if (userInputAnswer.Length != 8) return Constant.LENGTH_ERROR; return IsValidID(userInputAnswer);
                 case Constant.ANSWER_PASSWORD: if (userInputAnswer.Length < 8) return Constant.LENGTH_ERROR; break;
+                case Constant.ANSWER_BOOK_NAME: if (userInputAnswer.Length < 1) return Constant.LENGTH_ERROR; break;
             }
 
             return Constant.VALID;

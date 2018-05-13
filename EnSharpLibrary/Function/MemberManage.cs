@@ -302,10 +302,10 @@ namespace EnSharpLibrary.Function
 
             // 검색
             searchedMember = getValue.SearchMemberByCondition(name, age, address.ToString());
+            List<string> borrowedBookForEachMember = getValue.BorrowedBookForEachMember(searchedMember);
 
             // 열람
-            CheckMemberAndDelete(searchedMember, name, age.ToString(), address.ToString());
-            tool.WaitUntilGetEscapeKey();
+            CheckMemberAndDelete(searchedMember, borrowedBookForEachMember, name, age.ToString(), address.ToString());
         }
 
         /// <summary>
@@ -315,12 +315,12 @@ namespace EnSharpLibrary.Function
         /// <param name="name">관리자가 검색한 회원 이름</param>
         /// <param name="age">관리자가 검색한 회원 출생년도</param>
         /// <param name="address">관리자가 검색한 회원 주소</param>
-        public void CheckMemberAndDelete(List<MemberVO> searchedMember, string name, string age, string address)
+        public void CheckMemberAndDelete(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string age, string address)
         {
             bool isFirstLoop = true;
             int cursorTop = 13;
 
-            print.SearchedMember(searchedMember, name, age, address);
+            print.SearchedMember(searchedMember, borrowedBookForEachMember, name, age, address);
             if (searchedMember.Count == 0) return;
 
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
@@ -330,7 +330,7 @@ namespace EnSharpLibrary.Function
                 {
                     Console.SetCursorPosition(4, cursorTop);
                     Console.Write('▷');
-                    print.Members(searchedMember, cursorTop);
+                    print.Members(searchedMember, borrowedBookForEachMember, cursorTop);
                     Console.SetCursorPosition(4, cursorTop);
                     isFirstLoop = false;
                 }

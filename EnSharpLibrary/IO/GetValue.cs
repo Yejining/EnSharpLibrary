@@ -500,5 +500,88 @@ namespace EnSharpLibrary.IO
 
             return answer;
         }
+
+        public List<string> BorrowedBookForEachMember(List<MemberVO> members)
+        {
+            List<string> borrowedBookForEachMember = new List<string>();
+            StringBuilder sql = new StringBuilder();
+            StringBuilder IDInOnePlace = new StringBuilder();
+            int count = 0;
+
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            foreach (MemberVO member in members)
+            {
+                sql.Clear();
+                sql.Append("SELECT count(*) FROM history WHERE member_id=" + member.MemberID + " AND date_return IS NULL;");
+
+                MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
+                reader.Close();
+
+                IDInOnePlace.Clear();
+                if (count == 0) { IDInOnePlace.Append("없음"); borrowedBookForEachMember.Add(IDInOnePlace.ToString()); }
+                else
+                {
+                    sql.Clear();
+                    sql.Append("SELECT * FROM history WHERE member_id=" + member.MemberID + " AND date_return IS NULL;");
+                    command = new MySqlCommand(sql.ToString(), connect);
+                    reader = command.ExecuteReader();
+
+                    while (reader.Read()) IDInOnePlace.Append(reader["book_id"].ToString() + " ");
+
+                    borrowedBookForEachMember.Add(IDInOnePlace.ToString());
+
+                    reader.Close();
+                }
+            }
+
+            connect.Close();
+
+            return borrowedBookForEachMember;
+        }
+
+        public float BookID(string name, string author, string publisher, int publishingYear)
+        {
+            StringBuilder sql = new StringBuilder("SELECT count(*) FROM book WHERE name=\'" + name + "\' AND author=\'" + author + "\' AND publisher=\'" + publisher + "\' AND publishing_year=" + publishingYear + ";");
+            float count = 0;
+            float bookCount = 0;
+                       
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read()) count = float.Parse(reader["count(*)"].ToString());
+            reader.Close();
+
+            sql.Clear();
+            sql.Append("SELECT count(*) FROM book;");
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+
+            while (reader.Read()) bookCount = float.Parse(reader["count(*)"].ToString());
+            reader.Close();
+            connect.Close();
+
+            float ID = bookCount + 1 + (count / 100);
+
+            return ID;
+        }
     }
 }

@@ -118,6 +118,20 @@ namespace EnSharpLibrary.Data
             "선택"
         };
 
+        public static string[] ADD_BOOK_CATEGORY_AND_GUILDLINE =
+        {
+            "도서명 | ",
+            "15자 이내 입력",
+            "작가명 | ",
+            "10자 이내 입력",
+            "출판사 | ",
+            "10자 이내 입력",
+            "출판년도 | ",
+            "4글자 숫자 입력",
+            "가격 | ",
+            "숫자만 입력"
+        };
+
         public static string[] ERROR_MESSAGE =
         {
             "검색 조건과 일치하는 도서가 없습니다!",
@@ -150,8 +164,8 @@ namespace EnSharpLibrary.Data
 
         public static string[] SEARCHED_MEMBER_GUIDELINE =
         {
-            "  선택  |    이름    |   학번   |              주소               |    전화번호    |  대출도서 번호  ",
-            "-----------------------------------------------------------------------------------------------------"
+            "  선택  |    이름    |   학번   |              주소               |    전화번호    |        대출도서 번호        ",
+            "-----------------------------------------------------------------------------------------------------------------"
         };
 
         public static string[][] DISTRICT =
@@ -204,6 +218,12 @@ namespace EnSharpLibrary.Data
             "회원 삭제"
         };
 
+        public static string[] MANAGE_BOOK_OPTION =
+        {
+            "도서 등록",
+            "도서 삭제"
+        };
+
         public static string[] MEMBER_SEARCH_CATEGORY_AND_GUIDELINE =
         {
             "회원 이름 | ",
@@ -213,6 +233,10 @@ namespace EnSharpLibrary.Data
             "회원 주소 | ",
             "선택"
         };
+
+        public static string URL = "https://openapi.naver.com/v1/search/book_adv.xml?d_titl=";
+        public static string CLIENT_ID = "X1ZDuE2lngjCh3S3EV8x";
+        public static string CLIENT_SECRET = "9hOYQ7WQkY";
 
         public static string SEARCH_MEMBER_TITLE = "등록된 회원 관리";
 
@@ -235,6 +259,7 @@ namespace EnSharpLibrary.Data
         public const int MEMBER_MODE = 1;
         public const int ADMIN_MODE = 2;
         public const int MANAGE_MEMBER_MODE = 3;
+        public const int MANAGE_BOOK_MODE = 4;
 
         // Print Class의 SearchCategoryAndGuideline에서 사용
         public const int BOOK_SEARCH_MODE = 0;
@@ -242,6 +267,7 @@ namespace EnSharpLibrary.Data
         public const int JOIN_IN = 2;
         public const int MEMBER_SEARCH_MODE = 3;
         public const int MANAGE_BORROWED_BOOK = 4;
+        public const int ADD_BOOK = 5;
 
         // Menu Class의 cursorTop 정보
         public const int RELEVANT_TO_BOOK = 10;
@@ -252,6 +278,8 @@ namespace EnSharpLibrary.Data
 
         public const int APPEND_MEMBER = 12;
         public const int MANAGE_REGISTERED_MEMBER = 14;
+        public const int APPEND_BOOK = 12;
+        public const int MANAGE_REGISTERED_BOOK = 16;
 
         // BookManage SearchBook에서 사용
         // Menu에서 사용
@@ -288,6 +316,7 @@ namespace EnSharpLibrary.Data
         public const int ANSWER_BIRTHDATE_MONTH = 6;
         public const int ANSWER_BIRTHDATE_DAY = 7;
         public const int ANSWER_WHAT_TO_EDIT = 8;
+        public const int ANSWER_BOOK_NAME = 10;
 
         public const int GENERAL_MODE = 0;
         public const int INCLUDE_ALL_OPTION = 1;

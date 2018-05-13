@@ -19,6 +19,97 @@ namespace EnSharpLibrary.Function
         public void ManageBook()
         {
             usingMemberID = Constant.ADMIN;
+            bool isFirstLoop = true;
+
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    // 메뉴 출력
+                    print.SetWindowsizeAndPrintTitle(45, 30, "도서 관리");
+                    print.MenuOption(Constant.MANAGE_BOOK_MODE, Console.CursorTop + 2);
+
+                    // 기능 선택
+                    print.SetCursorAndChoice(38, 12, "◁");
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                // 기능 선택
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, '◁'); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, '◁'); break;
+                    case ConsoleKey.Enter: isFirstLoop = GoNextFunction(Console.CursorTop); break;
+                    case ConsoleKey.Escape: return;
+                    default: print.BlockCursorMove(38, "◁"); break;
+                }
+            }
+        }
+
+        public bool GoNextFunction(int cursorTop)
+        {
+            switch (Console.CursorTop)
+            {
+                case Constant.APPEND_BOOK: AddBook("도서 등록"); return true;
+                case Constant.MANAGE_REGISTERED_BOOK: SearchBook(); return true;
+            }
+
+            return true;
+        }
+
+        public void AddBook(string title)
+        {
+            string name;
+            string author;
+            string publisher;
+            string publishingYear;
+            string price;
+
+            print.SetWindowsizeAndPrintTitle(45, 30, title);
+
+            while (true)
+            {
+                print.SearchCategoryAndGuideline(Constant.ADD_BOOK);
+
+                // 정보 수정
+                // - 도서명
+                name = getValue.Information(19, 11, 15, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[1]);
+                int errorMode = tool.IsValidAnswer(Constant.ANSWER_BOOK_NAME, name);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 21); continue; }
+
+                // - 저자
+                author = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[3]);
+                if (string.Compare(author, "@입력취소@") == 0) return;
+
+                // - 출판사
+                publisher = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[5]);
+                if (string.Compare(publisher, "@입력취소@") == 0) return;
+
+                // - 출판년도
+                publishingYear = getValue.Information(21, 17, 4, Constant.ONLY_NUMBER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[7]);
+                if (string.Compare(publishingYear, "@입력취소@") == 0) return;
+                if (publishingYear.Length != 4) { print.ErrorMessage(4, 21); continue; }
+
+                // - 가격
+                price = getValue.Information(17, 19, 7, Constant.ONLY_NUMBER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[9]);
+                if (string.Compare(price, "@입력취소@") == 0) return;
+
+                break;
+            }
+
+            float bookID = getValue.BookID(name, author, publisher, Int32.Parse(publishingYear));
+            tool.AddBook(name, author, publisher, Int32.Parse(publishingYear), Int32.Parse(price), bookID);
+
+            return;
+        }
+
+        public void SearchBook()
+        {
+
         }
 
         /// <summary>
