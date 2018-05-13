@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
+using System.Xml;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 using EnSharpLibrary.Data;
 using EnSharpLibrary.Function;
@@ -13,6 +16,43 @@ namespace EnSharpLibrary.IO
     {
         Print print = new Print();
         Tool tool = new Tool();
+
+        public List<string> ShortenKeyword(XmlNodeList title, int limit)
+        {
+            List<string> bookTitle = new List<string>();
+            String modifiedTitle;
+            int cursorTop;
+            
+            cursorTop = Console.CursorTop;
+
+            for (int index = 0; index < title.Count; index++)
+            {
+                modifiedTitle = Regex.Replace(title[index].InnerText, @"<[^>]*>", String.Empty);
+
+                while (true)
+                {
+                    Console.Write(modifiedTitle);
+                    if (Console.CursorLeft > limit)
+                    {
+                        modifiedTitle = modifiedTitle.Remove(modifiedTitle.Length - 5);
+                        modifiedTitle = modifiedTitle.Insert(modifiedTitle.Length, "...");
+                    }
+                    else
+                    {
+                        print.ClearCurrentConsoleLine();
+                        Console.SetCursorPosition(0, cursorTop);
+                        break;
+                    }
+
+                    print.ClearCurrentConsoleLine();
+                    Console.SetCursorPosition(0, cursorTop);
+                }
+
+                bookTitle.Add(modifiedTitle);
+            }
+
+            return bookTitle;
+        }
 
         /// <summary>
         /// 사용자가 검색창에 입력한 값을 반환해주는 메소드입니다.

@@ -13,6 +13,7 @@ namespace EnSharpLibrary.Function
         Print print = new Print();
         GetValue getValue = new GetValue();
         Tool tool = new Tool();
+        ConnectDatabase connectDatabase = new ConnectDatabase();
 
         int usingMemberID;
 
@@ -63,10 +64,7 @@ namespace EnSharpLibrary.Function
         public void AddBook(string title)
         {
             string name;
-            string author;
-            string publisher;
-            string publishingYear;
-            string price;
+            string count;
 
             print.SetWindowsizeAndPrintTitle(45, 30, title);
 
@@ -79,30 +77,16 @@ namespace EnSharpLibrary.Function
                 name = getValue.Information(19, 11, 15, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[1]);
                 int errorMode = tool.IsValidAnswer(Constant.ANSWER_BOOK_NAME, name);
                 if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
-                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 21); continue; }
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 15); continue; }
 
-                // - 저자
-                author = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[3]);
-                if (string.Compare(author, "@입력취소@") == 0) return;
-
-                // - 출판사
-                publisher = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[5]);
-                if (string.Compare(publisher, "@입력취소@") == 0) return;
-
-                // - 출판년도
-                publishingYear = getValue.Information(21, 17, 4, Constant.ONLY_NUMBER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[7]);
-                if (string.Compare(publishingYear, "@입력취소@") == 0) return;
-                if (publishingYear.Length != 4) { print.ErrorMessage(4, 21); continue; }
-
-                // - 가격
-                price = getValue.Information(17, 19, 7, Constant.ONLY_NUMBER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[9]);
-                if (string.Compare(price, "@입력취소@") == 0) return;
+                // - 수량
+                count = getValue.Information(19, 13, 7, Constant.ONLY_NUMBER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[3]);
+                if (string.Compare(count, "@입력취소@") == 0) return;
 
                 break;
             }
 
-            float bookID = getValue.BookID(name, author, publisher, Int32.Parse(publishingYear));
-            tool.AddBook(name, author, publisher, Int32.Parse(publishingYear), Int32.Parse(price), bookID);
+            connectDatabase.ConnectAPI(name);
 
             return;
         }

@@ -122,13 +122,7 @@ namespace EnSharpLibrary.Data
         {
             "도서명 | ",
             "15자 이내 입력",
-            "작가명 | ",
-            "10자 이내 입력",
-            "출판사 | ",
-            "10자 이내 입력",
-            "출판년도 | ",
-            "4글자 숫자 입력",
-            "가격 | ",
+            "수  량 | ",
             "숫자만 입력"
         };
 
@@ -143,7 +137,7 @@ namespace EnSharpLibrary.Data
             "이미 등록된 학번입니다!",
             "8자 이상 15자 이하로 입력하세요!"
         };
-        
+
         public static string[] SEARCHED_BOOK_GUIDELINE =
         {
             "  선택  |                    도서                   |          저자         |       출판사       |  출판년도  |  수량  |  가격  |",
@@ -166,6 +160,12 @@ namespace EnSharpLibrary.Data
         {
             "  선택  |    이름    |   학번   |              주소               |    전화번호    |        대출도서 번호        ",
             "-----------------------------------------------------------------------------------------------------------------"
+        };
+
+        public static string[] ADD_NEW_BOOK_GUIDELINE =
+        {
+            "  선택  |                            도서명                            |         저자         |      출판사      |  출판일  |            ISBN            ",
+            "---------------------------------------------------------------------------------------------------------------------------------------------------------"
         };
 
         public static string[][] DISTRICT =
@@ -244,7 +244,7 @@ namespace EnSharpLibrary.Data
 
         public const string NUMBER_PATTERN = "[0-9]";
         public const string ENGLISH_PATTERN = "[a-zA-Z]";
-        public const string KOREAN_PATTERN = "[가-힣]";
+        public const string KOREAN_PATTERN = "[ㄱ-ㅎㅏ-ㅣ가-힣]";
         public const string SPECIAL_LETTER = "[`~!@#$%^&*()\\-_=+\\{\\}\\[\\]\\\\\\|:;\"\'<>,.?/]";
 
         // Menu Class에서의 usingMemberID
