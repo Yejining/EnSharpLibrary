@@ -59,12 +59,37 @@ namespace EnSharpLibrary.Function
         public static List<string> SelectFromDatabase(string column, string tableName, string searchCategory, string searchKey)
         {
             List<string> data = new List<string>();
-            string sql = "SELECT " + column + " FROM " + tableName + " WHERE " + searchCategory + "=\"" + searchKey + "\";";
+            string sql = "SELECT " + column + " FROM " + tableName;
+            if (searchCategory == Constant.BLANK) sql += ";";
+            else sql += " WHERE " + searchCategory + "=\"" + searchKey + "\";";
+            
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                if (string.Compare(column, "*") != 0) data.Add(reader[column].ToString());
+                else data.Add(reader.ToString());
+            }
+
+            reader.Close();
+
+            return data;
+        }
+
+        public static List<string> SelectFromDatabase(string column, string tableName, string searchCategory1, string searchKey, string searchCategory2)
+        {
+            List<string> data = new List<string>();
+            string sql = "SELECT " + column + " FROM " + tableName + " WHERE " + searchCategory1 + "=\"" + searchKey + "\" AND " + searchCategory2 + " IS NULL;";
 
             command = new MySqlCommand(sql.ToString(), connect);
             reader = command.ExecuteReader();
 
-            while (reader.Read()) data.Add(reader[column].ToString());
+            while (reader.Read())
+            {
+                if (string.Compare(column, "*") != 0) data.Add(reader[column].ToString());
+                else data.Add(reader.ToString());
+            }
 
             reader.Close();
 

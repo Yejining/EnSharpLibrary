@@ -173,6 +173,12 @@ namespace EnSharpLibrary.Data
             "---------------------------------------------------------------------------------------------------------------------------------------------------------"
         };
 
+        public static string[] MANAGE_REGISTERED_BOOK_GUIDLINE =
+        {
+            "                          선택                          |   청구기호   |   도서상태   |   대출인 학번   |     대출일     |   반납 에정일   | 연장 횟수 ",
+            "---------------------------------------------------------------------------------------------------------------------------------------------------------"
+        };
+
         public static string[][] DISTRICT =
         {
             new string[] {"강원도", "경기도", "경상남도", "경상북도", "광주광역시", "대구광역시", "대전광역시", "부산광역시", "서울특별시", "세종특별자치시", "울산광역시", "인천광역시", "제주특별자치도", "충청남도", "충청북도" },
@@ -239,6 +245,15 @@ namespace EnSharpLibrary.Data
             "선택"
         };
 
+        public static string[] COLUMN_NAME_FOR_DETAIL_INFORMATION =
+        {
+            "",
+            "member_id",
+            "date_borrowed",
+            "date_deadline_for_return",
+            "number_of_renew"
+        };
+
         public static string URL = "https://openapi.naver.com/v1/search/book_adv.xml?d_titl=";
         public static string CLIENT_ID = "X1ZDuE2lngjCh3S3EV8x";
         public static string CLIENT_SECRET = "9hOYQ7WQkY";
@@ -289,7 +304,7 @@ namespace EnSharpLibrary.Data
         public const int APPEND_MEMBER = 12;
         public const int MANAGE_REGISTERED_MEMBER = 14;
         public const int APPEND_BOOK = 12;
-        public const int MANAGE_REGISTERED_BOOK = 16;
+        public const int MANAGE_REGISTERED_BOOK = 14;
 
         // BookManage SearchBook에서 사용
         // Menu에서 사용
@@ -353,6 +368,10 @@ namespace EnSharpLibrary.Data
 
         public const int BOOK_ID = 0;
         public const int MEMBER_ID = 1;
+
+        public const int DATE_BORROWED = 2;
+        public const int DATE_DEADLINE_FOR_RETURN = 3;
+        public const int NUMBER_OF_RENEW = 4;
 
         public const int PRICE = 0;
         public const int DISCOUNT = 1;

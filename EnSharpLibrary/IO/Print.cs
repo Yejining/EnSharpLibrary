@@ -10,19 +10,59 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
-        public void BookDetailInBookAddMode(BookAPIVO book, int registeredCount)
+        // applicationNumber, bookCondition, memberID, dateBorrowed, dateDeadlineForReturn, numberOfRenew
+        public void RegisteredBook(List<float> applicationNumber, List<string> bookCondition, List<string> memberID, List<string> dateBorrowed, List<string> dateDeadlineForReturm, List<string> numberOfRenew)
         {
+            //if (string.Compare(bookCondition, "삭제") == 0) continue;
+            //else if (string.Compare(bookCondition, "대출 가능") == 0) guide = "분실(W)훼손(E)보관도서(R)삭제(T)";
+            //else if (string.Compare(bookCondition, "대출중") == 0) guide = "대출가능(Q)분실(W)훼손(E)보관도서(R)삭제(T)";
+            //else if (string.Compare(bookCondition, "분실") == 0) guide = "대출가능(Q)훼손(E)보관도서(R)삭제(T)";
+            //else if (string.Compare(bookCondition, "훼손") == 0) guide = "대출가능(Q)훼손(E)보관도서(R)삭제(T)";
+            //else if (string.Compare(bookCondition, "보관도서") == 0) guide = "대출가능(Q)분실(W)훼손(E)삭제(T)";
+            //else guide = "삭제(T)";
+            int countOfBorrowedBook = 0;
+
+            foreach (string guideline in Constant.MANAGE_REGISTERED_BOOK_GUIDLINE) Console.WriteLine(guideline);
+
+            for (int index = 0; index < applicationNumber.Count; index++)
+            {
+                Console.SetCursorPosition(66, Console.CursorTop);
+                Console.Write(applicationNumber[index].ToString("n2"));
+                Console.SetCursorPosition(79, Console.CursorTop);
+                Console.Write(bookCondition[index]);
+                if (string.Compare(bookCondition[index], "대출중") == 0)
+                {
+                    Console.SetCursorPosition(95, Console.CursorTop);
+                    Console.Write(memberID[countOfBorrowedBook]);
+                    Console.SetCursorPosition(112, Console.CursorTop);
+                    Console.Write(dateBorrowed[countOfBorrowedBook].Remove(10));
+                    Console.SetCursorPosition(129, Console.CursorTop);
+                    Console.Write(dateDeadlineForReturm[countOfBorrowedBook].Remove(10));
+                    Console.SetCursorPosition(148, Console.CursorTop);
+                    Console.Write(numberOfRenew[countOfBorrowedBook] + "회");
+                    countOfBorrowedBook++;
+                }
+                Console.WriteLine();
+            }
+        }
+
+        public void BookDetailInBookAdminMode(int mode, BookAPIVO book, int registeredCount)
+        {
+            int cursorLeft;
+
             Console.Clear();
-            Console.SetWindowSize(90, 35);
+            if (mode == Constant.ADD_BOOK) { Console.SetWindowSize(90, 35); cursorLeft = 90; }
+            else { Console.SetWindowSize(155, 35); cursorLeft = 155;}
             PrintSentences(Constant.ENSHARP_TITLE, 2);
-            PrintSentence("도서 등록", Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
+            if (mode == Constant.ADD_BOOK) PrintSentence("도서 검색 및 등록", Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
+            else PrintSentence("등록된 도서 관리", Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
 
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             Console.Write("도  서  명 | ");
             foreach (char title in book.Title)
             {
                 Console.Write(title);
-                if (Console.CursorLeft >= 88) Console.SetCursorPosition(17, Console.CursorTop + 1);
+                if (Console.CursorLeft >= cursorLeft - 3) Console.SetCursorPosition(17, Console.CursorTop + 1);
             }
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             Console.Write("저      자 | {0}", book.Author);
@@ -31,12 +71,12 @@ namespace EnSharpLibrary.IO
             foreach (char publisher in book.Publisher)
             {
                 Console.Write(publisher);
-                if (Console.CursorLeft >= 88) Console.SetCursorPosition(17, Console.CursorTop + 1);
+                if (Console.CursorLeft >= cursorLeft - 3) Console.SetCursorPosition(17, Console.CursorTop + 1);
             }
             Console.SetCursorPosition(4, Console.CursorTop + 2);
-            Console.Write("출  판  일 | {0}", book.pubdate);
+            Console.Write("출  판  일 | {0}", book.Pubdate);
             Console.SetCursorPosition(4, Console.CursorTop + 2);
-            Console.Write("I  S  B  N | {0}", book.isbn);
+            Console.Write("I  S  B  N | {0}", book.Isbn);
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             Console.Write("가      격 | {0}원", book.Price);
             Console.SetCursorPosition(4, Console.CursorTop + 2);
@@ -46,9 +86,10 @@ namespace EnSharpLibrary.IO
             foreach (char description in book.Description)
             {
                 Console.Write(description);
-                if (Console.CursorLeft >= 88) Console.SetCursorPosition(17, Console.CursorTop + 1);
+                if (Console.CursorLeft >= cursorLeft - 3) Console.SetCursorPosition(17, Console.CursorTop + 1);
             }
             Console.SetCursorPosition(4, Console.CursorTop + 2);
+            if (mode == Constant.MANAGE_REGISTERED_BOOK) return;
             Console.Write("등 록 된  수 량 | {0}권", registeredCount);
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             Console.Write("등 록 할  수 량 | ");
@@ -108,7 +149,7 @@ namespace EnSharpLibrary.IO
             int space = 0;
 
             if (mode == Constant.MEMBER_SEARCH_MODE) space = -9;
-            if (mode == Constant.ADD_BOOK) space = 32;
+            if (mode == Constant.ADD_BOOK || mode == Constant.MANAGE_REGISTERED_BOOK) space = 32;
 
             Console.SetCursorPosition(85 + space, 2);
             
@@ -117,6 +158,8 @@ namespace EnSharpLibrary.IO
                 Console.WriteLine(title);
                 Console.SetCursorPosition(85 + space, Console.CursorTop);
             }
+
+            if (mode == Constant.MANAGE_REGISTERED_BOOK) return;
 
             // 검색 조건이 '전체'로 설정되어있거나 입력값이 없는 경우
             if (string.Compare(bookName, "") == 0) bookName = string.Copy("전체");
@@ -284,12 +327,12 @@ namespace EnSharpLibrary.IO
             Books(searchedBook, Console.CursorTop);
         }
 
-        public void SearchedBook(List<BookAPIVO> searchedBook, string bookName)
+        public void SearchedBook(int mode, List<BookAPIVO> searchedBook, string bookName)
         {
             Console.SetWindowSize(155, 35);
             Console.Clear();
 
-            SearchedTitle(Constant.ADD_BOOK, bookName, Constant.BLANK, Constant.BLANK);
+            SearchedTitle(mode, bookName, Constant.BLANK, Constant.BLANK);
             Console.SetCursorPosition(0, 7);
             foreach (string guideline in Constant.ADD_NEW_BOOK_GUIDELINE) Console.WriteLine(guideline);
 
@@ -428,9 +471,9 @@ namespace EnSharpLibrary.IO
                 Console.SetCursorPosition(96, Console.CursorTop);
                 Console.Write(publisher);
                 Console.SetCursorPosition(115, Console.CursorTop);
-                Console.Write(book.pubdate);
+                Console.Write(book.Pubdate);
                 Console.SetCursorPosition(126, Console.CursorTop);
-                Console.WriteLine(book.isbn);
+                Console.WriteLine(book.Isbn);
             }
         }
 

@@ -17,6 +17,38 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
+        public string DetailInformationAboutBorrowedMember(int mode, float applicationNumber)
+        {
+            string information;
+            string column = Constant.COLUMN_NAME_FOR_DETAIL_INFORMATION[mode];
+            information = ConnectDatabase.SelectFromDatabase(column, "history", "book_id", applicationNumber.ToString(), "date_return")[0];
+
+            return information;
+        }
+
+        public List<BookAPIVO> RegisteredBook()
+        {
+            int count = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
+            List<BookAPIVO> books = new List<BookAPIVO>();
+            
+            for (int index = 0; index < count; index++)
+            {
+                books.Add(new BookAPIVO());
+                books[index].Title = ConnectDatabase.SelectFromDatabase("name", "book_api", Constant.BLANK, Constant.BLANK)[index];
+                books[index].Author = ConnectDatabase.SelectFromDatabase("author", "book_api", Constant.BLANK, Constant.BLANK)[index];
+                books[index].Publisher = ConnectDatabase.SelectFromDatabase("publisher", "book_api", Constant.BLANK, Constant.BLANK)[index];
+                books[index].Price = Int32.Parse(ConnectDatabase.SelectFromDatabase("price", "book_api", Constant.BLANK, Constant.BLANK)[index]);
+                books[index].Discount = Int32.Parse(ConnectDatabase.SelectFromDatabase("discount", "book_api", Constant.BLANK, Constant.BLANK)[index]);
+                books[index].Pubdate = ConnectDatabase.SelectFromDatabase("publishing_date", "book_api", Constant.BLANK, Constant.BLANK)[index];
+                books[index].Count = Int32.Parse(ConnectDatabase.SelectFromDatabase("count", "book_api", Constant.BLANK, Constant.BLANK)[index]);
+                books[index].Isbn = ConnectDatabase.SelectFromDatabase("isbn", "book_api", Constant.BLANK, Constant.BLANK)[index];
+                books[index].SerialNumber = Int32.Parse(ConnectDatabase.SelectFromDatabase("serial_number", "book_api", Constant.BLANK, Constant.BLANK)[index]);
+                books[index].Description = ConnectDatabase.SelectFromDatabase("description", "book_api", Constant.BLANK, Constant.BLANK)[index];
+            }
+            
+            return books;
+        }
+
         public List<BookAPIVO> OrganizedFoundBook(XmlDocument bookInformation)
         {
             List<BookAPIVO> books = new List<BookAPIVO>();

@@ -13,15 +13,24 @@ namespace EnSharpLibrary.Data
         private int price;
         private int discount;
         private string publisher;
-        public string pubdate;
-        public string isbn;
-        public string decription;
+        private string pubdate;
+        private string isbn;
+        private string decription;
+        private int count;
+        private int serialNumber;
+
+        public BookAPIVO()
+        {
+
+        }
 
         public BookAPIVO(string title, string publisher, string pubdate)
         {
             this.title = title;
             this.publisher = publisher;
             this.pubdate = pubdate;
+            count = 0;
+            serialNumber = 0;
         }
 
         public void SaveDetail(int mode, string detail)
@@ -100,6 +109,18 @@ namespace EnSharpLibrary.Data
         {
             get { return decription; }
             set { decription = value; }
+        }
+
+        public int Count
+        {
+            get { return count; }
+            set { count = value; }
+        }
+
+        public int SerialNumber
+        {
+            get { return serialNumber; }
+            set { serialNumber = value; }
         }
     }
 }

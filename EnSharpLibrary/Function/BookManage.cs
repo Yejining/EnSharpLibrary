@@ -55,7 +55,7 @@ namespace EnSharpLibrary.Function
             switch (Console.CursorTop)
             {
                 case Constant.APPEND_BOOK: AddBook("도서 검색 및 등록"); return true;
-                case Constant.MANAGE_REGISTERED_BOOK: SearchBook(); return true;
+                case Constant.MANAGE_REGISTERED_BOOK: ManageRegisteredBook(); return true;
             }
 
             return true;
@@ -85,15 +85,16 @@ namespace EnSharpLibrary.Function
 
             foundBook = ConnectDatabase.BookSearchResult(name);
             books = getValue.OrganizedFoundBook(foundBook);
-            print.SearchedBook(books, name);
-            SelectSearchedBook(books, name);
+            SelectSearchedBook(Constant.ADD_BOOK, books, name);
 
             return;
         }
 
-        public void SearchBook()
+        public void ManageRegisteredBook()
         {
-
+            List<BookAPIVO> books = getValue.RegisteredBook();
+            print.SearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK);
+            SelectSearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK);
         }
 
         /// <summary>
@@ -183,7 +184,7 @@ namespace EnSharpLibrary.Function
             }
         }
 
-        public void SelectSearchedBook(List<BookAPIVO> searchedBook, string name)
+        public void SelectSearchedBook(int mode, List<BookAPIVO> searchedBook, string name)
         {
             bool isFirstLoop = true;
             int cursorTop = 9;
@@ -194,6 +195,7 @@ namespace EnSharpLibrary.Function
             {
                 if (isFirstLoop)
                 {
+                    print.SearchedBook(mode, searchedBook, name);
                     Console.SetCursorPosition(4, cursorTop);
                     Console.Write('▷');
                     Console.SetCursorPosition(4, cursorTop);
@@ -208,9 +210,8 @@ namespace EnSharpLibrary.Function
                 else if (keyInfo.Key == ConsoleKey.Enter)                                                                // 해당 도서 자세히 보기
                 {
                     index = Console.CursorTop - cursorTop;
-                    CheckDetailInformationWhichUserSelected(searchedBook[index]);
-                    tool.WaitUntilGetEscapeKey();
-                    return;
+                    CheckDetailInformationWhichUserSelected(mode, searchedBook[index]);
+                    isFirstLoop = true;
                 }
                 else print.BlockCursorMove(4, "▷");                                                                      // 입력 무시 
             }
@@ -276,28 +277,40 @@ namespace EnSharpLibrary.Function
             }
         }
 
-        public void CheckDetailInformationWhichUserSelected(BookAPIVO book)
+        public void CheckDetailInformationWhichUserSelected(int mode, BookAPIVO book)
+        {
+            int registeredCount = 0;
+            
+            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
+            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
+            
+            // 등록된 책이 몇 종류인지 알아냄
+            if (result.Count == 0) registeredCount = 0;
+            else registeredCount = Int32.Parse(result[0]);
+            Console.Clear();
+            print.BookDetailInBookAdminMode(mode, book, registeredCount);
+
+            if (mode == Constant.ADD_BOOK) RegisterBook(book, registeredCount, countOfTableData);
+            else ModifyBookCondition(book, registeredCount);
+        }
+
+        public void RegisterBook(BookAPIVO book, int registeredCount, int countOfTableData)
         {
             int cursorLeft;
             int cursorTop;
-            int registeredCount = 0;
             string count;
             int countToRenew;
-
-            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
-            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
             int serialNumber;
 
-            if (result.Count == 0) registeredCount = 0;
-            else registeredCount = Int32.Parse(result[0]);
-            print.BookDetailInBookAddMode(book, registeredCount);
-
+            // 청구기호에 쓰일 고유번호 계산(정수)
             if (registeredCount == 0) serialNumber = countOfTableData + 1;
             else serialNumber = Int32.Parse(ConnectDatabase.SelectFromDatabase("serial_number", "book_api", "isbn", book.Isbn)[0]);
 
+            // 커서 정보 저장
             cursorLeft = Console.CursorLeft;
             cursorTop = Console.CursorTop;
 
+            // 저장할 권수 입력
             while (true)
             {
                 count = getValue.Information(cursorLeft, cursorTop, 3, Constant.ONLY_NUMBER, "숫자 입력(등록 취소:ESC)");
@@ -309,27 +322,60 @@ namespace EnSharpLibrary.Function
                 else { countToRenew = Int32.Parse(count) + registeredCount; break; }
             }
 
+            // sql문 작성
             string values1 = "(\"" + book.Title + "\",\"" + book.Author + "\",\"" + book.Publisher + "\"," + book.Price + "," + book.Discount + ",\"";
             string values2 = book.Pubdate + "\"," + count + ",\"" + book.Isbn + "\",\"" + book.Description + "\"," + serialNumber + ")";
 
+            // 데이터베이스에 저장_1
             if (registeredCount == 0) ConnectDatabase.InsertIntoDatabase("book_api", Constant.ADD_BOOK_COLUMNS, values1 + values2);
             else ConnectDatabase.UpdateToDatabase("book_api", "count", countToRenew.ToString(), "isbn", book.Isbn);
 
             float applicationNumber;
             string value;
 
+            // 데이터베이스에 저장_2
             for (int create = 0; create < Int32.Parse(count); create++)
             {
-                applicationNumber = serialNumber +  ((float)(create + registeredCount) / 100);
-                value = "(" + applicationNumber.ToString() + ",\"대출 가능\")";
+                applicationNumber = serialNumber + ((float)(create + registeredCount) / 100);
+                value = "(" + applicationNumber.ToString("n2") + ",\"대출 가능\")";
                 ConnectDatabase.InsertIntoDatabase("book_detail", Constant.INSERT_NEW_APPLICATION_NUMBER, value);
             }
 
+            // 완료 알림
             Console.SetCursorPosition(4, cursorTop - 2);
             Console.Write("등 록 된  수 량 | {0}", countToRenew);
             Console.SetCursorPosition(0, cursorTop);
             print.ClearCurrentConsoleLine();
             print.PrintSentence("등록이 완료되었습니다!(나가기:ESC)", cursorTop, Constant.FOREGROUND_COLOR);
+
+            tool.WaitUntilGetEscapeKey();
+        }
+
+        public void ModifyBookCondition(BookAPIVO book, int registeredCount)
+        {
+            List<float> applicationNumber = new List<float>();
+            List<string> bookCondition = new List<string>();
+            List<string> memberID = new List<string>();
+            List<string> dateBorrowed = new List<string>();
+            List<string> dateDeadlineForReturn = new List<string>();
+            List<string> numberOfRenew = new List<string>();
+
+            for (int count = 0; count < registeredCount; count++)
+            {
+                applicationNumber.Add(book.SerialNumber + ((float)count / 100));
+                bookCondition.Add(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", applicationNumber[count].ToString("n2"))[0]);
+                if (string.Compare(bookCondition[count], "대출중") == 0)
+                {
+                    memberID.Add(getValue.DetailInformationAboutBorrowedMember(Constant.MEMBER_ID, applicationNumber[count]));
+                    dateBorrowed.Add(getValue.DetailInformationAboutBorrowedMember(Constant.DATE_BORROWED, applicationNumber[count]));
+                    dateDeadlineForReturn.Add(getValue.DetailInformationAboutBorrowedMember(Constant.DATE_DEADLINE_FOR_RETURN, applicationNumber[count]));
+                    numberOfRenew.Add(getValue.DetailInformationAboutBorrowedMember(Constant.NUMBER_OF_RENEW, applicationNumber[count]));
+                }
+            }
+
+            print.RegisteredBook(applicationNumber, bookCondition, memberID, dateBorrowed, dateDeadlineForReturn, numberOfRenew);
+            // 작업
+            tool.WaitUntilGetEscapeKey();
         }
 
         /// <summary>
