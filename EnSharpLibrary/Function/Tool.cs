@@ -20,6 +20,12 @@ namespace EnSharpLibrary.Function
             else return false;
         }
 
+        public bool IsBorrowed(string condition)
+        {
+            if (string.Compare(condition, "대출중") == 0) return true;
+            else return false;
+        }
+
         /// <summary>
         /// 방향키를 이용하는 기능을 수행할 경우, 위 방향키를 누를 때 호출되는 메소드입니다.
         /// </summary>

@@ -116,6 +116,16 @@ namespace EnSharpLibrary.Function
             reader.Close();
         }
 
+        public static void UpdateToDatabase(string table, string column, string data, string category1, string key, string category2)
+        {
+            string sql = "UPDATE " + table + " SET " + column + "=" + data + " WHERE ";
+            sql += category1 + "=\"" + key + "\" AND " + category2 + " IS NULL;";
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+            reader.Close();
+        }
+
         public static XmlDocument BookSearchResult(string searchingKeyword)
         {
             string url = Constant.URL + searchingKeyword + "&target=book&display=100";

@@ -356,6 +356,7 @@ namespace EnSharpLibrary.Function
             string guide;
             int cursorTop = Console.CursorTop + 2;
             int index;
+            string currentCondition;
 
             List<float> applicationNumber = new List<float>();
             List<string> bookCondition = new List<string>();
@@ -383,14 +384,13 @@ namespace EnSharpLibrary.Function
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
             while (true)
             {
-                bookCondition.Clear();
-                bookCondition = ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", Constant.BLANK, Constant.BLANK);
-
                 index = Console.CursorTop - cursorTop;
                 guide = getValue.GuideForModifyingBookCondition(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", applicationNumber[index].ToString("n2"))[0]);
                 print.SetCursorAndChoice(4, Console.CursorTop, guide);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                currentCondition = bookCondition[index];
 
                 if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, registeredCount, 1, Console.CursorLeft);          // 위로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, registeredCount, 1, Console.CursorLeft); // 밑으로 커서 옮김
@@ -435,7 +435,16 @@ namespace EnSharpLibrary.Function
                     print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
                     print.SetCursorAndWrite(79, Console.CursorTop, "삭제");
                 }
-                else print.BlockCursorMove(4, guide);                                                                       // 입력 무시 
+                else print.BlockCursorMove(4, guide);                                                                 // 입력 무시 
+
+                bookCondition.Clear();
+                bookCondition = ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", Constant.BLANK, Constant.BLANK);
+
+                if (tool.IsBorrowed(currentCondition) && !tool.IsBorrowed(bookCondition[index]))
+                {
+                    ConnectDatabase.UpdateToDatabase("history", "date_return", "NOW()", "book_id", applicationNumber[index].ToString("n2"), "date_return");
+                    print.SetCursorAndWrite(95, Console.CursorTop, new string(' ', Console.WindowWidth - 96));
+                }
             }
         }
 
