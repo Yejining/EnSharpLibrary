@@ -10,6 +10,19 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
+        public void BookInLibrary(List<float> applicationNumber, List<string> bookCondition)
+        {
+            Console.SetCursorPosition(0, Console.CursorTop + 3);
+            PrintSentences(Constant.SEARCHED_BOOK_DETAILED_GUIDLINE, Console.CursorTop);
+
+            for (int index = 0; index < applicationNumber.Count; index++)
+            {
+                SetCursorAndWrite(43, Console.CursorTop, applicationNumber[index].ToString("n2"));
+                SetCursorAndWrite(53, Console.CursorTop, bookCondition[index].ToString());
+                Console.WriteLine();
+            }
+        }
+
         public void SetCursorAndWrite(int cursorLeft, int cursorTop, string sentence)
         {
             Console.SetCursorPosition(cursorLeft, cursorTop);
@@ -57,6 +70,7 @@ namespace EnSharpLibrary.IO
 
             Console.Clear();
             if (mode == Constant.ADD_BOOK) { Console.SetWindowSize(90, 35); cursorLeft = 90; }
+            else if (mode == Constant.BOOK_SEARCH_MODE) { Console.SetWindowSize(90, 35); cursorLeft = 90; }
             else { Console.SetWindowSize(155, 35); cursorLeft = 155;}
             PrintSentences(Constant.ENSHARP_TITLE, 2);
             if (mode == Constant.ADD_BOOK) PrintSentence("도서 검색 및 등록", Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
@@ -80,12 +94,15 @@ namespace EnSharpLibrary.IO
             }
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             Console.Write("출  판  일 | {0}", book.Pubdate);
-            Console.SetCursorPosition(4, Console.CursorTop + 2);
-            Console.Write("I  S  B  N | {0}", book.Isbn);
-            Console.SetCursorPosition(4, Console.CursorTop + 2);
-            Console.Write("가      격 | {0}원", book.Price);
-            Console.SetCursorPosition(4, Console.CursorTop + 2);
-            Console.Write("할  인  가 | {0}원", book.Discount);
+            if (mode != Constant.BOOK_SEARCH_MODE)
+            {
+                Console.SetCursorPosition(4, Console.CursorTop + 2);
+                Console.Write("I  S  B  N | {0}", book.Isbn);
+                Console.SetCursorPosition(4, Console.CursorTop + 2);
+                Console.Write("가      격 | {0}원", book.Price);
+                Console.SetCursorPosition(4, Console.CursorTop + 2);
+                Console.Write("할  인  가 | {0}원", book.Discount);
+            }
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             Console.Write("책  소  개 | ");
             foreach (char description in book.Description)
@@ -93,6 +110,7 @@ namespace EnSharpLibrary.IO
                 Console.Write(description);
                 if (Console.CursorLeft >= cursorLeft - 3) Console.SetCursorPosition(17, Console.CursorTop + 1);
             }
+            if (mode == Constant.BOOK_SEARCH_MODE) return;
             Console.SetCursorPosition(4, Console.CursorTop + 2);
             if (mode == Constant.MANAGE_REGISTERED_BOOK) return;
             Console.Write("등 록 된  수 량 | {0}권", registeredCount);
@@ -153,15 +171,14 @@ namespace EnSharpLibrary.IO
             List<string> searchingCondition = new List<string>();
             int space = 0;
 
-            if (mode == Constant.MEMBER_SEARCH_MODE) space = -9;
-            if (mode == Constant.ADD_BOOK || mode == Constant.MANAGE_REGISTERED_BOOK) space = 32;
+            if (mode == Constant.MEMBER_SEARCH_MODE) space = -41;
 
-            Console.SetCursorPosition(85 + space, 2);
+            Console.SetCursorPosition(117 + space, 2);
             
             foreach (string title in Constant.ENSHARP_TITLE_IN_SEARCH_MODE)
             {
                 Console.WriteLine(title);
-                Console.SetCursorPosition(85 + space, Console.CursorTop);
+                Console.SetCursorPosition(117 + space, Console.CursorTop);
             }
 
             if (mode == Constant.MANAGE_REGISTERED_BOOK) return;
@@ -332,42 +349,28 @@ namespace EnSharpLibrary.IO
             Books(searchedBook, Console.CursorTop);
         }
 
-        public void SearchedBook(int mode, List<BookAPIVO> searchedBook, string bookName)
+        public void SearchedBook(int mode, List<BookAPIVO> searchedBook, string bookName, string publisher, string author)
         {
+            string[] guideline;
+
+            if (mode == Constant.ADD_BOOK) guideline = Constant.ADD_NEW_BOOK_GUIDELINE;
+            else if (mode == Constant.MANAGE_REGISTERED_BOOK) guideline = Constant.ADD_NEW_BOOK_GUIDELINE;
+            else guideline = Constant.SEARCHED_BOOK_GUIDELINE;
+
             Console.SetWindowSize(155, 35);
             Console.Clear();
 
-            SearchedTitle(mode, bookName, Constant.BLANK, Constant.BLANK);
-            Console.SetCursorPosition(0, 7);
-            foreach (string guideline in Constant.ADD_NEW_BOOK_GUIDELINE) Console.WriteLine(guideline);
+            SearchedTitle(mode, bookName, publisher, author);
+            Console.SetCursorPosition(0, Console.CursorTop + 3);
+            foreach (string guide in guideline) Console.WriteLine(guide);
 
-            Books(searchedBook, Console.CursorTop);
+            Books(mode, searchedBook, Console.CursorTop);
         }
 
-        public void SearchedBookWithMoreDetail(List<BookVO> books)
+        public void SearchedBookWithMoreDetail(BookAPIVO book, int count)
         {
-            Console.SetCursorPosition(0, 11);
-            foreach (string guideline in Constant.SEARCHED_BOOK_DETAILED_GUIDLINE) Console.WriteLine(guideline);
-            Console.SetCursorPosition(0, 13);
 
-            for (int order = 0; order < books.Count; order++)
-            {
-                Console.SetCursorPosition(10, Console.CursorTop);
-                Console.Write(books[order].Name);
-                Console.SetCursorPosition(50, Console.CursorTop);
-                Console.Write(books[order].Author);
-                Console.SetCursorPosition(68, Console.CursorTop);
-                Console.Write(books[order].Publisher);
-                Console.SetCursorPosition(87, Console.CursorTop);
-                Console.Write(books[order].PublishingYear);
-                Console.SetCursorPosition(97, Console.CursorTop);
-                Console.Write(books[order].BookCondition);
-                Console.SetCursorPosition(109, Console.CursorTop);
-                Console.Write(books[order].BookID);
-                Console.SetCursorPosition(120, Console.CursorTop);
-                Console.Write(books[order].Price + "원");
-                Console.SetCursorPosition(0, Console.CursorTop + 1);
-            }
+            
         }
 
         public void BorrowedBook(List<BookVO> books, List<HistoryVO> histories)
@@ -457,7 +460,7 @@ namespace EnSharpLibrary.IO
             return keyword;
         }
 
-        public void Books(List<BookAPIVO> books, int cursorTop)
+        public void Books(int mode, List<BookAPIVO> books, int cursorTop)
         {
             string title;
             string author;
@@ -478,7 +481,8 @@ namespace EnSharpLibrary.IO
                 Console.SetCursorPosition(115, Console.CursorTop);
                 Console.Write(book.Pubdate);
                 Console.SetCursorPosition(126, Console.CursorTop);
-                Console.WriteLine(book.Isbn);
+                if (mode == Constant.MANAGE_REGISTERED_BOOK || mode == Constant.ADD_BOOK) Console.WriteLine(book.Isbn);
+                else Console.WriteLine("          " + book.SerialNumber);
             }
         }
 

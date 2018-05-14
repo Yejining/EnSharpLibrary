@@ -96,6 +96,25 @@ namespace EnSharpLibrary.Function
             return data;
         }
 
+        public static List<string> SelectFromDatabase(string column, string tableName, string conditionalExpression)
+        {
+            List<string> data = new List<string>();
+            string sql = "SELECT " + column + " FROM " + tableName + conditionalExpression + ";";
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                if (string.Compare(column, "*") != 0) data.Add(reader[column].ToString());
+                else data.Add(reader.ToString());
+            }
+
+            reader.Close();
+
+            return data;
+        }
+
         public static void InsertIntoDatabase(string table, string columns, string values)
         {
             string sql = "INSERT INTO " + table + " " + columns + " VALUES " + values + ";";
@@ -121,6 +140,23 @@ namespace EnSharpLibrary.Function
             string sql = "UPDATE " + table + " SET " + column + "=" + data + " WHERE ";
             sql += category1 + "=\"" + key + "\" AND " + category2 + " IS NULL;";
 
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+            reader.Close();
+        }
+
+        public static void BorrowBook(int memberID, string applicationNumber)
+        {
+            string sql1 = "UPDATE book_detail SET book_condition=\"대출중\" WHERE application_number = \"" + applicationNumber + "\";";
+            string sql2 = "INSERT INTO history (member_id, book_id, date_borrowed, date_deadline_for_return, number_of_renew) ";
+            sql2 += "VALUES (" + memberID + ", \"" + applicationNumber + "\", NOW(), DATE_ADD(NOW(), INTERVAL 6 DAY), 0);";
+
+            MakeCommand(sql1);
+            MakeCommand(sql2);
+        }
+
+        public static void MakeCommand(string sql)
+        {
             command = new MySqlCommand(sql.ToString(), connect);
             reader = command.ExecuteReader();
             reader.Close();

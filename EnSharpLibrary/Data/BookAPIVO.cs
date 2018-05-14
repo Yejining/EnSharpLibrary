@@ -24,11 +24,12 @@ namespace EnSharpLibrary.Data
 
         }
 
-        public BookAPIVO(string title, string publisher, string pubdate)
+        public BookAPIVO(int mode, string title, string publisher, string value)
         {
             this.title = title;
             this.publisher = publisher;
-            this.pubdate = pubdate;
+            if (mode == Constant.ADMIN_MODE) pubdate = value;
+            else author = value;
             count = 0;
             serialNumber = 0;
         }

@@ -14,6 +14,12 @@ namespace EnSharpLibrary.Function
     {
         Print print = new Print();
 
+        public bool IsNormal(string condition)
+        {
+            if (string.Compare(condition, "대출 가능") == 0) return true;
+            else return false;
+        }
+
         public bool IsDeleted(string condition)
         {
             if (string.Compare(condition, "삭제") == 0) return true;

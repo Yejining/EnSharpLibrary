@@ -31,7 +31,7 @@ namespace EnSharpLibrary.IO
         {
             string information;
             string column = Constant.COLUMN_NAME_FOR_DETAIL_INFORMATION[mode];
-            information = ConnectDatabase.SelectFromDatabase(column, "history", "book_id", applicationNumber.ToString(), "date_return")[0];
+            information = ConnectDatabase.SelectFromDatabase(column, "history", "book_id", applicationNumber.ToString("n2"), "date_return")[0];
 
             return information;
         }
@@ -78,7 +78,7 @@ namespace EnSharpLibrary.IO
 
             for (int count = 0; count < title.Count - 1; count++)
             {
-                BookAPIVO book = new BookAPIVO(bookTitle[count + 1], publisher[count].InnerText, pubdate[count].InnerText);
+                BookAPIVO book = new BookAPIVO(Constant.ADMIN_MODE, bookTitle[count + 1], publisher[count].InnerText, pubdate[count].InnerText);
                 book.SaveDetail(Constant.AUTHOR, author[count].InnerText);
                 book.SavePrice(Constant.PRICE, price[count].InnerText);
                 book.SavePrice(Constant.DISCOUNT, discount[count].InnerText);
@@ -193,78 +193,44 @@ namespace EnSharpLibrary.IO
             return searchedBook;
         }
 
-        public List<BookVO> SearchBookByCondition(string bookName, string publisher, string author)
+        public string ConditionalExpression(string bookName, string publisher, string author)
         {
-            string nameForVO;
-            string authorForVO;
-            string publisherForVO;
-            int publishingYearForVO;
-            float bookIDForVO;
-            string bookConditionForVO;
-            int borrowedMemberIDForVO;
-            int priceForVO;
-            int numberOfBooksForVO = 0;
+            string conditionalExpression = "";
 
-            List<BookVO> searchedBook = new List<BookVO>();
-            StringBuilder sql = new StringBuilder("SELECT * FROM book ");
+            if (bookName.Length != 0) conditionalExpression = " WHERE name REGEXP \"" + bookName + "\"";
+            if (bookName.Length != 0 && publisher.Length != 0) conditionalExpression += "AND publisher REGEXP \"" + publisher + "\"";
+            else if (bookName.Length == 0 && publisher.Length != 0) conditionalExpression = " WHERE publisher REGEXP \"" + publisher + "\"";
+            if (conditionalExpression.Length != 0 && author.Length != 0) conditionalExpression += "AND author REGEXP \"" + author + "\"";
+            else if (conditionalExpression.Length == 0 && author.Length != 0) conditionalExpression = " WHERE author REGEXP \"" + author + "\"";
 
-            String databaseConnect;
-            MySqlConnection connect;
+            return conditionalExpression;
+        }
 
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
+        public List<BookAPIVO> SearchBookByCondition(string bookName, string bookPublisher, string bookAuthor)
+        {
+            List<BookAPIVO> searchedBook = new List<BookAPIVO>();
+            string conditionalExpression = ConditionalExpression(bookName, bookPublisher, bookAuthor);
+            List<string> serialNumber = ConnectDatabase.SelectFromDatabase("serial_number", "book_api", conditionalExpression);
 
-            connect.Open();
+            if (serialNumber.Count == 0) return searchedBook;
 
-            if (bookName.Length != 0) sql.Append("WHERE name REGEXP \'" + bookName + "\'");
-            if (publisher.Length != 0 && bookName.Length != 0) sql.Append("AND publisher REGEXP \'" + publisher + "\'");
-            else if (publisher.Length != 0) sql.Append("WHERE publisher REGEXP \'" + publisher + "\'");
-            if (author.Length != 0 && (bookName.Length != 0 || publisher.Length != 0)) sql.Append("AND publisher REGEXP \'" + publisher + "\'");
-            else if (author.Length != 0) sql.Append("WHERE author REGEXP \'" + author + "\'");
-            sql.Append(";");
+            List<string> name = ConnectDatabase.SelectFromDatabase("name", "book_api", conditionalExpression);
+            List<string> publisher = ConnectDatabase.SelectFromDatabase("publisher", "book_api", conditionalExpression);
+            List<string> author = ConnectDatabase.SelectFromDatabase("author", "book_api", conditionalExpression);
+            List<string> pubdate = ConnectDatabase.SelectFromDatabase("publishing_date", "book_api", conditionalExpression);
+            List<string> isbn = ConnectDatabase.SelectFromDatabase("isbn", "book_api", conditionalExpression);
+            List<string> description = ConnectDatabase.SelectFromDatabase("description", "book_api", conditionalExpression);
 
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            for (int count = 0; count < serialNumber.Count; count++)
             {
-                nameForVO = reader["name"].ToString();
-                authorForVO = reader["author"].ToString();
-                publisherForVO = reader["publisher"].ToString();
-                publishingYearForVO = Int32.Parse(reader["publishing_year"].ToString());
-                bookIDForVO = float.Parse(reader["book_id"].ToString());
-                bookConditionForVO = reader["book_condition"].ToString();
-                borrowedMemberIDForVO = Int32.Parse(reader["borrowed_member_id"].ToString());
-                priceForVO = Int32.Parse(reader["price"].ToString());
+                BookAPIVO book = new BookAPIVO(Constant.MEMBER_MODE, name[count], publisher[count], author[count]);
+                book.Pubdate = pubdate[count];
+                book.SerialNumber = Int32.Parse(serialNumber[count]);
+                book.Isbn = isbn[count];
+                book.Description = description[count];
 
-                BookVO book = new BookVO(nameForVO, authorForVO, publisherForVO, publishingYearForVO);
-                book.AppendInformation(bookIDForVO, bookConditionForVO, borrowedMemberIDForVO, priceForVO);
-
-                if (book.BookID - Math.Floor(book.BookID) == 0) searchedBook.Add(book);
+                searchedBook.Add(book);
             }
-
-            reader.Close();
-
-            foreach (BookVO book in searchedBook)
-            {
-                sql.Clear();
-                sql.Append("SELECT count(*) FROM book WHERE FLOOR(book_id)=");
-                sql.Append(Math.Floor(book.BookID));
-                sql.Append(";");
-
-                command = new MySqlCommand(sql.ToString(), connect);
-                reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    numberOfBooksForVO = Int32.Parse(reader["count(*)"].ToString());
-                    book.NumberOfBooks = numberOfBooksForVO;
-                }
-
-                reader.Close();
-            }
-            
-            connect.Close();
 
             return searchedBook;
         }
