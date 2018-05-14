@@ -226,7 +226,7 @@ namespace EnSharpLibrary.Data
         public static string[] MANAGE_MEMBER_OPTION =
         {
             "회원 등록",
-            "회원 삭제"
+            "회원 검색 및 관리"
         };
 
         public static string[] MANAGE_BOOK_OPTION =
