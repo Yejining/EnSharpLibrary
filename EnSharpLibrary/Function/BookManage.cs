@@ -353,6 +353,10 @@ namespace EnSharpLibrary.Function
 
         public void ModifyBookCondition(BookAPIVO book, int registeredCount)
         {
+            string guide;
+            int cursorTop = Console.CursorTop + 2;
+            int index;
+
             List<float> applicationNumber = new List<float>();
             List<string> bookCondition = new List<string>();
             List<string> memberID = new List<string>();
@@ -374,8 +378,65 @@ namespace EnSharpLibrary.Function
             }
 
             print.RegisteredBook(applicationNumber, bookCondition, memberID, dateBorrowed, dateDeadlineForReturn, numberOfRenew);
-            // 작업
-            tool.WaitUntilGetEscapeKey();
+            Console.SetCursorPosition(0, cursorTop);
+
+            // 방향키 및 엔터, ESC키를 이용해 기능 수행
+            while (true)
+            {
+                bookCondition.Clear();
+                bookCondition = ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", Constant.BLANK, Constant.BLANK);
+
+                index = Console.CursorTop - cursorTop;
+                guide = getValue.GuideForModifyingBookCondition(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", applicationNumber[index].ToString("n2"))[0]);
+                print.SetCursorAndChoice(4, Console.CursorTop, guide);
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, registeredCount, 1, Console.CursorLeft);          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, registeredCount, 1, Console.CursorLeft); // 밑으로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                              // 나가기
+                else if (keyInfo.Key == ConsoleKey.Q && string.Compare(bookCondition[index], "대출 가능") != 0 && !tool.IsDeleted(bookCondition[index]))
+                {
+                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "대출 가능", "application_number", applicationNumber[index].ToString("n2"));
+                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
+                    print.ClearGuideline(79, cursorTop, 89);
+                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
+                    print.SetCursorAndWrite(79, Console.CursorTop, "대출 가능");
+                }
+                else if (keyInfo.Key == ConsoleKey.W && string.Compare(bookCondition[index], "분실") != 0 && !tool.IsDeleted(bookCondition[index]))
+                {
+                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "분실", "application_number", applicationNumber[index].ToString("n2"));
+                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
+                    print.ClearGuideline(79, cursorTop, 89);
+                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
+                    print.SetCursorAndWrite(79, Console.CursorTop, "분실");
+                }
+                else if (keyInfo.Key == ConsoleKey.E && string.Compare(bookCondition[index], "훼손") != 0 && !tool.IsDeleted(bookCondition[index]))
+                {
+                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "훼손", "application_number", applicationNumber[index].ToString("n2"));
+                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
+                    print.ClearGuideline(79, cursorTop, 89);
+                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
+                    print.SetCursorAndWrite(79, Console.CursorTop, "훼손");
+                }
+                else if (keyInfo.Key == ConsoleKey.R && string.Compare(bookCondition[index], "대출 가능") == 0 && !tool.IsDeleted(bookCondition[index]))
+                {
+                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "보관도서", "application_number", applicationNumber[index].ToString("n2"));
+                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
+                    print.ClearGuideline(79, cursorTop, 89);
+                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
+                    print.SetCursorAndWrite(79, Console.CursorTop, "보관도서");
+                }
+                else if (keyInfo.Key == ConsoleKey.T && !tool.IsDeleted(bookCondition[index]))
+                {
+                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "삭제", "application_number", applicationNumber[index].ToString("n2"));
+                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
+                    print.ClearGuideline(79, cursorTop, 89);
+                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
+                    print.SetCursorAndWrite(79, Console.CursorTop, "삭제");
+                }
+                else print.BlockCursorMove(4, guide);                                                                       // 입력 무시 
+            }
         }
 
         /// <summary>

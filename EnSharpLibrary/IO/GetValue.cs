@@ -17,6 +17,16 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
+        public string GuideForModifyingBookCondition(string bookCondition)
+        {
+            if (string.Compare(bookCondition, "삭제") == 0) return "                          X";
+
+            if (string.Compare(bookCondition, "대출 가능") == 0) return Constant.GUIDE_FOR_MODIFYING_BOOK_CONDITION[0];
+            else if (string.Compare(bookCondition, "대출중") == 0) return Constant.GUIDE_FOR_MODIFYING_BOOK_CONDITION[1];
+            else if (string.Compare(bookCondition, "보관도서") == 0) return Constant.GUIDE_FOR_MODIFYING_BOOK_CONDITION[3];
+            else return Constant.GUIDE_FOR_MODIFYING_BOOK_CONDITION[2];
+        }
+
         public string DetailInformationAboutBorrowedMember(int mode, float applicationNumber)
         {
             string information;

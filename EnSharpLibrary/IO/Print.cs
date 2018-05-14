@@ -10,16 +10,21 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
-        // applicationNumber, bookCondition, memberID, dateBorrowed, dateDeadlineForReturn, numberOfRenew
+        public void SetCursorAndWrite(int cursorLeft, int cursorTop, string sentence)
+        {
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.Write(sentence);
+        }
+
+        public void ClearGuideline(int cursorLocation, int startingLine, int left)
+        {
+            int length = left - cursorLocation;
+            Console.SetCursorPosition(cursorLocation, Console.CursorTop);
+            Console.Write(new string(' ', length));
+        }
+
         public void RegisteredBook(List<float> applicationNumber, List<string> bookCondition, List<string> memberID, List<string> dateBorrowed, List<string> dateDeadlineForReturm, List<string> numberOfRenew)
         {
-            //if (string.Compare(bookCondition, "삭제") == 0) continue;
-            //else if (string.Compare(bookCondition, "대출 가능") == 0) guide = "분실(W)훼손(E)보관도서(R)삭제(T)";
-            //else if (string.Compare(bookCondition, "대출중") == 0) guide = "대출가능(Q)분실(W)훼손(E)보관도서(R)삭제(T)";
-            //else if (string.Compare(bookCondition, "분실") == 0) guide = "대출가능(Q)훼손(E)보관도서(R)삭제(T)";
-            //else if (string.Compare(bookCondition, "훼손") == 0) guide = "대출가능(Q)훼손(E)보관도서(R)삭제(T)";
-            //else if (string.Compare(bookCondition, "보관도서") == 0) guide = "대출가능(Q)분실(W)훼손(E)삭제(T)";
-            //else guide = "삭제(T)";
             int countOfBorrowedBook = 0;
 
             foreach (string guideline in Constant.MANAGE_REGISTERED_BOOK_GUIDLINE) Console.WriteLine(guideline);
@@ -576,6 +581,7 @@ namespace EnSharpLibrary.IO
             if (mode == Constant.BORROW) Console.Write("대출");
             else if (mode == Constant.EXTEND) Console.Write("연장");
             else if (mode == Constant.RETURN) Console.Write("반납");
+            else if (mode == Constant.SUCCESS) Console.Write("상태 변경 완료");
             else Console.Write(" X");
             System.Threading.Thread.Sleep(500);
             Console.SetCursorPosition(cursorLeft, cursorTop);
@@ -608,13 +614,12 @@ namespace EnSharpLibrary.IO
         {
             Console.SetCursorPosition(cursorLeft, cursorTop);
             Console.Write(pointer);
-            Console.SetCursorPosition(cursorLeft, cursorTop);
         }
 
         public void BlockCursorMove(int cursorLeft, string pointer)
         {
             Console.SetCursorPosition(cursorLeft, Console.CursorTop);
-            Console.Write(pointer);
+            Console.Write(pointer + " ");
             Console.SetCursorPosition(cursorLeft, Console.CursorTop);
         }
 

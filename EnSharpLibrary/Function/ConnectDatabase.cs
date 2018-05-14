@@ -107,9 +107,9 @@ namespace EnSharpLibrary.Function
 
         public static void UpdateToDatabase(string table, string column, string data, string category, string key)
         {
-            StringBuilder sql = new StringBuilder("UPDATE " + table + " SET " + column + "=" + data);
-            if (category == Constant.BLANK) sql.Append(";");
-            else sql.Append(" WHERE " + category + "=\"" + key + "\";");
+            StringBuilder sql = new StringBuilder("UPDATE " + table + " SET " + column + "=\"" + data);
+            if (category == Constant.BLANK) sql.Append("\";");
+            else sql.Append("\" WHERE " + category + "=\"" + key + "\";");
 
             command = new MySqlCommand(sql.ToString(), connect);
             reader = command.ExecuteReader();

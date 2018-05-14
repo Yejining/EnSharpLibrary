@@ -175,7 +175,7 @@ namespace EnSharpLibrary.Data
 
         public static string[] MANAGE_REGISTERED_BOOK_GUIDLINE =
         {
-            "                          선택                          |   청구기호   |   도서상태   |   대출인 학번   |     대출일     |   반납 에정일   | 연장 횟수 ",
+            "                          선택                          |   청구기호   |   도서상태   |   대출인 학번   |     대출일     |   반납 에정일   | 연장 횟수",
             "---------------------------------------------------------------------------------------------------------------------------------------------------------"
         };
 
@@ -252,6 +252,14 @@ namespace EnSharpLibrary.Data
             "date_borrowed",
             "date_deadline_for_return",
             "number_of_renew"
+        };
+
+        public static string[] GUIDE_FOR_MODIFYING_BOOK_CONDITION =
+        {
+            "▷분실(W)훼손(E)보관도서(R)삭제(T)◁",
+            "▷대출가능(Q)분실(W)훼손(E)삭제(T)◁",
+            "▷대출가능(Q)훼손(E)삭제(T)◁",
+            "▷대출가능(Q)분실(W)훼손(E)삭제(T)◁"
         };
 
         public static string URL = "https://openapi.naver.com/v1/search/book_adv.xml?d_titl=";
@@ -365,6 +373,7 @@ namespace EnSharpLibrary.Data
         public const int EXTEND = 1;
         public const int RETURN = 2;
         public const int FAIL = 3;
+        public const int SUCCESS = 4;
 
         public const int BOOK_ID = 0;
         public const int MEMBER_ID = 1;
