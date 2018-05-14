@@ -386,7 +386,7 @@ namespace EnSharpLibrary.Function
             {
                 for (int count = bookCondition.Count - 1; count >= 0; count--)
                 {
-                    if (!tool.IsBorrowed(bookCondition[count]) && !tool.IsNormal(bookCondition[count]))
+                    if (!tool.IsBorrowed(bookCondition[count]) && !tool.IsNotRented(bookCondition[count]))
                     {
                         bookCondition.RemoveAt(count);
                         applicationNumber.RemoveAt(count);
@@ -491,7 +491,7 @@ namespace EnSharpLibrary.Function
                 print.SetCursorAndChoice(30, Console.CursorTop, "▷");
 
                 isValidUser = tool.IsValidUser(usingMemberID);
-                if (!tool.IsNormal(bookCondition[index]) || !isValidUser) print.NonAvailableLectureMark(30, Console.CursorTop);
+                if (!tool.IsNormal(bookCondition[index], usingMemberID, applicationNumber[index]) || !isValidUser) print.NonAvailableLectureMark(30, Console.CursorTop);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
@@ -503,7 +503,7 @@ namespace EnSharpLibrary.Function
                 else if (keyInfo.Key == ConsoleKey.Enter)
                 {
                     // 대출
-                    if (tool.IsNormal(bookCondition[index]) && isValidUser)
+                    if (tool.IsNormal(bookCondition[index], usingMemberID, applicationNumber[index]) && isValidUser)
                     {
                         ConnectDatabase.BorrowBook(usingMemberID, applicationNumber[index].ToString("n2"));
                         print.CompleteOrFaildProcess(30, cursorTop, Constant.BORROW);
@@ -522,26 +522,32 @@ namespace EnSharpLibrary.Function
         {
             bool isFirstLoop = true;
             int cursorTop = 8;
-            
+
             this.usingMemberID = usingMemberID;
 
-            List<BookVO> borrowedBook = getValue.SearchBookByID(Constant.MEMBER_ID, usingMemberID);
-            List<HistoryVO> histories = getValue.BookHistory(usingMemberID);
+            string conditionalExpression = " WHERE member_id =" + usingMemberID.ToString() + " AND date_return IS NULL";
+
+            List<string> bookID = ConnectDatabase.SelectFromDatabase("book_id", "history", conditionalExpression);
+            bookID = getValue.CorrectBookID(bookID);
+            List<BookAPIVO> borrowedBook = getValue.SearchBookByID(usingMemberID, bookID);
+            List<HistoryVO> histories = getValue.SearchHistoryByID(usingMemberID, bookID);
 
             print.ManageBorrowedBookTitle();
             Console.SetCursorPosition(0, cursorTop);
-            print.BorrowedBook(borrowedBook, histories);
+            print.BorrowedBook(borrowedBook, histories, bookID);
 
             while (true)
             {
                 if (isFirstLoop)
                 {
-                    // 대출한 책 모록 출력
+                    // 대출한 책 목록 출력
                     print.ClearBoard(cursorTop, borrowedBook.Count + 4);
                     Console.SetCursorPosition(0, cursorTop);
-                    borrowedBook = getValue.SearchBookByID(Constant.MEMBER_ID, usingMemberID);
-                    histories = getValue.BookHistory(usingMemberID);
-                    print.BorrowedBook(borrowedBook, histories);
+                    bookID = ConnectDatabase.SelectFromDatabase("book_id", "history", conditionalExpression);
+                    bookID = getValue.CorrectBookID(bookID);
+                    borrowedBook = getValue.SearchBookByID(usingMemberID, bookID);
+                    histories = getValue.SearchHistoryByID(usingMemberID, bookID);
+                    print.BorrowedBook(borrowedBook, histories, bookID);
                     print.PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
 
                     if (borrowedBook.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
@@ -561,7 +567,7 @@ namespace EnSharpLibrary.Function
                     // 연장
                     if (histories[Console.CursorTop - cursorTop].NumberOfRenew != 2)
                     {
-                        tool.Extend(borrowedBook[Console.CursorTop - cursorTop].BookID);
+                        ConnectDatabase.Extend(bookID[Console.CursorTop - cursorTop]);
                         print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.EXTEND);
                     }
                     else print.CompleteOrFaildProcess(4, cursorTop, Constant.FAIL);
@@ -570,7 +576,7 @@ namespace EnSharpLibrary.Function
                 else if (keyInfo.Key == ConsoleKey.W)
                 {
                     // 반납
-                    tool.Return(borrowedBook[Console.CursorTop - cursorTop].BookID);
+                    ConnectDatabase.Return(bookID[Console.CursorTop - cursorTop]);
                     print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.RETURN);
                     isFirstLoop = true;
                 }

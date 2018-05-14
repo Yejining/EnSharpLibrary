@@ -373,22 +373,22 @@ namespace EnSharpLibrary.IO
             
         }
 
-        public void BorrowedBook(List<BookVO> books, List<HistoryVO> histories)
+        public void BorrowedBook(List<BookAPIVO> books, List<HistoryVO> histories, List<string> numbers)
         {
             for (int order = 0; order < books.Count; order++)
             {
                 Console.SetCursorPosition(18, Console.CursorTop);
-                Console.Write(books[order].Name);
+                Console.Write(books[order].Title);
                 Console.SetCursorPosition(58, Console.CursorTop);
                 Console.Write(books[order].Author);
                 Console.SetCursorPosition(80, Console.CursorTop);
-                Console.Write(histories[order].DateBorrowed.ToShortDateString());
+                Console.Write(histories[order].DateBorrowed);
                 Console.SetCursorPosition(95, Console.CursorTop);
                 Console.Write(histories[order].NumberOfRenew + "회");
                 Console.SetCursorPosition(104, Console.CursorTop);
-                Console.Write(histories[order].DateDeadlineForReturn.ToShortDateString());
+                Console.Write(histories[order].DateDeadlineForReturn);
                 Console.SetCursorPosition(118, Console.CursorTop);
-                Console.WriteLine(books[order].BookID);
+                Console.WriteLine(numbers[order]);
             }
         }
 

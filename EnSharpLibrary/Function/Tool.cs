@@ -14,7 +14,16 @@ namespace EnSharpLibrary.Function
     {
         Print print = new Print();
 
-        public bool IsNormal(string condition)
+        public bool IsNormal(string condition, int memberID, float application_Number)
+        {
+            int count = ConnectDatabase.GetCountFromDatabase("history", " WHERE member_id=" + memberID + " AND FLOOR(book_id)=" + Math.Floor(application_Number) + " AND date_return IS NULL");
+
+            if (count != 0) return false;
+            if (string.Compare(condition, "대출 가능") == 0) return true;
+            else return false;
+        }
+
+        public bool IsNotRented(string condition)
         {
             if (string.Compare(condition, "대출 가능") == 0) return true;
             else return false;

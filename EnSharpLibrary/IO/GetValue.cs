@@ -143,55 +143,110 @@ namespace EnSharpLibrary.IO
             }
         }
 
-        public List<BookVO> SearchBookByID(int mode, int ID)
+        public List<BookAPIVO> SearchBookByID(int memberID, List<string> bookID)
         {
-            List<BookVO> searchedBook = new List<BookVO>();
-            StringBuilder sql = new StringBuilder();
+            string conditionalExpression = " WHERE member_id =" + memberID.ToString() + " AND date_return IS NULL";
+            List<BookAPIVO> books = new List<BookAPIVO>();
+            List<string> name = new List<string>();
+            List<string> author = new List<string>();
+            string bookName, bookAuthor;
 
-            if (mode == Constant.BOOK_ID) sql.Append("SELECT * FROM book WHERE FLOOR(book_id)=" + ID + ";");
-            else sql.Append("SELECT * FROM book WHERE FLOOR(borrowed_member_id)=" + ID + ";");
-
-            string nameForVO;
-            string authorForVO;
-            string publisherForVO;
-            int publishingYearForVO;
-            float bookIDForVO;
-            string bookConditionForVO;
-            int borrowedMemberIDForVO;
-            int priceForVO;
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            foreach (string id in bookID)
             {
-                nameForVO = reader["name"].ToString();
-                authorForVO = reader["author"].ToString();
-                publisherForVO = reader["publisher"].ToString();
-                publishingYearForVO = Int32.Parse(reader["publishing_year"].ToString());
-                bookIDForVO = float.Parse(reader["book_id"].ToString());
-                bookConditionForVO = reader["book_condition"].ToString();
-                borrowedMemberIDForVO = Int32.Parse(reader["borrowed_member_id"].ToString());
-                priceForVO = Int32.Parse(reader["price"].ToString());
-
-                BookVO book = new BookVO(nameForVO, authorForVO, publisherForVO, publishingYearForVO);
-                book.AppendInformation(bookIDForVO, bookConditionForVO, borrowedMemberIDForVO, priceForVO);
-
-                searchedBook.Add(book);
+                bookName = ConnectDatabase.SelectFromDatabase("name", "book_api", "serial_number", id[0].ToString())[0];
+                bookAuthor = ConnectDatabase.SelectFromDatabase("author", "book_api", "serial_number", id[0].ToString())[0];
+                name.Add(print.ShortenKeyword(bookName, 38));
+                author.Add(print.ShortenKeyword(bookName, 15));
             }
 
-            reader.Close();
+            for (int count = 0; count < bookID.Count; count++)
+            {
+                BookAPIVO book = new BookAPIVO();
+                book.Title = name[count];
+                book.Author = author[count];
+                books.Add(book);
+            }
 
-            return searchedBook;
+            return books;
         }
+
+        public List<string> CorrectBookID(List<string> bookID)
+        {
+            for (int index = 0; index < bookID.Count; index++)
+            {
+                if (bookID[index].Length == 1) bookID[index] += ".00";
+            }
+
+            return bookID;
+        }
+
+        public List<HistoryVO> SearchHistoryByID(int memberID, List<string> bookID)
+        {
+            string conditionalExpression = " WHERE member_id =" + memberID.ToString() + " AND date_return IS NULL";
+
+            List<HistoryVO> histories = new List<HistoryVO>();
+            List<string> dateBorrowed = ConnectDatabase.SelectFromDatabase("date_borrowed", "history", conditionalExpression);
+            List<string> numberOfRenew = ConnectDatabase.SelectFromDatabase("number_of_renew", "history", conditionalExpression);
+            List<string> dateDeadlineForReturn = ConnectDatabase.SelectFromDatabase("date_deadline_for_return", "history", conditionalExpression);
+
+            for (int count = 0; count < bookID.Count; count++)
+            {
+                HistoryVO history = new HistoryVO(dateBorrowed[count].Remove(10), dateDeadlineForReturn[count].Remove(10), Int32.Parse(numberOfRenew[count]));
+                histories.Add(history);
+            }
+
+            return histories;
+        }
+
+        //public List<BookVO> SearchBookByID(int mode, int ID)
+        //{
+        //    List<BookVO> searchedBook = new List<BookVO>();
+        //    StringBuilder sql = new StringBuilder();
+
+        //    if (mode == Constant.BOOK_ID) sql.Append("SELECT * FROM book WHERE FLOOR(book_id)=" + ID + ";");
+        //    else sql.Append("SELECT * FROM book WHERE FLOOR(borrowed_member_id)=" + ID + ";");
+
+        //    string nameForVO;
+        //    string authorForVO;
+        //    string publisherForVO;
+        //    int publishingYearForVO;
+        //    float bookIDForVO;
+        //    string bookConditionForVO;
+        //    int borrowedMemberIDForVO;
+        //    int priceForVO;
+
+        //    String databaseConnect;
+        //    MySqlConnection connect;
+
+        //    databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+        //    connect = new MySqlConnection(databaseConnect);
+
+        //    connect.Open();
+
+        //    MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+        //    MySqlDataReader reader = command.ExecuteReader();
+
+        //    while (reader.Read())
+        //    {
+        //        nameForVO = reader["name"].ToString();
+        //        authorForVO = reader["author"].ToString();
+        //        publisherForVO = reader["publisher"].ToString();
+        //        publishingYearForVO = Int32.Parse(reader["publishing_year"].ToString());
+        //        bookIDForVO = float.Parse(reader["book_id"].ToString());
+        //        bookConditionForVO = reader["book_condition"].ToString();
+        //        borrowedMemberIDForVO = Int32.Parse(reader["borrowed_member_id"].ToString());
+        //        priceForVO = Int32.Parse(reader["price"].ToString());
+
+        //        BookVO book = new BookVO(nameForVO, authorForVO, publisherForVO, publishingYearForVO);
+        //        book.AppendInformation(bookIDForVO, bookConditionForVO, borrowedMemberIDForVO, priceForVO);
+
+        //        searchedBook.Add(book);
+        //    }
+
+        //    reader.Close();
+
+        //    return searchedBook;
+        //}
 
         public string ConditionalExpression(string bookName, string publisher, string author)
         {
@@ -327,41 +382,41 @@ namespace EnSharpLibrary.IO
             return password;
         }
 
-        public List<HistoryVO> BookHistory(int memberID)
-        {
-            List<HistoryVO> histories = new List<HistoryVO>();
-            StringBuilder sql = new StringBuilder("SELECT * FROM history WHERE member_id=" + memberID + " AND date_return IS NULL;");
+        //public List<HistoryVO> BookHistory(int memberID)
+        //{
+        //    List<HistoryVO> histories = new List<HistoryVO>();
+        //    StringBuilder sql = new StringBuilder("SELECT * FROM history WHERE member_id=" + memberID + " AND date_return IS NULL;");
 
-            String databaseConnect;
-            MySqlConnection connect;
+        //    String databaseConnect;
+        //    MySqlConnection connect;
 
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
+        //    databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+        //    connect = new MySqlConnection(databaseConnect);
 
-            connect.Open();
+        //    connect.Open();
 
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
+        //    MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+        //    MySqlDataReader reader = command.ExecuteReader();
 
-            while (reader.Read())
-            {
-                string date1 = reader["date_borrowed"].ToString().Remove(10, 12);
-                string[] date2 = date1.Split('-');
-                string date3 = reader["date_deadline_for_return"].ToString().Remove(10, 12);
-                string[] date4 = date3.Split('-');
-                int numberOfRenew = Int32.Parse(reader["number_of_renew"].ToString());
+        //    while (reader.Read())
+        //    {
+        //        string date1 = reader["date_borrowed"].ToString().Remove(10, 12);
+        //        string[] date2 = date1.Split('-');
+        //        string date3 = reader["date_deadline_for_return"].ToString().Remove(10, 12);
+        //        string[] date4 = date3.Split('-');
+        //        int numberOfRenew = Int32.Parse(reader["number_of_renew"].ToString());
 
-                HistoryVO history = new HistoryVO(new DateTime(Int32.Parse(date2[0]), Int32.Parse(date2[1]), Int32.Parse(date2[2])),
-                    new DateTime(Int32.Parse(date4[0]), Int32.Parse(date4[1]), Int32.Parse(date4[2])), numberOfRenew);
+        //        HistoryVO history = new HistoryVO(new DateTime(Int32.Parse(date2[0]), Int32.Parse(date2[1]), Int32.Parse(date2[2])),
+        //            new DateTime(Int32.Parse(date4[0]), Int32.Parse(date4[1]), Int32.Parse(date4[2])), numberOfRenew);
 
-                histories.Add(history);
-            }
+        //        histories.Add(history);
+        //    }
 
-            reader.Close();
-            connect.Close();
+        //    reader.Close();
+        //    connect.Close();
 
-            return histories;
-        }
+        //    return histories;
+        //}
 
         /// <summary>
         /// 드롭박스에서 원하는 옵션을 선택하는 메소드입니다.

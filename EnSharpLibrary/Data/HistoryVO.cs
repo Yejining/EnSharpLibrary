@@ -8,8 +8,8 @@ namespace EnSharpLibrary.Data
 {
     class HistoryVO
     {
-        private DateTime dateBorrowed;
-        private DateTime dateDeadlineForReturn;
+        private string dateBorrowed;
+        private string dateDeadlineForReturn;
         private int numberOfRenew;
 
         /// <summary>
@@ -18,19 +18,20 @@ namespace EnSharpLibrary.Data
         /// <param name="dateBorrowed">대출일</param>
         /// <param name="dateDeadlineForReturn">예상 반납일</param>
         /// <param name="numberOfRenew">연장 횟수</param>
-        public HistoryVO(DateTime dateBorrowed, DateTime dateDeadlineForReturn, int numberOfRenew)
+        public HistoryVO(string dateBorrowed, string dateDeadlineForReturn, int numberOfRenew)
         {
             this.dateBorrowed = dateBorrowed;
             this.dateDeadlineForReturn = dateDeadlineForReturn;
             this.numberOfRenew = numberOfRenew;
         }
 
-        public DateTime DateBorrowed
+        public string DateBorrowed
         {
             get { return dateBorrowed; }
+            set { dateBorrowed = value; }
         }
 
-        public DateTime DateDeadlineForReturn
+        public string DateDeadlineForReturn
         {
             get { return dateDeadlineForReturn; }
             set { dateDeadlineForReturn = value; }

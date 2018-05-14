@@ -56,6 +56,21 @@ namespace EnSharpLibrary.Function
             return count;
         }
 
+        public static int GetCountFromDatabase(string tableName, string conditionalExpression)
+        {
+            string sql = "SELECT count(*) FROM " + tableName + conditionalExpression + ";";
+            int count = 0;
+
+            command = new MySqlCommand(sql.ToString(), connect);
+            reader = command.ExecuteReader();
+
+            while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
+
+            reader.Close();
+
+            return count;
+        }
+
         public static List<string> SelectFromDatabase(string column, string tableName, string searchCategory, string searchKey)
         {
             List<string> data = new List<string>();
@@ -160,6 +175,25 @@ namespace EnSharpLibrary.Function
             command = new MySqlCommand(sql.ToString(), connect);
             reader = command.ExecuteReader();
             reader.Close();
+        }
+
+        public static void Extend(string bookID)
+        {
+            string sql = " WHERE book_id=" + bookID + " AND date_return IS NULL";
+            int renew = Int32.Parse(SelectFromDatabase("number_of_renew", "history", sql)[0]) + 1;
+            string deadline = SelectFromDatabase("date_deadline_for_return", "history", sql)[0].Remove(10);
+
+            string sql1 = "UPDATE history SET date_deadline_for_return=DATE_ADD(\"" + deadline + "\", INTERVAL 6 DAY) WHERE book_id=" + bookID + " AND date_return IS NULL;";
+            string sql2 = "UPDATE history SET number_of_renew=" + renew + " WHERE book_id=" + bookID + " AND date_return IS NULL;";
+
+            MakeCommand(sql1);
+            MakeCommand(sql2);
+        }
+
+        public static void Return(string bookID)
+        {
+            UpdateToDatabase("history", "date_return", "NOW()", "book_id", bookID, "date_return");
+            UpdateToDatabase("book_detail", "book_condition", "대출 가능", "application_number", bookID);
         }
 
         public static XmlDocument BookSearchResult(string searchingKeyword)
