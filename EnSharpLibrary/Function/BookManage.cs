@@ -17,50 +17,6 @@ namespace EnSharpLibrary.Function
 
         int usingMemberID;
 
-        public void ManageBook()
-        {
-            usingMemberID = Constant.ADMIN;
-            bool isFirstLoop = true;
-
-            while (true)
-            {
-                if (isFirstLoop)
-                {
-                    // 메뉴 출력
-                    print.SetWindowsizeAndPrintTitle(45, 30, "도서 관리");
-                    print.MenuOption(Constant.MANAGE_BOOK_MODE, Console.CursorTop + 2);
-
-                    // 기능 선택
-                    print.SetCursorAndChoice(38, 12, "◁");
-
-                    isFirstLoop = false;
-                }
-
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-                // 기능 선택
-                switch (keyInfo.Key)
-                {
-                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, '◁'); break;
-                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, '◁'); break;
-                    case ConsoleKey.Enter: isFirstLoop = GoNextFunction(Console.CursorTop); break;
-                    case ConsoleKey.Escape: return;
-                    default: print.BlockCursorMove(38, "◁"); break;
-                }
-            }
-        }
-
-        public bool GoNextFunction(int cursorTop)
-        {
-            switch (Console.CursorTop)
-            {
-                case Constant.APPEND_BOOK: AddBook("도서 검색 및 등록"); return true;
-                case Constant.MANAGE_REGISTERED_BOOK: ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK); return true;
-            }
-
-            return true;
-        }
-
         public void AddBook(string title)
         {
             string name;
@@ -89,13 +45,6 @@ namespace EnSharpLibrary.Function
 
             return;
         }
-
-        //public void ManageRegisteredBook()
-        //{
-        //    List<BookAPIVO> books = getValue.RegisteredBook();
-        //    print.SearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
-        //    ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
-        //}
 
         /// <summary>
         /// 도서 검색을 위한 메소드입니다.
@@ -192,6 +141,7 @@ namespace EnSharpLibrary.Function
             Console.Clear();
             print.BookDetailInBookAdminMode(mode, book, registeredCount);
 
+            if (usingMemberID == Constant.ADMIN) { RegisterBook(book, registeredCount, countOfTableData); return; }
             if (mode == Constant.BOOK_SEARCH_MODE) ChangeBookCondition(book, registeredCount);
             else ChangeBookCondition(book, registeredCount);
         }
