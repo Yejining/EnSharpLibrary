@@ -301,11 +301,12 @@ namespace EnSharpLibrary.Function
             }
 
             // 검색
-            searchedMember = getValue.SearchMemberByCondition(name, age, address.ToString());
-            List<string> borrowedBookForEachMember = getValue.BorrowedBookForEachMember(searchedMember);
+            //searchedMember = getValue.SearchMemberByCondition(name, age, address.ToString());
+            //List<string> borrowedBookForEachMember = getValue.BorrowedBookForEachMember(searchedMember);
 
             // 열람
-            CheckMemberAndDelete(searchedMember, borrowedBookForEachMember, name, age.ToString(), address.ToString());
+            //CheckMemberAndDelete(searchedMember, borrowedBookForEachMember, name, age.ToString(), address.ToString());
+
         }
 
         /// <summary>

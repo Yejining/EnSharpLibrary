@@ -15,6 +15,7 @@ namespace EnSharpLibrary.Function
 
         BookManage bookManage = new BookManage();
         MemberManage memberManage = new MemberManage();
+        LogManage logManage = new LogManage();
 
         private int usingMemberID;
 
@@ -25,6 +26,9 @@ namespace EnSharpLibrary.Function
         public void RunLibraryProgram(int mode)
         {
             bool isFirstLoop = true;
+            int optionCount;
+            if (usingMemberID == Constant.ADMIN) optionCount = 6;
+            else optionCount = 5;
 
             if (mode == Constant.NON_MEMBER_MODE) usingMemberID = Constant.PUBLIC;
 
@@ -36,6 +40,8 @@ namespace EnSharpLibrary.Function
                     if (usingMemberID == Constant.ADMIN) mode = Constant.ADMIN_MODE;
                     else if (usingMemberID != Constant.PUBLIC) mode = Constant.MEMBER_MODE;
                     else mode = Constant.NON_MEMBER_MODE;
+                    if (usingMemberID == Constant.ADMIN) optionCount = 6;
+                    else optionCount = 5;
 
                     // 메뉴 출력
                     print.SetWindowsizeAndPrintTitle(45, 30, "");
@@ -52,8 +58,8 @@ namespace EnSharpLibrary.Function
                 // 기능 선택
                 switch(keyInfo.Key)
                 {
-                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, 5, 2, '◁'); break;
-                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, 5, 2, '◁'); break;
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, optionCount, 2, '◁'); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, optionCount, 2, '◁'); break;
                     case ConsoleKey.Enter: isFirstLoop = GoNextFunction(Console.CursorTop);
                         if (Console.CursorTop == Constant.CLOSE_PROGRAM) return; break;
                     default: print.BlockCursorMove(38, "◁"); break;
@@ -87,6 +93,9 @@ namespace EnSharpLibrary.Function
                     break;
                 case Constant.CLOSE_PROGRAM:                                     // 종료
                     return true;
+                case Constant.MANAGE_LOG:
+                    logManage.LogMenu();
+                    break;
             }
 
             return true;

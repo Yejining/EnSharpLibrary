@@ -74,6 +74,7 @@
     <Compile Include="Data\MemberVO.cs" />
     <Compile Include="Function\BookManage.cs" />
     <Compile Include="Function\ConnectDatabase.cs" />
+    <Compile Include="Function\LogManage.cs" />
     <Compile Include="Function\MemberManage.cs" />
     <Compile Include="Function\Menu.cs" />
     <Compile Include="Function\Tool.cs" />

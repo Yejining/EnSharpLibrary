@@ -53,6 +53,7 @@ namespace EnSharpLibrary.Data
             "암호 수정",
             "로그아웃",
             "종료",
+            "로그 관리"
         };
 
         public static string[] SEARCH_BOOK_TITLE =
@@ -308,6 +309,7 @@ namespace EnSharpLibrary.Data
         public const int JOIN_IN_OR_UPDATE_USER_INFORMATION = 14;
         public const int LOG_IN_OR_LOG_OUT = 16;
         public const int CLOSE_PROGRAM = 18;
+        public const int MANAGE_LOG = 20;
 
         public const int APPEND_MEMBER = 12;
         public const int MANAGE_REGISTERED_MEMBER = 14;

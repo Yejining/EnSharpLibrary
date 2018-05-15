@@ -255,7 +255,10 @@ namespace EnSharpLibrary.IO
             PrintSentence(option[3], cursorTop + 7, Constant.FOREGROUND_COLOR);
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 8, Constant.FOREGROUND_COLOR);
             PrintSentence(option[4], cursorTop + 9, Constant.FOREGROUND_COLOR);
-            PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 10, Constant.FOREGROUND_COLOR);
+            if (mode != Constant.ADMIN_MODE) { PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 10, Constant.FOREGROUND_COLOR);  return; }
+            PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 10, Constant.FOREGROUND_COLOR);
+            PrintSentence(option[5], cursorTop + 11, Constant.FOREGROUND_COLOR);
+            PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 12, Constant.FOREGROUND_COLOR);
         }
 
         /// <summary>
