@@ -55,7 +55,7 @@ namespace EnSharpLibrary.Function
             switch (Console.CursorTop)
             {
                 case Constant.APPEND_BOOK: AddBook("도서 검색 및 등록"); return true;
-                case Constant.MANAGE_REGISTERED_BOOK: ManageRegisteredBook(); return true;
+                case Constant.MANAGE_REGISTERED_BOOK: ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK); return true;
             }
 
             return true;
@@ -90,49 +90,12 @@ namespace EnSharpLibrary.Function
             return;
         }
 
-        public void ManageRegisteredBook()
-        {
-            List<BookAPIVO> books = getValue.RegisteredBook();
-            print.SearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
-            ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
-        }
-
-        public void LookUpBookAndChooseToSee(int usingMemberID)
-        {
-            List<BookAPIVO> searchedBook;
-            int mode;
-            string bookName;
-            string publisher;
-            string author;
-            string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
-
-            this.usingMemberID = usingMemberID;
-
-            // 사용자에 따른 모드 설정
-            if (usingMemberID == Constant.PUBLIC) mode = Constant.NON_MEMBER_MODE;
-            else mode = Constant.MEMBER_MODE;
-
-            while (true)
-            {
-                print.SetWindowsizeAndPrintTitle(45, 30, Constant.SEARCH_BOOK_TITLE[mode]);
-                print.SearchCategoryAndGuideline(Constant.BOOK_SEARCH_MODE);
-
-                // 정보 수집
-                bookName = getValue.Information(19, 11, 10, Constant.ALL_CHARACTER, guideline);
-                if (string.Compare(bookName, "@입력취소@") == 0) return;
-                publisher = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, guideline);
-                if (string.Compare(publisher, "@입력취소@") == 0) return;
-                author = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, guideline);
-                if (string.Compare(author, "@입력취소@") == 0) return;
-
-                // 조건 검색
-                searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);
-
-                // 상세 정보를 확인할 도서 선택
-                if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
-                else ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
-            }
-        }
+        //public void ManageRegisteredBook()
+        //{
+        //    List<BookAPIVO> books = getValue.RegisteredBook();
+        //    print.SearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
+        //    ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
+        //}
 
         /// <summary>
         /// 도서 검색을 위한 메소드입니다.
@@ -182,6 +145,14 @@ namespace EnSharpLibrary.Function
             if (mode == Constant.BOOK_SEARCH_MODE) cursorTop = 12;
             int index;
 
+            if (usingMemberID == Constant.ADMIN)
+            {
+                searchedBook = getValue.RegisteredBook();
+                name = Constant.BLANK;
+                publisher = Constant.BLANK;
+                author = Constant.BLANK;
+            }
+
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
             while (true)
             {
@@ -221,8 +192,7 @@ namespace EnSharpLibrary.Function
             Console.Clear();
             print.BookDetailInBookAdminMode(mode, book, registeredCount);
 
-            if (mode == Constant.ADD_BOOK) RegisterBook(book, registeredCount, countOfTableData);
-            else if (mode == Constant.BOOK_SEARCH_MODE) ChangeBookCondition(book, registeredCount);
+            if (mode == Constant.BOOK_SEARCH_MODE) ChangeBookCondition(book, registeredCount);
             else ChangeBookCondition(book, registeredCount);
         }
         
