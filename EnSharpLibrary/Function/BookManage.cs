@@ -85,7 +85,7 @@ namespace EnSharpLibrary.Function
 
             foundBook = ConnectDatabase.BookSearchResult(name);
             books = getValue.OrganizedFoundBook(foundBook);
-            SelectSearchedBook(Constant.ADD_BOOK, books, name, Constant.BLANK, Constant.BLANK);
+            ListRegisteredBookAndChooseOneBook(Constant.ADD_BOOK, books, name, Constant.BLANK, Constant.BLANK);
 
             return;
         }
@@ -94,7 +94,44 @@ namespace EnSharpLibrary.Function
         {
             List<BookAPIVO> books = getValue.RegisteredBook();
             print.SearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
-            SelectSearchedBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
+            ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, books, Constant.BLANK, Constant.BLANK, Constant.BLANK);
+        }
+
+        public void LookUpBookAndChooseToSee(int usingMemberID)
+        {
+            List<BookAPIVO> searchedBook;
+            int mode;
+            string bookName;
+            string publisher;
+            string author;
+            string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
+
+            this.usingMemberID = usingMemberID;
+
+            // 사용자에 따른 모드 설정
+            if (usingMemberID == Constant.PUBLIC) mode = Constant.NON_MEMBER_MODE;
+            else mode = Constant.MEMBER_MODE;
+
+            while (true)
+            {
+                print.SetWindowsizeAndPrintTitle(45, 30, Constant.SEARCH_BOOK_TITLE[mode]);
+                print.SearchCategoryAndGuideline(Constant.BOOK_SEARCH_MODE);
+
+                // 정보 수집
+                bookName = getValue.Information(19, 11, 10, Constant.ALL_CHARACTER, guideline);
+                if (string.Compare(bookName, "@입력취소@") == 0) return;
+                publisher = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, guideline);
+                if (string.Compare(publisher, "@입력취소@") == 0) return;
+                author = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, guideline);
+                if (string.Compare(author, "@입력취소@") == 0) return;
+
+                // 조건 검색
+                searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);
+
+                // 상세 정보를 확인할 도서 선택
+                if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
+                else ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
+            }
         }
 
         /// <summary>
@@ -134,31 +171,24 @@ namespace EnSharpLibrary.Function
 
                 // 상세 정보를 확인할 도서 선택
                 if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
-                else SelectSearchedBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
+                else ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
             }
         }
 
-        /// <summary>
-        /// 도서 검색 후 상세 정보를 확인하기 위해 도서를 선택하는 메소드입니다.
-        /// </summary>
-        /// <param name="searchedBook">검색된 도서</param>
-        /// <param name="bookName">사용자가 입력한 도서명</param>
-        /// <param name="publisher">사용자가 입력한 출판사명</param>
-        /// <param name="author">사용자가 입력한 작가명</param>
-        public void SelectSearchedBook(List<BookVO> searchedBook, string bookName, string publisher, string author)
+        public void ListRegisteredBookAndChooseOneBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
         {
             bool isFirstLoop = true;
-            int cursorTop;
-
-            // 검색된 도서 출력
-            cursorTop = Console.CursorTop - 2;
-            print.SearchedBook(searchedBook, bookName, publisher, author);
+            int cursorTop = 10;
+            if (mode == Constant.BOOK_SEARCH_MODE) cursorTop = 12;
+            int index;
 
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
             while (true)
             {
                 if (isFirstLoop)
                 {
+                    Console.SetCursorPosition(0, cursorTop - 2);
+                    print.SearchedBook(mode, searchedBook, name, publisher, author);
                     Console.SetCursorPosition(4, cursorTop);
                     Console.Write('▷');
                     Console.SetCursorPosition(4, cursorTop);
@@ -172,16 +202,28 @@ namespace EnSharpLibrary.Function
                 else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                   // 나가기
                 else if (keyInfo.Key == ConsoleKey.Enter)                                                                // 해당 도서 자세히 보기
                 {
-                    int index = Console.CursorTop - cursorTop;
-                    print.SearchedBook(searchedBook, bookName, publisher, author);
-                    Console.SetCursorPosition(45, 3);
-                    Console.Write("|" + searchedBook[index].Name + "|");
-                    print.ClearBoard(cursorTop, searchedBook.Count + 4);
-                    //CheckDetailInformationWhichUserSelected((int)Math.Floor(searchedBook[index].BookID));
-                    return;
+                    index = Console.CursorTop - cursorTop;
+                    isFirstLoop = true;
+                    break;
                 }
                 else print.BlockCursorMove(4, "▷");                                                                      // 입력 무시 
             }
+
+            int registeredCount = 0;
+            BookAPIVO book = searchedBook[Console.CursorTop - cursorTop];
+
+            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
+            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
+
+            // 등록된 책이 몇 종류인지 알아냄
+            if (result.Count == 0) registeredCount = 0;
+            else registeredCount = Int32.Parse(result[0]);
+            Console.Clear();
+            print.BookDetailInBookAdminMode(mode, book, registeredCount);
+
+            if (mode == Constant.ADD_BOOK) RegisterBook(book, registeredCount, countOfTableData);
+            else if (mode == Constant.BOOK_SEARCH_MODE) ModifyBookCondition(book, registeredCount);
+            else ModifyBookCondition(book, registeredCount);
         }
 
         public void SelectSearchedBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
@@ -218,66 +260,6 @@ namespace EnSharpLibrary.Function
                 else print.BlockCursorMove(4, "▷");                                                                      // 입력 무시 
             }
         }
-
-        /// <summary>
-        /// 사용자가 선택한 도서의 상세정보를 보여주는 메소드입니다.
-        /// 사용자가 로그인한 경우 대출이 가능합니다.
-        /// </summary>
-        /// <param name="bookID">정수화된 도서의 청구기호</param>
-        //public void CheckDetailInformationWhichUserSelected(int bookID)
-        //{
-        //    bool isFirstLoop = true;
-        //    bool isValidBook = true;
-        //    bool isValidUser = true;
-        //    int cursorTop = 13;
-
-        //    List<BookVO> books = new List<BookVO>();
-
-        //    books = getValue.SearchBookByID(Constant.BOOK_ID, bookID);
-        //    print.SearchedBookWithMoreDetail(books);
-        //    print.PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
-
-        //    if (usingMemberID == Constant.PUBLIC || books.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
-
-        //    // 방향키 및 엔터, ESC키를 이용해 기능 수행
-        //    while (true)
-        //    {
-        //        if (isFirstLoop)
-        //        {
-        //            print.ClearBoard(cursorTop, books.Count + 4);
-        //            books = getValue.SearchBookByID(Constant.BOOK_ID, bookID);
-        //            print.SearchedBookWithMoreDetail(books);
-        //            print.PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
-
-        //            Console.SetCursorPosition(4, cursorTop);
-        //            Console.Write('▷');
-        //            Console.SetCursorPosition(4, cursorTop);
-        //            isFirstLoop = false;
-        //        }
-
-        //        isValidBook = tool.IsValidBook(books[Console.CursorTop - cursorTop].BookID);
-        //        isValidUser = tool.IsValidUser(usingMemberID);
-        //        if (!isValidBook || !isValidUser) print.NonAvailableLectureMark(4, Console.CursorTop);
-
-        //        ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-        //        if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, books.Count, 1, '▷');          // 위로 커서 옮김
-        //        else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, books.Count, 1, '▷'); // 밑으로 커서 옮김
-        //        else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }            // 나가기
-        //        else if (keyInfo.Key == ConsoleKey.Enter)                                                         // 해당 도서 선택
-        //        {
-        //            // 대출
-        //            if (isValidBook && isValidUser)
-        //            {
-        //                tool.Borrow(usingMemberID, books[Console.CursorTop - cursorTop].BookID);
-        //                print.CompleteOrFaildProcess(4, cursorTop, Constant.BORROW);
-        //            }
-        //            else print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.FAIL);
-        //            isFirstLoop = true;
-        //        }
-        //        else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 
-        //    }
-        //}
 
         public void CheckDetailInformationWhichUserSelected(int mode, BookAPIVO book)
         {

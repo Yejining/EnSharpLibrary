@@ -60,7 +60,7 @@ namespace EnSharpLibrary.Function
                 {
                     case ConsoleKey.UpArrow: tool.UpArrow(38, 10, optionCount, 2, '◁'); break;
                     case ConsoleKey.DownArrow: tool.DownArrow(38, 10, optionCount, 2, '◁'); break;
-                    case ConsoleKey.Enter: isFirstLoop = GoNextFunction(Console.CursorTop);
+                    case ConsoleKey.Enter: isFirstLoop = StartMenu(Console.CursorTop);
                         if (Console.CursorTop == Constant.CLOSE_PROGRAM) return; break;
                     default: print.BlockCursorMove(38, "◁"); break;
                 }
@@ -71,7 +71,7 @@ namespace EnSharpLibrary.Function
         /// 사용자가 다음 기능을 선택하면 해당 메소드를 실행시키는 메소드입니다.
         /// </summary>
         /// <param name="cursorTop">사용자가 선택한 기능</param>
-        public bool GoNextFunction(int cursorTop)
+        public bool StartMenu(int cursorTop)
         {
             switch (Console.CursorTop)                                           // 비회원,          회원,          관리자
             {
@@ -101,4 +101,6 @@ namespace EnSharpLibrary.Function
             return true;
         }
     }
+
+
 }
