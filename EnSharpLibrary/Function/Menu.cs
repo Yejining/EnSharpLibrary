@@ -76,7 +76,7 @@ namespace EnSharpLibrary.Function
             switch (Console.CursorTop)                                           // 비회원,          회원,          관리자
             {
                 case Constant.RELEVANT_TO_BOOK:                                  // 비회원 도서검색, 도서대출.      도서관리
-                    if (usingMemberID != Constant.ADMIN) bookManage.SearchBook(usingMemberID);
+                    if (usingMemberID != Constant.ADMIN) bookManage.GetSearchWordAndSearchInRegisteredBook(usingMemberID);
                     else bookManage.ManageBook();
                     break;
                 case Constant.LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER:    // 로그인,          연장 및 반납,  회원관리
