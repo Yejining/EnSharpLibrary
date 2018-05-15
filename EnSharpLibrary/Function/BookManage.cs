@@ -48,25 +48,38 @@ namespace EnSharpLibrary.Function
             return;
         }
 
-        /// <summary>
-        /// 도서 검색을 위한 메소드입니다.
-        /// </summary>
-        /// <param name="usingMemberID">사용자 학번</param>
-        public void GetSearchWordAndSearchInRegisteredBook(int usingMemberID)
+        public void SearchInRegisteredBook(int usingMemberID)
         {
-            List<BookAPIVO> searchedBook;
-            BookAPIVO book;
             int mode;
-            string bookName;
+            string name;
             string publisher;
             string author;
-            string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
+            List<BookAPIVO> searchedBook;
+            BookAPIVO book;
 
             this.usingMemberID = usingMemberID;
 
             // 사용자에 따른 모드 설정
             if (usingMemberID == Constant.PUBLIC) mode = Constant.NON_MEMBER_MODE;
             else mode = Constant.MEMBER_MODE;
+
+            GetSearchWordAndSearchInRegisteredBook(mode, out searchedBook, out name, out publisher, out author);
+            book = ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, name, publisher, author);
+            ChangeBookCondition(book);
+        }
+
+        /// <summary>
+        /// 도서 검색을 위한 메소드입니다.
+        /// </summary>
+        /// <param name="usingMemberID">사용자 학번</param>
+        public void GetSearchWordAndSearchInRegisteredBook(int mode, out List<BookAPIVO> searchedBook, out string bookName, out string publisher, out string author)
+        {
+            string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
+
+            searchedBook = null;
+            bookName = Constant.BLANK;
+            publisher = Constant.BLANK;
+            author = Constant.BLANK;
 
             while (true)
             {
@@ -86,8 +99,6 @@ namespace EnSharpLibrary.Function
 
                 // 상세 정보를 확인할 도서 선택
                 if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
-                book = ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
-                ChangeBookCondition(book);
             }
         }
 
