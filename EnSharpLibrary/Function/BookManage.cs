@@ -17,11 +17,12 @@ namespace EnSharpLibrary.Function
 
         int usingMemberID;
 
-        public void AddBook(string title)
+        public void AddBookThroughNaverAPI(string title)
         {
             string name;
             XmlDocument foundBook;
             List<BookAPIVO> books;
+            BookAPIVO book;
 
             print.SetWindowsizeAndPrintTitle(45, 30, title);
 
@@ -41,7 +42,8 @@ namespace EnSharpLibrary.Function
 
             foundBook = ConnectDatabase.BookSearchResult(name);
             books = getValue.OrganizedFoundBook(foundBook);
-            ListRegisteredBookAndChooseOneBook(Constant.ADD_BOOK, books, name, Constant.BLANK, Constant.BLANK);
+            book = ListRegisteredBookAndChooseOneBook(Constant.ADD_BOOK, books, name, Constant.BLANK, Constant.BLANK);
+            RegisterBook(book);
 
             return;
         }
@@ -53,6 +55,7 @@ namespace EnSharpLibrary.Function
         public void GetSearchWordAndSearchInRegisteredBook(int usingMemberID)
         {
             List<BookAPIVO> searchedBook;
+            BookAPIVO book;
             int mode;
             string bookName;
             string publisher;
@@ -83,11 +86,12 @@ namespace EnSharpLibrary.Function
 
                 // 상세 정보를 확인할 도서 선택
                 if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
-                else ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
+                book = ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, bookName, publisher, author);
+                ChangeBookCondition(book);
             }
         }
 
-        public void ListRegisteredBookAndChooseOneBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
+        public BookAPIVO ListRegisteredBookAndChooseOneBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
         {
             bool isFirstLoop = true;
             int cursorTop = 10;
@@ -119,7 +123,7 @@ namespace EnSharpLibrary.Function
 
                 if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedBook.Count, 1, '▷');          // 위로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedBook.Count, 1, '▷'); // 밑으로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                   // 나가기
+                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); break; }                   // 나가기
                 else if (keyInfo.Key == ConsoleKey.Enter)                                                                // 해당 도서 자세히 보기
                 {
                     index = Console.CursorTop - cursorTop;
@@ -128,31 +132,35 @@ namespace EnSharpLibrary.Function
                 }
                 else print.BlockCursorMove(4, "▷");                                                                      // 입력 무시 
             }
-
-            int registeredCount = 0;
+            
             BookAPIVO book = searchedBook[Console.CursorTop - cursorTop];
 
+            int registeredCount;
             List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
-            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
-
-            // 등록된 책이 몇 종류인지 알아냄
             if (result.Count == 0) registeredCount = 0;
             else registeredCount = Int32.Parse(result[0]);
+
             Console.Clear();
             print.BookDetailInBookAdminMode(mode, book, registeredCount);
 
-            if (usingMemberID == Constant.ADMIN) { RegisterBook(book, registeredCount, countOfTableData); return; }
-            if (mode == Constant.BOOK_SEARCH_MODE) ChangeBookCondition(book, registeredCount);
-            else ChangeBookCondition(book, registeredCount);
+            return book;
         }
         
-        public void RegisterBook(BookAPIVO book, int registeredCount, int countOfTableData)
+        public void RegisterBook(BookAPIVO book)
         {
             int cursorLeft;
             int cursorTop;
             string count;
             int countToRenew;
             int serialNumber;
+
+            // 등록된 책이 몇 종류인지 알아냄
+            int registeredCount;
+            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
+            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
+            if (result.Count == 0) registeredCount = 0;
+            else registeredCount = Int32.Parse(result[0]);
+            
 
             // 청구기호에 쓰일 고유번호 계산(정수)
             if (registeredCount == 0) serialNumber = countOfTableData + 1;
@@ -203,13 +211,19 @@ namespace EnSharpLibrary.Function
             tool.WaitUntilGetEscapeKey();
         }
 
-        public void ChangeBookCondition(BookAPIVO book, int registeredCount)
+        public void ChangeBookCondition(BookAPIVO book)
         {
             string guide;
             int cursorTop = Console.CursorTop + 2;
             int index;
             string currentCondition;
             int currentIndex;
+
+            int registeredCount;
+            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
+            if (result.Count == 0) registeredCount = 0;
+            else registeredCount = Int32.Parse(result[0]);
+
 
             List<float> applicationNumber = new List<float>();
             List<string> bookCondition = new List<string>();

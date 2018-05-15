@@ -106,6 +106,7 @@ namespace EnSharpLibrary.Function
         {
             bool isFirstLoop = true;
             bool isTimeToGo = false;
+            BookAPIVO book;
 
             while (true)
             {
@@ -128,7 +129,7 @@ namespace EnSharpLibrary.Function
                 {
                     case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, '◁'); break;
                     case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, '◁'); break;
-                    case ConsoleKey.Enter: /*isFirstLoop = GoNextFunction(Console.CursorTop); */isTimeToGo = true; break;
+                    case ConsoleKey.Enter: isTimeToGo = true; break;
                     case ConsoleKey.Escape: return;
                     default: print.BlockCursorMove(38, "◁"); break;
                 }
@@ -138,8 +139,13 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.APPEND_BOOK: bookManage.AddBook("도서 검색 및 등록"); break;
-                case Constant.MANAGE_REGISTERED_BOOK: bookManage.ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK); break;
+                case Constant.APPEND_BOOK: bookManage.AddBookThroughNaverAPI("도서 검색 및 등록"); break;
+                case Constant.MANAGE_REGISTERED_BOOK:
+                    {
+                        book = bookManage.ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK);
+                        bookManage.ChangeBookCondition(book);
+                        break;
+                    }
             }
         }
     }
