@@ -10,6 +10,28 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
+        public void ChangeUserInformationTitle(int usingMemberID, string name, string address, string phoneNumber, DateTime birthDate)
+        {
+            if (usingMemberID == Constant.ADMIN)
+            {
+                SetWindowsizeAndPrintTitle(45, 30, "암호수정");
+            }
+            else
+            {
+                SetWindowsizeAndPrintTitle(45, 30, "정보수정");
+                UserInformation(name, usingMemberID, address, phoneNumber, birthDate);
+            }
+        }
+
+        public void UserInformation(string name, int usingMemberID, string address, string phoneNumber, DateTime birthDate)
+        {
+            SetCursorAndWrite(5, Console.CursorTop + 2, "이    름 | " + name);
+            SetCursorAndWrite(5, Console.CursorTop + 2, "학    번 | " + usingMemberID);
+            SetCursorAndWrite(5, Console.CursorTop + 2, "주    소 | " + address);
+            SetCursorAndWrite(5, Console.CursorTop + 2, "전화번호 | " + phoneNumber);
+            SetCursorAndWrite(5, Console.CursorTop + 2, "생    일 | " + birthDate.ToShortDateString());
+        }
+
         public void CompleteToRegisterBook(int cursorLeft, int cursorTop, string message)
         {
             SetCursorAndWrite(cursorLeft, cursorTop, message);
@@ -134,6 +156,7 @@ namespace EnSharpLibrary.IO
         /// <param name="color">출력할 문자열의 색</param>
         public void PrintSentence(string sentence, int cursorTop, ConsoleColor color)
         {
+            Console.SetCursorPosition(0, cursorTop);
             int leftCursor = GetLeftCursorForCenterArrangeMent(sentence);
             Console.SetCursorPosition(leftCursor, cursorTop);
             Console.ForegroundColor = color;

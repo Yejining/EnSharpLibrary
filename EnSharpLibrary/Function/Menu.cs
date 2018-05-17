@@ -85,7 +85,7 @@ namespace EnSharpLibrary.Function
                 case Constant.LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER:    // 로그인,          연장 및 반납,  회원관리
                     if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.LogIn(Constant.MEMBER_MODE);
                     else if (usingMemberID != Constant.ADMIN) bookManage.ExtendOrReturnBook();
-                    else memberManage.ManageMember();
+                    else ManageMemberMenu();
                     break;
                 case Constant.JOIN_IN_OR_UPDATE_USER_INFORMATION:                // 회원가입,        정보수정,      암호수정
                     if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.JoinIn("회원가입");
@@ -148,6 +148,47 @@ namespace EnSharpLibrary.Function
                         if (book != null) bookManage.ChangeBookCondition(book);
                         break;
                     }
+            }
+        }
+
+        public void ManageMemberMenu()
+        {
+            bool isFirstLoop = true;
+            bool isTimeToGo = false;
+
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    // 메뉴 출력
+                    print.SetWindowsizeAndPrintTitle(45, 30, "회원 관리");
+                    print.MenuOption(Constant.MANAGE_MEMBER_MODE, Console.CursorTop + 2);
+
+                    // 기능 선택
+                    print.SetCursorAndChoice(38, 12, "◁");
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                // 기능 선택
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, "◁"); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, "◁"); break;
+                    case ConsoleKey.Enter: isTimeToGo = true; break;
+                    case ConsoleKey.Escape: return;
+                    default: print.BlockCursorMove(38, "◁"); break;
+                }
+
+                if (isTimeToGo) break;
+            }
+
+            switch (Console.CursorTop)
+            {
+                case Constant.APPEND_MEMBER: memberManage.JoinIn("회원 등록"); break;
+                case Constant.MANAGE_REGISTERED_MEMBER: memberManage.SearchMember(); break;
             }
         }
     }

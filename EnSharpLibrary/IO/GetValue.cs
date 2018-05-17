@@ -17,7 +17,67 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
-        public void GetUserInformation(out string name, out string userID, out string password, out string address, out string phoneNumber, out DateTime birthdate)
+        public int GetDataTypeFromUser(int usingMemberID, out int cursorLeft, out int cursorTop)
+        {
+            int dataType;
+
+            if (usingMemberID != Constant.ADMIN)
+            {
+                print.SetCursorAndWrite(5, Console.CursorTop + 2, "수정할 정보 | ");
+                dataType = DropBox(Console.CursorLeft, Console.CursorTop, Constant.ANSWER_WHAT_TO_EDIT);
+            }
+            else
+            {
+                dataType = Constant.EDIT_PASSWORD;
+            }
+            
+            Console.SetCursorPosition(5, Console.CursorTop + 2);
+            if (dataType == Constant.EDIT_PASSWORD) Console.Write("현재 ");
+            Console.Write(Constant.MEMBER_EDIT_OPTION[dataType] + " | ");
+
+            cursorLeft = Console.CursorLeft;
+            cursorTop = Console.CursorTop;
+
+            return dataType;
+        }
+
+        public bool IsPasswordCorrespond(string userInputMemberID, string userInputPassword)
+        {
+            string password = ConnectDatabase.SelectFromDatabase("password", "member", "member_id", userInputMemberID)[0];
+
+            if (string.Compare(password, userInputPassword) == 0) return true;
+            else return false;
+        }
+
+        public DateTime StringToDateTime(string date)
+        {
+            int year, day;
+            string month;
+
+            year = Int32.Parse(date.Remove(4));
+            month = date.Remove(7);
+            month = month.Remove(0, 5);
+            day = Int32.Parse(date.Remove(0, 8));
+
+            return new DateTime(year, Int32.Parse(month), day);
+        }
+
+        public void UserInformationFromDatabase(int memberID, out string name, out string address, out string phoneNumber, out DateTime birthDate)
+        {
+            string table = "member";
+            string conditionalExpression = " WHERE member_id=" + memberID;
+            string date;
+
+            name = ConnectDatabase.SelectFromDatabase("name", table, conditionalExpression)[0];
+            address = ConnectDatabase.SelectFromDatabase("address", table, conditionalExpression)[0];
+            phoneNumber = ConnectDatabase.SelectFromDatabase("phone_number", table, conditionalExpression)[0];
+            date = ConnectDatabase.SelectFromDatabase("birthdate", table, conditionalExpression)[0].Remove(10);
+            birthDate = StringToDateTime(date);
+
+            return;
+        }
+
+        public void UserInformationFromUser(out string name, out string userID, out string password, out string address, out string phoneNumber, out DateTime birthdate)
         {
             int errorMode;
             int address1, address2;

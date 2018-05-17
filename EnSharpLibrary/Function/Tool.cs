@@ -184,31 +184,7 @@ namespace EnSharpLibrary.Function
             else return false;
         }
 
-        public bool IsPasswordCorrespond(string userInputMemberID, string userInputPassword)
-        {
-            string password = "";
-
-            StringBuilder sql = new StringBuilder("SELECT password FROM member WHERE member_id=" + userInputMemberID + ";");
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read()) password = reader["password"].ToString();
-
-            reader.Close();
-            connect.Close();
-
-            if (string.Compare(password, userInputPassword) == 0) return true;
-            else return false;
-        }
+        
 
         public void MakeQuerry(string sql)
         {
