@@ -226,24 +226,7 @@ namespace EnSharpLibrary.Function
             connect.Close();
         }
 
-        public void RegisterMember(string name, int userID, string password, string address, string phoneNumber, DateTime birthdate)
-        {
-            StringBuilder sql = new StringBuilder("INSERT INTO member (member_id, name, address, phone_number, password, accumulated_overdue_number, overdue_number, birthdate)");
-            sql.Append("VALUES (" + userID + ",\'" + name + "\',\'" + address + "\',\'" + phoneNumber + "\',\'" + password + "\',0,0,\'" + birthdate.ToShortDateString() + "\');");
-            
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            command.ExecuteReader();
-
-            connect.Close();
-        }
+        
 
         public void AddBook(string name, string author, string publisher, int publishingYear, int price, float bookID)
         {

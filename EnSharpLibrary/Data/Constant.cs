@@ -280,7 +280,7 @@ namespace EnSharpLibrary.Data
         public const string KOREAN_PATTERN = "[ㄱ-ㅎㅏ-ㅣ가-힣]";
         public const string SPECIAL_LETTER = "[`~!@#$%^&*()\\-_=+\\{\\}\\[\\]\\\\\\|:;\"\'<>,.?/]";
 
-        public const string BLANK = "";
+        public const string BLANK = ""; 
 
         // Menu Class에서의 usingMemberID
         public const int PUBLIC = 0;

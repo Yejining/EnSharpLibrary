@@ -17,6 +17,82 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
+        public void GetUserInformation(out string name, out string userID, out string password, out string address, out string phoneNumber, out DateTime birthdate)
+        {
+            int errorMode;
+            int address1, address2;
+            int year, month, day;
+
+            // 초기화
+            name = Constant.BLANK;
+            userID = Constant.BLANK;
+            password = Constant.BLANK;
+            address = Constant.BLANK;
+            phoneNumber = Constant.BLANK;
+            birthdate = new DateTime(1980, 1, 1);
+
+            // - 이름
+            while (true)
+            {
+                name = Information(17, 11, 5, Constant.ONLY_KOREAN, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
+                errorMode = tool.IsValidAnswer(Constant.ANSWER_NAME, name);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
+                else break;
+            }
+
+            // - 학번
+            while (true)
+            {
+                userID = Information(17, 13, 8, Constant.ONLY_NUMBER, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
+                errorMode = tool.IsValidAnswer(Constant.ANSWER_USER_ID, userID);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
+                else break;
+            }
+
+            // - 암호
+            while (true)
+            {
+                password = Information(17, 15, 15, Constant.NO_KOREAN, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[5]);
+                errorMode = tool.IsValidAnswer(Constant.ANSWER_PASSWORD, password);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
+                else break;
+            }
+            
+            // - 주소
+            while (true)
+            {
+                address1 = DropBox(17, 17, Constant.ANSWER_ADDRESS);
+                if (address1 == -1) return;
+                Console.SetCursorPosition(17, 17);
+                Console.Write(Constant.DISTRICT[0][address1]);
+                address2 = DropBox(Console.CursorLeft + 1, 17, Constant.ANSWER_ADDRESS_DEEPLY + address1);
+                if (address2 == 2) return;
+                address = Constant.DISTRICT[0][address1] + " " + Constant.DISTRICT[address1 + 1][address2];
+                break;
+            }
+            
+            // 전화번호
+            while (true)
+            {
+                phoneNumber = PhoneNumber(21, 19);
+                if (IsCanceled(phoneNumber)) return;
+                else break;
+            }
+
+            // 생일
+            while (true)
+            {
+                year = DropBox(17, 21, Constant.ANSWER_BIRTHDATE_YEAR); if (year == -1) return;
+                month = DropBox(24, 21, Constant.ANSWER_BIRTHDATE_MONTH); if (month == -1) return;
+                day = DropBox(29, 21, Constant.ANSWER_BIRTHDATE_DAY); if (day == -1) return;
+                birthdate = Birthdate(year, month, day);
+                break;
+            }
+        }
+
         public bool IsQualifiedToBeNormal(ConsoleKey key, string condition)
         {
             if (key == ConsoleKey.Q && string.Compare(condition, "대출 가능") != 0 && !tool.IsDeleted(condition)) return true;
