@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Web;
+using System.IO;
+using System.Xml;
 using MySql.Data.MySqlClient;
 
 using EnSharpLibrary.Data;
@@ -14,10 +18,36 @@ namespace EnSharpLibrary.Function
     {
         Print print = new Print();
 
+        public void SetPointerStartPosition(int cursorLeft, int cursorTop, string pointer)
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.Write(pointer);
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+        }
+
+        public XmlDocument ConnectNaverAPIAndGetInformation(string searchingKeyword)
+        {
+            string url = Constant.URL + searchingKeyword + "&target=book&display=100";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Headers.Add("X-Naver-Client-Id", Constant.CLIENT_ID);
+            request.Headers.Add("X-Naver-Client-Secret", Constant.CLIENT_SECRET);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            Stream stream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+            string text = reader.ReadToEnd();
+            XmlDocument bookInformation = new XmlDocument();
+            bookInformation.LoadXml(text);
+            return bookInformation;
+        }
+
         public bool IsNormal(string condition, int memberID, float application_Number)
         {
             int count = ConnectDatabase.GetCountFromDatabase("history", " WHERE member_id=" + memberID + " AND FLOOR(book_id)=" + Math.Floor(application_Number) + " AND date_return IS NULL");
+            bool isValidUser = IsValidUser(memberID);
 
+            if (!isValidUser) return false;
             if (count != 0) return false;
             if (string.Compare(condition, "대출 가능") == 0) return true;
             else return false;
@@ -48,7 +78,7 @@ namespace EnSharpLibrary.Function
         /// <param name="startingLine">첫 선택지가 위치한 줄</param>
         /// <param name="interval">줄간격</param>
         /// <param name="pointer">포인터</param>
-        public void UpArrow(int cursorLocation, int startingLine, int countOfOption, int interval, char pointer)
+        public void UpArrow(int cursorLocation, int startingLine, int countOfOption, int interval, string pointer)
         {
             print.ClearOneLetter(cursorLocation);
             if (Console.CursorTop > startingLine) Console.SetCursorPosition(cursorLocation, Console.CursorTop - interval);
@@ -73,7 +103,7 @@ namespace EnSharpLibrary.Function
         /// <param name="countOfOption">선택지 개수</param>
         /// <param name="interval">줄간격</param>
         /// <param name="pointer">포인터</param>
-        public void DownArrow(int cursorLocation, int startingLine, int countOfOption, int interval, char pointer)
+        public void DownArrow(int cursorLocation, int startingLine, int countOfOption, int interval, string pointer)
         {
             print.ClearOneLetter(cursorLocation);
             if (Console.CursorTop < startingLine + (interval * (countOfOption - 1))) Console.SetCursorPosition(cursorLocation, Console.CursorTop + interval);
@@ -297,6 +327,12 @@ namespace EnSharpLibrary.Function
             else return true;
         }
 
+        /// <summary>
+        /// 입력취소 에러, 입력길이 에러 체크
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="userInputAnswer"></param>
+        /// <returns></returns>
         public int IsValidAnswer(int mode, string userInputAnswer)
         {
             if (string.Compare(userInputAnswer, "@입력취소@") == 0) return Constant.ESCAPE_KEY_ERROR;

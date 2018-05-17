@@ -18,10 +18,33 @@ namespace EnSharpLibrary.Function
 {
     class ConnectDatabase
     {
-        Tool tool = new Tool();
         static MySqlConnection connect;
         static MySqlCommand command;
         static MySqlDataReader reader;
+
+        public static void RegisterBookToDatabase(BookAPIVO book, int registeredCount, string count, int serialNumber)
+        {
+            int countToUpdate = registeredCount + Int32.Parse(count);
+
+            // sql문 작성
+            string values1 = "(\"" + book.Title + "\",\"" + book.Author + "\",\"" + book.Publisher + "\"," + book.Price + "," + book.Discount + ",\"";
+            string values2 = book.Pubdate + "\"," + count + ",\"" + book.Isbn + "\",\"" + book.Description + "\"," + serialNumber + ")";
+
+            // 데이터베이스에 저장_1(book_api)
+            if (registeredCount == 0) InsertIntoDatabase("book_api", Constant.ADD_BOOK_COLUMNS, values1 + values2);
+            else UpdateToDatabase("book_api", "count", countToUpdate.ToString(), "isbn", book.Isbn);
+
+            float applicationNumber;
+            string value;
+
+            // 데이터베이스에 저장_2(book_detail)
+            for (int create = 0; create < Int32.Parse(count); create++)
+            {
+                applicationNumber = serialNumber + ((float)(create + registeredCount) / 100);
+                value = "(" + applicationNumber.ToString("n2") + ",\"대출 가능\")"; 
+                InsertIntoDatabase("book_detail", Constant.INSERT_NEW_APPLICATION_NUMBER, value);
+            }
+        }
 
         public static void ConnectToMySQL()
         {
@@ -196,20 +219,6 @@ namespace EnSharpLibrary.Function
             UpdateToDatabase("book_detail", "book_condition", "대출 가능", "application_number", bookID);
         }
 
-        public static XmlDocument BookSearchResult(string searchingKeyword)
-        {
-            string url = Constant.URL + searchingKeyword + "&target=book&display=100";
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Headers.Add("X-Naver-Client-Id", Constant.CLIENT_ID);
-            request.Headers.Add("X-Naver-Client-Secret", Constant.CLIENT_SECRET);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-            Stream stream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-            string text = reader.ReadToEnd();
-            XmlDocument bookInformation = new XmlDocument();
-            bookInformation.LoadXml(text);
-            return bookInformation;
-        }
+        
     }
 }

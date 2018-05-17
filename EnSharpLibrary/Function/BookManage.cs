@@ -17,62 +17,109 @@ namespace EnSharpLibrary.Function
 
         int usingMemberID;
 
-        public void AddBookThroughNaverAPI(string title)
+        public int UsingMemberID
+        {
+            set { usingMemberID = value; }
+        }
+
+        public void SearchInRegisteredBook()
         {
             string name;
-            XmlDocument foundBook;
-            List<BookAPIVO> books;
+            string publisher;
+            string author;
+            
+            List<BookAPIVO> searchedBook;
             BookAPIVO book;
 
-            print.SetWindowsizeAndPrintTitle(45, 30, title);
+            GetSearchWordAndSearchInRegisteredBook(out searchedBook, out name, out publisher, out author);
+            if (getValue.IsCanceled(name) || getValue.IsCanceled(publisher) || getValue.IsCanceled(author)) return;
+
+            book = ListBooksAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, name, publisher, author);
+            if (book == null) return;
+        }
+
+        public void ExtendOrReturnBook()
+        {
+            List<string> bookID;
+            List<BookAPIVO> borrowedBook;
+            List<HistoryVO> histories;
+
+            ConsoleKeyInfo keyInfo;
+            bool isFirstLoop = true;
+            int cursorTop = 8;
+
+            // 회원이 빌린 책의 청구기호와 책 정보, 대출 기록 불러옴
+            getValue.InformationAboutBorrowedBookFromMember(usingMemberID, out bookID, out borrowedBook, out histories);
+
+            print.ManageBorrowedBookTitle();
 
             while (true)
             {
-                print.SearchCategoryAndGuideline(Constant.ADD_BOOK);
+                if (isFirstLoop)
+                {
+                    // 대출한 책 목록 출력
+                    getValue.InformationAboutBorrowedBookFromMember(usingMemberID, out bookID, out borrowedBook, out histories);
+                    print.BorrowedBook(cursorTop, borrowedBook, histories, bookID);
+                    tool.SetPointerStartPosition(4, cursorTop, "▷");
 
-                // 정보 수정
-                // - 도서명
-                name = getValue.Information(19, 11, 15, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[1]);
-                int errorMode = tool.IsValidAnswer(Constant.ANSWER_BOOK_NAME, name);
-                if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
-                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 15); continue; }
+                    if (borrowedBook.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
+                    
+                    isFirstLoop = false;
+                }
 
-                break;
+                keyInfo = Console.ReadKey();
+
+                // 키 입력을 통해 도서 연장/반납 등의 기능 수행
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, borrowedBook.Count, 1, "▷");
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, borrowedBook.Count, 1, "▷");
+                else if (keyInfo.Key == ConsoleKey.Q) isFirstLoop = Extend(histories[Console.CursorTop - cursorTop], bookID[Console.CursorTop - cursorTop]);
+                else if (keyInfo.Key == ConsoleKey.W) isFirstLoop = Return(bookID[Console.CursorTop - cursorTop]);
+                else if (keyInfo.Key == ConsoleKey.Escape) return;
+                else print.BlockCursorMove(4, "▷");                                                               
             }
+        }
 
-            foundBook = ConnectDatabase.BookSearchResult(name);
-            books = getValue.OrganizedFoundBook(foundBook);
-            book = ListRegisteredBookAndChooseOneBook(Constant.ADD_BOOK, books, name, Constant.BLANK, Constant.BLANK);
-            RegisterBook(book);
+        public void AddBookThroughNaverAPI()
+        {
+            string name;
+            List<BookAPIVO> books;
+            BookAPIVO bookToRegister;
+
+            print.SetWindowsizeAndPrintTitle(45, 30, "도서 검색 및 등록");
+
+            // 검색할 도서명 입력
+            name = getValue.BookNameToSearch();
+            if (getValue.IsCanceled(name)) return;
+
+            // 네이버에서 검색어와 일치하는 도서 검색, 등록할 책 선택 후 등록
+            books = getValue.MatchedBooksFromSearchWord(name);
+            bookToRegister = ListBooksAndChooseOneBook(Constant.ADD_BOOK, books, name, Constant.BLANK, Constant.BLANK);
+            if (bookToRegister != null) RegisterBook(bookToRegister);
 
             return;
         }
 
-        public void SearchInRegisteredBook(int usingMemberID)
+        public bool Extend(HistoryVO history, string bookID)
         {
-            int mode;
-            string name;
-            string publisher;
-            string author;
-            List<BookAPIVO> searchedBook;
-            BookAPIVO book;
+            if (history.NumberOfRenew != 2)
+            {
+                ConnectDatabase.Extend(bookID);
+                print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.EXTEND);
+            }
+            else print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.FAIL);
 
-            this.usingMemberID = usingMemberID;
-
-            // 사용자에 따른 모드 설정
-            if (usingMemberID == Constant.PUBLIC) mode = Constant.NON_MEMBER_MODE;
-            else mode = Constant.MEMBER_MODE;
-
-            GetSearchWordAndSearchInRegisteredBook(mode, out searchedBook, out name, out publisher, out author);
-            book = ListRegisteredBookAndChooseOneBook(Constant.BOOK_SEARCH_MODE, searchedBook, name, publisher, author);
-            ChangeBookCondition(book);
+            return true;
         }
 
-        /// <summary>
-        /// 도서 검색을 위한 메소드입니다.
-        /// </summary>
-        /// <param name="usingMemberID">사용자 학번</param>
-        public void GetSearchWordAndSearchInRegisteredBook(int mode, out List<BookAPIVO> searchedBook, out string bookName, out string publisher, out string author)
+        public bool Return(string bookID)
+        {
+            ConnectDatabase.Return(bookID);
+            print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.RETURN);
+
+            return true;
+        }
+        
+        public void GetSearchWordAndSearchInRegisteredBook(out List<BookAPIVO> searchedBook, out string bookName, out string publisher, out string author)
         {
             string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
 
@@ -81,144 +128,78 @@ namespace EnSharpLibrary.Function
             publisher = Constant.BLANK;
             author = Constant.BLANK;
 
-            while (true)
-            {
-                print.SetWindowsizeAndPrintTitle(45, 30, Constant.SEARCH_BOOK_TITLE[mode]);
-                print.SearchCategoryAndGuideline(Constant.BOOK_SEARCH_MODE);
+            print.SetWindowsizeAndPrintTitle(45, 30, Constant.SEARCH_BOOK_TITLE[0]);
+            print.SearchCategoryAndGuideline(Constant.BOOK_SEARCH_MODE);
 
-                // 정보 수집
-                bookName = getValue.Information(19, 11, 10, Constant.ALL_CHARACTER, guideline);
-                if (string.Compare(bookName, "@입력취소@") == 0) return;
-                publisher = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, guideline);
-                if (string.Compare(publisher, "@입력취소@") == 0) return;
-                author = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, guideline);
-                if (string.Compare(author, "@입력취소@") == 0) return;
+            // 정보 수집
+            bookName = getValue.Information(19, 11, 10, Constant.ALL_CHARACTER, guideline);
+            if (string.Compare(bookName, "@입력취소@") == 0) return;
+            publisher = getValue.Information(19, 13, 10, Constant.ALL_CHARACTER, guideline);
+            if (string.Compare(publisher, "@입력취소@") == 0) return;
+            author = getValue.Information(19, 15, 10, Constant.ALL_CHARACTER, guideline);
+            if (string.Compare(author, "@입력취소@") == 0) return;
 
-                // 조건 검색
-                searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);
-
-                // 상세 정보를 확인할 도서 선택
-                if (searchedBook.Count == 0) { print.ErrorMessage(Constant.THERE_IS_NO_BOOK, 22); return; }
-            }
+            // 조건 검색
+            searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);
         }
 
-        public BookAPIVO ListRegisteredBookAndChooseOneBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
+        public BookAPIVO ListBooksAndChooseOneBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
         {
+            BookAPIVO book;
             bool isFirstLoop = true;
+            int registeredCount;
             int cursorTop = 10;
             if (mode == Constant.BOOK_SEARCH_MODE) cursorTop = 12;
-            int index;
-
-            if (usingMemberID == Constant.ADMIN)
-            {
-                searchedBook = getValue.RegisteredBook();
-                name = Constant.BLANK;
-                publisher = Constant.BLANK;
-                author = Constant.BLANK;
-            }
 
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
             while (true)
             {
                 if (isFirstLoop)
                 {
-                    Console.SetCursorPosition(0, cursorTop - 2);
-                    print.SearchedBook(mode, searchedBook, name, publisher, author);
-                    Console.SetCursorPosition(4, cursorTop);
-                    Console.Write('▷');
-                    Console.SetCursorPosition(4, cursorTop);
+                    print.SearchedBook(mode, cursorTop, searchedBook, name, publisher, author);
+                    tool.SetPointerStartPosition(4, cursorTop, "▷");
                     isFirstLoop = false;
                 }
 
+                if (searchedBook.Count == 0) { tool.WaitUntilGetEscapeKey(); return null; }
+
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
-                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedBook.Count, 1, '▷');          // 위로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedBook.Count, 1, '▷'); // 밑으로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); break; }                   // 나가기
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedBook.Count, 1, "▷");          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedBook.Count, 1, "▷"); // 밑으로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.Escape) return null;                                                  // 나가기
                 else if (keyInfo.Key == ConsoleKey.Enter)                                                                // 해당 도서 자세히 보기
                 {
-                    index = Console.CursorTop - cursorTop;
+                    book = searchedBook[Console.CursorTop - cursorTop];
+                    registeredCount = getValue.RegisteredCount(book.Isbn);
+                    print.BookDetailInBookAdminMode(mode, book, registeredCount);
+                    if (usingMemberID != Constant.ADMIN) SelectBookToBorrow(book);
+                    else return book;
                     isFirstLoop = true;
-                    break;
                 }
                 else print.BlockCursorMove(4, "▷");                                                                      // 입력 무시 
             }
-            
-            BookAPIVO book = searchedBook[Console.CursorTop - cursorTop];
-
-            int registeredCount;
-            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
-            if (result.Count == 0) registeredCount = 0;
-            else registeredCount = Int32.Parse(result[0]);
-
-            Console.Clear();
-            print.BookDetailInBookAdminMode(mode, book, registeredCount);
-
-            return book;
         }
         
         public void RegisterBook(BookAPIVO book)
         {
-            int cursorLeft;
             int cursorTop;
-            string count;
-            int countToRenew;
+            string countToRegister;
+            int registeredCount;
             int serialNumber;
 
-            // 등록된 책이 몇 종류인지 알아냄
-            int registeredCount;
-            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
-            int countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
-            if (result.Count == 0) registeredCount = 0;
-            else registeredCount = Int32.Parse(result[0]);
-            
+            // 데이터베이스에 등록된 책의 숫자와 청구기호 구하기
+            getValue.SerialNumberAndRegisteredCount(book.Isbn, out serialNumber, out registeredCount);
 
-            // 청구기호에 쓰일 고유번호 계산(정수)
-            if (registeredCount == 0) serialNumber = countOfTableData + 1;
-            else serialNumber = Int32.Parse(ConnectDatabase.SelectFromDatabase("serial_number", "book_api", "isbn", book.Isbn)[0]);
-
-            // 커서 정보 저장
-            cursorLeft = Console.CursorLeft;
             cursorTop = Console.CursorTop;
 
-            // 저장할 권수 입력
-            while (true)
-            {
-                count = getValue.Information(cursorLeft, cursorTop, 3, Constant.ONLY_NUMBER, "숫자 입력(등록 취소:ESC)");
+            // 새로 등록할 수량 입력
+            countToRegister = getValue.BookCountToRegister(Console.CursorLeft, cursorTop, registeredCount);
+            if (getValue.IsCanceled(countToRegister)) return;
 
-                if (string.Compare(count, "@입력취소@") == 0) return;
-                else if (Int32.Parse(count) == 0) print.ErrorMessage(Constant.EXCEED_INPUT_ERROR, cursorTop + 2);
-                else if (count.Length == 0) print.ErrorMessage(Constant.LENGTH_ERROR, cursorTop + 2);
-                else if (Int32.Parse(count) + registeredCount > 99) print.ErrorMessage(Constant.EXCEED_INPUT_ERROR, cursorTop + 2);
-                else { countToRenew = Int32.Parse(count) + registeredCount; break; }
-            }
-
-            // sql문 작성
-            string values1 = "(\"" + book.Title + "\",\"" + book.Author + "\",\"" + book.Publisher + "\"," + book.Price + "," + book.Discount + ",\"";
-            string values2 = book.Pubdate + "\"," + count + ",\"" + book.Isbn + "\",\"" + book.Description + "\"," + serialNumber + ")";
-
-            // 데이터베이스에 저장_1
-            if (registeredCount == 0) ConnectDatabase.InsertIntoDatabase("book_api", Constant.ADD_BOOK_COLUMNS, values1 + values2);
-            else ConnectDatabase.UpdateToDatabase("book_api", "count", countToRenew.ToString(), "isbn", book.Isbn);
-
-            float applicationNumber;
-            string value;
-
-            // 데이터베이스에 저장_2
-            for (int create = 0; create < Int32.Parse(count); create++)
-            {
-                applicationNumber = serialNumber + ((float)(create + registeredCount) / 100);
-                value = "(" + applicationNumber.ToString("n2") + ",\"대출 가능\")";
-                ConnectDatabase.InsertIntoDatabase("book_detail", Constant.INSERT_NEW_APPLICATION_NUMBER, value);
-            }
-
-            // 완료 알림
-            Console.SetCursorPosition(4, cursorTop - 2);
-            Console.Write("등 록 된  수 량 | {0}", countToRenew);
-            Console.SetCursorPosition(0, cursorTop);
-            print.ClearCurrentConsoleLine();
-            print.PrintSentence("등록이 완료되었습니다!(나가기:ESC)", cursorTop, Constant.FOREGROUND_COLOR);
-
+            // 데이터베이스에 책 등록
+            ConnectDatabase.RegisterBookToDatabase(book, registeredCount, countToRegister, serialNumber);
+            print.CompleteToRegisterBook(4, cursorTop - 2, "등 록 된  수 량 | " + (registeredCount + Int32.Parse(countToRegister)));
             tool.WaitUntilGetEscapeKey();
         }
 
@@ -226,240 +207,105 @@ namespace EnSharpLibrary.Function
         {
             string guide;
             int cursorTop = Console.CursorTop + 2;
+            int registeredCount;
             int index;
             string currentCondition;
-            int currentIndex;
+            List<float> bookID;
+            List<string> condition;
+            List<string> memberID;
+            List<string> dateBorrowed;
+            List<string> deadline;
+            List<string> numberOfRenew;
+            
+            // 도서 정보 구하기
+            registeredCount = getValue.RegisteredCount(book.Isbn);
+            getValue.BookCondition(usingMemberID, registeredCount, book, out bookID, out condition);
+            getValue.BookCondition(registeredCount, book, bookID, condition, out memberID, out dateBorrowed, out deadline, out numberOfRenew);
 
-            int registeredCount;
-            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", book.Isbn);
-            if (result.Count == 0) registeredCount = 0;
-            else registeredCount = Int32.Parse(result[0]);
-
-
-            List<float> applicationNumber = new List<float>();
-            List<string> bookCondition = new List<string>();
-            List<string> memberID = new List<string>();
-            List<string> dateBorrowed = new List<string>();
-            List<string> dateDeadlineForReturn = new List<string>();
-            List<string> numberOfRenew = new List<string>();
-
-            for (int count = 0; count < registeredCount; count++)
-            {
-                applicationNumber.Add(book.SerialNumber + ((float)count / 100));
-                bookCondition.Add(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", applicationNumber[count].ToString("n2"))[0]);
-                if (string.Compare(bookCondition[count], "대출중") == 0)
-                {
-                    memberID.Add(getValue.DetailInformationAboutBorrowedMember(Constant.MEMBER_ID, applicationNumber[count]));
-                    dateBorrowed.Add(getValue.DetailInformationAboutBorrowedMember(Constant.DATE_BORROWED, applicationNumber[count]));
-                    dateDeadlineForReturn.Add(getValue.DetailInformationAboutBorrowedMember(Constant.DATE_DEADLINE_FOR_RETURN, applicationNumber[count]));
-                    numberOfRenew.Add(getValue.DetailInformationAboutBorrowedMember(Constant.NUMBER_OF_RENEW, applicationNumber[count]));
-                }
-            }
-
-            if (usingMemberID != Constant.ADMIN)
-            {
-                for (int count = bookCondition.Count - 1; count >= 0; count--)
-                {
-                    if (!tool.IsBorrowed(bookCondition[count]) && !tool.IsNotRented(bookCondition[count]))
-                    {
-                        bookCondition.RemoveAt(count);
-                        applicationNumber.RemoveAt(count);
-                    }
-                }
-
-                print.BookInLibrary(applicationNumber, bookCondition);
-            }
-            else
-            {
-                print.RegisteredBook(applicationNumber, bookCondition, memberID, dateBorrowed, dateDeadlineForReturn, numberOfRenew);
-            }
-
-            Console.SetCursorPosition(0, cursorTop);
+            // 도서 정보 출력
+            print.RegisteredBook(bookID, condition, memberID, dateBorrowed, deadline, numberOfRenew);
+            Console.SetCursorPosition(4, cursorTop);
 
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
             while (true)
             {
                 index = Console.CursorTop - cursorTop;
-                guide = getValue.GuideForModifyingBookCondition(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", applicationNumber[index].ToString("n2"))[0]);
-                if (usingMemberID == Constant.PUBLIC) { tool.WaitUntilGetEscapeKey(); return; }
-                else if (usingMemberID != Constant.ADMIN) { SelectBookToBorrow(bookCondition, applicationNumber); return; }
+                currentCondition = condition[index];
 
-                print.SetCursorAndChoice(4, Console.CursorTop, guide);
+                guide = getValue.GuideForModifyingBookCondition(bookID[index]);
+                Console.Write(guide);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-                currentCondition = bookCondition[index];
-                currentIndex = index;
-                bool isChanged = false;
 
                 if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, registeredCount, 1, Console.CursorLeft);          // 위로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, registeredCount, 1, Console.CursorLeft); // 밑으로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                              // 나가기
-                else if (keyInfo.Key == ConsoleKey.Q && string.Compare(bookCondition[index], "대출 가능") != 0 && !tool.IsDeleted(bookCondition[index]))
-                {
-                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "대출 가능", "application_number", applicationNumber[index].ToString("n2"));
-                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
-                    print.ClearGuideline(79, cursorTop, 89);
-                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
-                    print.SetCursorAndWrite(79, Console.CursorTop, "대출 가능");
-                    isChanged = true;
-                }
-                else if (keyInfo.Key == ConsoleKey.W && string.Compare(bookCondition[index], "분실") != 0 && !tool.IsDeleted(bookCondition[index]))
-                {
-                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "분실", "application_number", applicationNumber[index].ToString("n2"));
-                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
-                    print.ClearGuideline(79, cursorTop, 89);
-                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
-                    print.SetCursorAndWrite(79, Console.CursorTop, "분실");
-                    isChanged = true;
-                }
-                else if (keyInfo.Key == ConsoleKey.E && string.Compare(bookCondition[index], "훼손") != 0 && !tool.IsDeleted(bookCondition[index]))
-                {
-                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "훼손", "application_number", applicationNumber[index].ToString("n2"));
-                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
-                    print.ClearGuideline(79, cursorTop, 89);
-                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
-                    print.SetCursorAndWrite(79, Console.CursorTop, "훼손");
-                    isChanged = true;
-                }
-                else if (keyInfo.Key == ConsoleKey.R && string.Compare(bookCondition[index], "대출 가능") == 0 && !tool.IsDeleted(bookCondition[index]))
-                {
-                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "보관도서", "application_number", applicationNumber[index].ToString("n2"));
-                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
-                    print.ClearGuideline(79, cursorTop, 89);
-                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
-                    print.SetCursorAndWrite(79, Console.CursorTop, "보관도서");
-                    isChanged = true;
-                }
-                else if (keyInfo.Key == ConsoleKey.T && !tool.IsDeleted(bookCondition[index]))
-                {
-                    ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "삭제", "application_number", applicationNumber[index].ToString("n2"));
-                    print.ClearGuideline(4, cursorTop, Console.CursorLeft);
-                    print.ClearGuideline(79, cursorTop, 89);
-                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
-                    print.SetCursorAndWrite(79, Console.CursorTop, "삭제");
-                    isChanged = true;
-                }
-                else print.BlockCursorMove(4, guide);                                                                 // 입력 무시 
-                
-                if (tool.IsBorrowed(currentCondition) && isChanged)
-                {
-                    ConnectDatabase.UpdateToDatabase("history", "date_return", "NOW()", "book_id", applicationNumber[index].ToString("n2"), "date_return");
-                    print.SetCursorAndWrite(95, Console.CursorTop, new string(' ', Console.WindowWidth - 96));
-                }
+                else if (keyInfo.Key == ConsoleKey.Escape) return;                                                                  // 나가기
+                else if (getValue.IsQualifiedToBeNormal(keyInfo.Key, currentCondition)) ChangeBookCondition(cursorTop, bookID[index], "대출 가능", currentCondition);
+                else if (getValue.IsQualifiedToBeLost(keyInfo.Key, currentCondition)) ChangeBookCondition(cursorTop, bookID[index], "분실", currentCondition);
+                else if (getValue.IsQualifiedToBeDamaged(keyInfo.Key, currentCondition)) ChangeBookCondition(cursorTop, bookID[index], "훼손", currentCondition);
+                else if (getValue.IsQualifiedToBeSaved(keyInfo.Key, currentCondition)) ChangeBookCondition(cursorTop, bookID[index], "보관도서", currentCondition);
+                else if (getValue.IsQualiiedToBeDeleted(keyInfo.Key, currentCondition)) ChangeBookCondition(cursorTop, bookID[index], "삭제", currentCondition);
+                else print.BlockCursorMove(4, guide);
             }
         }
 
-        public void SelectBookToBorrow(List<string> bookCondition, List<float> applicationNumber)
+        public void ChangeBookCondition(int cursorTop, float bookID, string condition, string currentCondition)
+        {
+            ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", condition, "application_number", bookID.ToString("n2"));
+            print.ClearGuideline(4, cursorTop, Console.CursorLeft);
+            print.ClearGuideline(79, cursorTop, 89);
+            print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
+            print.SetCursorAndWrite(79, Console.CursorTop, condition);
+
+            if (tool.IsBorrowed(currentCondition))
+            {
+                ConnectDatabase.UpdateToDatabase("history", "date_return", "NOW()", "book_id", bookID.ToString("n2"), "date_return");
+                print.SetCursorAndWrite(95, Console.CursorTop, new string(' ', Console.WindowWidth - 96));
+            }
+        }
+
+        public void SelectBookToBorrow(BookAPIVO book)
         {
             int index;
-            int cursorTop = Console.CursorTop + 3;
-            string currentCondition;
-            bool isValidUser = true;
+            int cursorTop = Console.CursorTop + 5;
+            int registeredCount;
 
-            Console.SetCursorPosition(0, cursorTop);
+            List<float> bookID;
+            List<string> condition;
 
+            // 도서 정보 구하기
+            registeredCount = getValue.RegisteredCount(book.Isbn);
+            getValue.BookCondition(usingMemberID, registeredCount, book, out bookID, out condition);
+
+            // 도서 정보 출력
+            print.BookInLibrary(bookID, condition);
+
+            if (usingMemberID == Constant.PUBLIC) { tool.WaitUntilGetEscapeKey(); return; }
+
+            print.SetCursorAndChoice(30, cursorTop, "▷");
             while (true)
             {
                 index = Console.CursorTop - cursorTop;
-                print.SetCursorAndChoice(30, Console.CursorTop, "▷");
-
-                isValidUser = tool.IsValidUser(usingMemberID);
-                if (!tool.IsNormal(bookCondition[index], usingMemberID, applicationNumber[index]) || !isValidUser) print.NonAvailableLectureMark(30, Console.CursorTop);
+                if (!tool.IsNormal(condition[index], usingMemberID, bookID[index])) print.NonAvailableBookMark(30, Console.CursorTop);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
-                currentCondition = bookCondition[index];
-
-                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(30, cursorTop, bookCondition.Count, 1, Console.CursorLeft);          // 위로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(30, cursorTop, bookCondition.Count, 1, Console.CursorLeft); // 밑으로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(30, "▷"); return; }                                  // 나가기
-                else if (keyInfo.Key == ConsoleKey.Enter)
-                {
-                    // 대출
-                    if (tool.IsNormal(bookCondition[index], usingMemberID, applicationNumber[index]) && isValidUser)
-                    {
-                        ConnectDatabase.BorrowBook(usingMemberID, applicationNumber[index].ToString("n2"));
-                        print.CompleteOrFaildProcess(30, cursorTop, Constant.BORROW);
-                    }
-                    else print.CompleteOrFaildProcess(30, Console.CursorTop, Constant.FAIL);
-                }
-                else print.BlockCursorMove(30, "▷");                                                                                    // 입력 무시
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(30, cursorTop, condition.Count, 1, "▷");          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(30, cursorTop, condition.Count, 1, "▷"); // 밑으로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(30, "▷"); return; }                // 나가기
+                else if (keyInfo.Key == ConsoleKey.Enter) BorrowBook(condition[index], usingMemberID, bookID[index]);  // 대출
+                else print.BlockCursorMove(30, "▷");                                                                  // 입력 무시
             }
         }
 
-        /// <summary>
-        /// 사용자가 자신이 대출한 책을 보고, 연장하거나 반납하도록 하는 메소드입니다.
-        /// </summary>
-        /// <param name="usingMemberID">사용자 학번</param>
-        public void ManageBorrowedBook(int usingMemberID)
+        public void BorrowBook(string condition, int usingMemberID, float bookID)
         {
-            bool isFirstLoop = true;
-            int cursorTop = 8;
-
-            this.usingMemberID = usingMemberID;
-
-            string conditionalExpression = " WHERE member_id =" + usingMemberID.ToString() + " AND date_return IS NULL";
-
-            List<string> bookID = ConnectDatabase.SelectFromDatabase("book_id", "history", conditionalExpression);
-            bookID = getValue.CorrectBookID(bookID);
-            List<BookAPIVO> borrowedBook = getValue.SearchBookByID(usingMemberID, bookID);
-            List<HistoryVO> histories = getValue.SearchHistoryByID(usingMemberID, bookID);
-
-            print.ManageBorrowedBookTitle();
-            Console.SetCursorPosition(0, cursorTop);
-            print.BorrowedBook(borrowedBook, histories, bookID);
-
-            while (true)
+            if (tool.IsNormal(condition, usingMemberID, bookID))
             {
-                if (isFirstLoop)
-                {
-                    // 대출한 책 목록 출력
-                    print.ClearBoard(cursorTop, borrowedBook.Count + 4);
-                    Console.SetCursorPosition(0, cursorTop);
-                    bookID = ConnectDatabase.SelectFromDatabase("book_id", "history", conditionalExpression);
-                    bookID = getValue.CorrectBookID(bookID);
-                    borrowedBook = getValue.SearchBookByID(usingMemberID, bookID);
-                    histories = getValue.SearchHistoryByID(usingMemberID, bookID);
-                    print.BorrowedBook(borrowedBook, histories, bookID);
-                    print.PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
-
-                    if (borrowedBook.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
-
-                    Console.SetCursorPosition(4, cursorTop);
-                    Console.Write('▷');
-                    Console.SetCursorPosition(4, cursorTop);
-                    isFirstLoop = false;
-                }
-
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, borrowedBook.Count, 1, '▷');          // 위로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, borrowedBook.Count, 1, '▷'); // 밑으로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.Q)
-                {
-                    // 연장
-                    if (histories[Console.CursorTop - cursorTop].NumberOfRenew != 2)
-                    {
-                        ConnectDatabase.Extend(bookID[Console.CursorTop - cursorTop]);
-                        print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.EXTEND);
-                    }
-                    else print.CompleteOrFaildProcess(4, cursorTop, Constant.FAIL);
-                    isFirstLoop = true;
-                }
-                else if (keyInfo.Key == ConsoleKey.W)
-                {
-                    // 반납
-                    ConnectDatabase.Return(bookID[Console.CursorTop - cursorTop]);
-                    print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.RETURN);
-                    isFirstLoop = true;
-                }
-                else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }            // 나가기
-                else print.BlockCursorMove(4, "▷");                                                              // 입력 무시 
+                ConnectDatabase.BorrowBook(usingMemberID, bookID.ToString("n2"));
+                print.CompleteOrFaildProcess(30, Console.CursorTop, Constant.BORROW);
             }
+            else print.CompleteOrFaildProcess(30, Console.CursorTop, Constant.FAIL);
         }
     }
 }
-
-
-

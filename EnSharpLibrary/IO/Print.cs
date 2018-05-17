@@ -10,6 +10,14 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
+        public void CompleteToRegisterBook(int cursorLeft, int cursorTop, string message)
+        {
+            SetCursorAndWrite(cursorLeft, cursorTop, message);
+            Console.SetCursorPosition(0, cursorTop + 2);
+            ClearCurrentConsoleLine();
+            PrintSentence(Constant.COMPLETE_TO_REGISTER, cursorTop + 2, Constant.FOREGROUND_COLOR);
+        }
+
         public void BookInLibrary(List<float> applicationNumber, List<string> bookCondition)
         {
             Console.SetCursorPosition(0, Console.CursorTop + 3);
@@ -352,7 +360,7 @@ namespace EnSharpLibrary.IO
             Books(searchedBook, Console.CursorTop);
         }
 
-        public void SearchedBook(int mode, List<BookAPIVO> searchedBook, string bookName, string publisher, string author)
+        public void SearchedBook(int mode, int cursorTop, List<BookAPIVO> searchedBook, string bookName, string publisher, string author)
         {
             string[] guideline;
 
@@ -363,11 +371,14 @@ namespace EnSharpLibrary.IO
             Console.SetWindowSize(155, 35);
             Console.Clear();
 
+            Console.SetCursorPosition(0, cursorTop);
             SearchedTitle(mode, bookName, publisher, author);
             Console.SetCursorPosition(0, Console.CursorTop + 3);
+            if (mode == Constant.ADD_BOOK) Console.SetCursorPosition(0, Console.CursorTop + 2);
             foreach (string guide in guideline) Console.WriteLine(guide);
 
             Books(mode, searchedBook, Console.CursorTop);
+            PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
         }
 
         public void SearchedBookWithMoreDetail(BookAPIVO book, int count)
@@ -376,8 +387,11 @@ namespace EnSharpLibrary.IO
             
         }
 
-        public void BorrowedBook(List<BookAPIVO> books, List<HistoryVO> histories, List<string> numbers)
+        public void BorrowedBook(int cursorTop, List<BookAPIVO> books, List<HistoryVO> histories, List<string> numbers)
         {
+            ClearBoard(cursorTop, Console.WindowHeight);
+            Console.SetCursorPosition(0, cursorTop);
+
             for (int order = 0; order < books.Count; order++)
             {
                 Console.SetCursorPosition(18, Console.CursorTop);
@@ -393,6 +407,8 @@ namespace EnSharpLibrary.IO
                 Console.SetCursorPosition(118, Console.CursorTop);
                 Console.WriteLine(numbers[order]);
             }
+
+            PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
         }
 
         public void SearchedMember(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string age, string address)
@@ -525,7 +541,7 @@ namespace EnSharpLibrary.IO
             ClearCurrentConsoleLine();
         }
 
-        public void NonAvailableLectureMark(int cursorLeft, int cursorTop)
+        public void NonAvailableBookMark(int cursorLeft, int cursorTop)
         {
             Console.SetCursorPosition(cursorLeft, cursorTop);
             Console.Write(" X");

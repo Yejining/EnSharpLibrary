@@ -44,6 +44,8 @@ namespace EnSharpLibrary.Function
                     if (usingMemberID == Constant.ADMIN) optionCount = 6;
                     else optionCount = 5;
 
+                    bookManage.UsingMemberID = usingMemberID;
+
                     // 메뉴 출력
                     print.SetWindowsizeAndPrintTitle(45, 30, "");
                     print.MenuOption(mode, Console.CursorTop + 2);
@@ -59,8 +61,8 @@ namespace EnSharpLibrary.Function
                 // 기능 선택
                 switch(keyInfo.Key)
                 {
-                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, optionCount, 2, '◁'); break;
-                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, optionCount, 2, '◁'); break;
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, optionCount, 2, "◁"); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, optionCount, 2, "◁"); break;
                     case ConsoleKey.Enter: isFirstLoop = StartMenu(Console.CursorTop);
                         if (Console.CursorTop == Constant.CLOSE_PROGRAM) return; break;
                     default: print.BlockCursorMove(38, "◁"); break;
@@ -77,12 +79,12 @@ namespace EnSharpLibrary.Function
             switch (Console.CursorTop)                                           // 비회원,          회원,          관리자
             {
                 case Constant.RELEVANT_TO_BOOK:                                  // 비회원 도서검색, 도서대출.      도서관리
-                    if (usingMemberID != Constant.ADMIN) bookManage.SearchInRegisteredBook(usingMemberID);
+                    if (usingMemberID != Constant.ADMIN) bookManage.SearchInRegisteredBook();
                     else ManageBookMenu();
                     break;
                 case Constant.LOG_IN_OR_CHECK_BORROWED_BOOK_OR_MANAGE_MEMBER:    // 로그인,          연장 및 반납,  회원관리
                     if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.LogIn(Constant.MEMBER_MODE);
-                    else if (usingMemberID != Constant.ADMIN) bookManage.ManageBorrowedBook(usingMemberID);
+                    else if (usingMemberID != Constant.ADMIN) bookManage.ExtendOrReturnBook();
                     else memberManage.ManageMember();
                     break;
                 case Constant.JOIN_IN_OR_UPDATE_USER_INFORMATION:                // 회원가입,        정보수정,      암호수정
@@ -127,8 +129,8 @@ namespace EnSharpLibrary.Function
                 // 기능 선택
                 switch (keyInfo.Key)
                 {
-                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, '◁'); break;
-                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, '◁'); break;
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 2, 2, "◁"); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 2, 2, "◁"); break;
                     case ConsoleKey.Enter: isTimeToGo = true; break;
                     case ConsoleKey.Escape: return;
                     default: print.BlockCursorMove(38, "◁"); break;
@@ -139,11 +141,11 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.APPEND_BOOK: bookManage.AddBookThroughNaverAPI("도서 검색 및 등록"); break;
+                case Constant.APPEND_BOOK: bookManage.AddBookThroughNaverAPI(); break;
                 case Constant.MANAGE_REGISTERED_BOOK:
                     {
-                        book = bookManage.ListRegisteredBookAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK);
-                        bookManage.ChangeBookCondition(book);
+                        book = bookManage.ListBooksAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK);
+                        if (book != null) bookManage.ChangeBookCondition(book);
                         break;
                     }
             }

@@ -17,8 +17,140 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
-        public string GuideForModifyingBookCondition(string bookCondition)
+        public bool IsQualifiedToBeNormal(ConsoleKey key, string condition)
         {
+            if (key == ConsoleKey.Q && string.Compare(condition, "대출 가능") != 0 && !tool.IsDeleted(condition)) return true;
+            else return false;
+        }
+
+        public bool IsQualifiedToBeLost(ConsoleKey key, string condition)
+        {
+            if (key == ConsoleKey.W && string.Compare(condition, "분실") != 0 && !tool.IsDeleted(condition)) return true;
+            else return false;
+        }
+
+        public bool IsQualifiedToBeDamaged(ConsoleKey key, string condition)
+        {
+            if (key == ConsoleKey.E && string.Compare(condition, "훼손") != 0 && !tool.IsDeleted(condition)) return true;
+            else return false;
+        }
+
+        public bool IsQualifiedToBeSaved(ConsoleKey key, string condition)
+        {
+            if (key == ConsoleKey.R && string.Compare(condition, "대출 가능") == 0 && !tool.IsDeleted(condition)) return true;
+            else return false;
+        }
+
+        public bool IsQualiiedToBeDeleted(ConsoleKey key, string condition)
+        {
+            if (key == ConsoleKey.T && !tool.IsDeleted(condition)) return true;
+            else return false;
+        }
+
+        public void BookCondition(int usingMemberID, int registeredCount, BookAPIVO book, out List<float> bookID, out List<string> condition)
+        {
+            bookID = new List<float>();
+            condition = new List<string>();
+
+            for (int count = 0; count < registeredCount; count++)
+            {
+                bookID.Add(book.SerialNumber + ((float)count / 100));
+                condition.Add(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", bookID[count].ToString("n2"))[0]);
+            }
+
+            for (int count = condition.Count - 1; count >= 0; count--)
+            {
+                if (usingMemberID != Constant.ADMIN && !tool.IsBorrowed(condition[count]) && !tool.IsNotRented(condition[count]))
+                {
+                    condition.RemoveAt(count);
+                    bookID.RemoveAt(count);
+                }
+            }
+        }
+
+        public void BookCondition(int registeredCount, BookAPIVO book, List<float> applicationNumber, List<string> bookCondition,
+            out List<string> memberID, out List<string> dateBorrowed, out List<string> dateDeadlineForReturn, out List<string> numberOfRenew)
+        {
+            memberID = new List<string>();
+            dateBorrowed = new List<string>();
+            dateDeadlineForReturn = new List<string>();
+            numberOfRenew = new List<string>();
+
+            for (int count = 0; count < registeredCount; count++)
+            {
+                if (string.Compare(bookCondition[count], "대출중") == 0)
+                {
+                    memberID.Add(DetailInformationAboutBorrowedMember(Constant.MEMBER_ID, applicationNumber[count]));
+                    dateBorrowed.Add(DetailInformationAboutBorrowedMember(Constant.DATE_BORROWED, applicationNumber[count]));
+                    dateDeadlineForReturn.Add(DetailInformationAboutBorrowedMember(Constant.DATE_DEADLINE_FOR_RETURN, applicationNumber[count]));
+                    numberOfRenew.Add(DetailInformationAboutBorrowedMember(Constant.NUMBER_OF_RENEW, applicationNumber[count]));
+                }
+            }
+        }
+
+        public string BookCountToRegister(int cursorLeft, int cursorTop, int registeredCount)
+        {
+            string count;
+
+            while (true)
+            {
+                count = Information(cursorLeft, cursorTop, 3, Constant.ONLY_NUMBER, "숫자 입력(등록 취소:ESC)");
+
+                if (IsCanceled(count)) return Constant.CANCELED_INPUT;
+                else if (Int32.Parse(count) == 0) print.ErrorMessage(Constant.EXCEED_INPUT_ERROR, cursorTop + 2);
+                else if (count.Length == 0) print.ErrorMessage(Constant.LENGTH_ERROR, cursorTop + 2);
+                else if (Int32.Parse(count) + registeredCount > 99) print.ErrorMessage(Constant.EXCEED_INPUT_ERROR, cursorTop + 2);
+                else { count = Int32.Parse(count).ToString(); break; }
+            }
+
+            return count;
+        }
+
+        public void SerialNumberAndRegisteredCount(string isbn, out int serialNumber, out int registeredCount)
+        {
+            int countOfTableData;
+
+            // 등록된 책이 몇 종류인지 알아냄
+            registeredCount = RegisteredCount(isbn);
+            countOfTableData = ConnectDatabase.GetCountFromDatabase("book_api", Constant.BLANK, Constant.BLANK);
+
+            // 청구기호에 쓰일 고유번호 계산(정수)
+            if (registeredCount == 0) serialNumber = countOfTableData + 1;
+            else serialNumber = Int32.Parse(ConnectDatabase.SelectFromDatabase("serial_number", "book_api", "isbn", isbn)[0]);
+        }
+
+        public string BookNameToSearch()
+        {
+            string name;
+            int errorMode;
+
+            while (true)
+            {
+                print.SearchCategoryAndGuideline(Constant.ADD_BOOK);
+
+                // 정보 수정
+                // - 도서명
+                name = Information(19, 11, 15, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[1]);
+                errorMode = tool.IsValidAnswer(Constant.ANSWER_BOOK_NAME, name);
+                if (errorMode == Constant.ESCAPE_KEY_ERROR) return Constant.CANCELED_INPUT;
+                else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 15); continue; }
+
+                break;
+            }
+
+            return name;
+        }
+
+        public bool IsCanceled(string searchWord)
+        {
+            if (string.Compare(searchWord, Constant.CANCELED_INPUT) == 0) return true;
+            else return false;
+        }
+
+        public string GuideForModifyingBookCondition(float bookID)
+        {
+            string bookCondition = ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", bookID.ToString("n2"))[0];
+
             if (string.Compare(bookCondition, "삭제") == 0) return "                           X";
 
             if (string.Compare(bookCondition, "대출 가능") == 0) return Constant.GUIDE_FOR_MODIFYING_BOOK_CONDITION[0];
@@ -59,11 +191,13 @@ namespace EnSharpLibrary.IO
             return books;
         }
 
-        public List<BookAPIVO> OrganizedFoundBook(XmlDocument bookInformation)
+        public List<BookAPIVO> MatchedBooksFromSearchWord(string nameToSearch)
         {
             List<BookAPIVO> books = new List<BookAPIVO>();
             List<string> bookTitle;
             List<string> bookDescription;
+
+            XmlDocument bookInformation = tool.ConnectNaverAPIAndGetInformation(nameToSearch);
 
             XmlNodeList title = bookInformation.GetElementsByTagName("title");
             bookTitle = CleareaceKeyword(title);
@@ -168,6 +302,33 @@ namespace EnSharpLibrary.IO
             }
 
             return books;
+        }
+
+        public void InformationAboutBorrowedBookFromMember(int usingMemberID, out List<string> bookID, out List<BookAPIVO> borrowedBook, out List<HistoryVO> histories)
+        {
+            bookID = BookIDFromDatabase(usingMemberID);
+            borrowedBook = SearchBookByID(usingMemberID, bookID);
+            histories = SearchHistoryByID(usingMemberID, bookID);
+
+            return;
+        }
+
+        public int RegisteredCount(string isbn)
+        {
+            List<string> result = ConnectDatabase.SelectFromDatabase("count", "book_api", "isbn", isbn);
+
+            if (result.Count == 0) return 0;
+            else return Int32.Parse(result[0]);
+        }
+
+        public List<string> BookIDFromDatabase(int usingMemberID)
+        {
+            string conditionalExpression = " WHERE member_id =" + usingMemberID.ToString() + " AND date_return IS NULL";
+
+            List<string> bookID = ConnectDatabase.SelectFromDatabase("book_id", "history", conditionalExpression);
+            bookID = CorrectBookID(bookID);
+
+            return bookID;
         }
 
         public List<string> CorrectBookID(List<string> bookID)

@@ -268,6 +268,7 @@ namespace EnSharpLibrary.Data
         public static string CLIENT_SECRET = "9hOYQ7WQkY";
 
         public static string SEARCH_MEMBER_TITLE = "등록된 회원 관리";
+        public static string COMPLETE_TO_REGISTER = "등록이 완료되었습니다!(나가기:ESC)";
 
         public static string ADD_BOOK_COLUMNS = "(name, author, publisher, price, discount, publishing_date, count, isbn, description, serial_number)";
         public static string INSERT_NEW_APPLICATION_NUMBER = "(application_number, book_condition)";
@@ -365,6 +366,7 @@ namespace EnSharpLibrary.Data
         public const int OVERRIDE_ERROR = 6;
         public const int WRONG_LENGTH_ERROR = 7;
         public const int EXCEED_INPUT_ERROR = 8;
+        public const string CANCELED_INPUT = "@입력취소@";
 
         // MemberMabage.ChangeUserInformation에서 사용
         public const int EDIT_ADDRESS = 0;
