@@ -22,6 +22,11 @@ namespace EnSharpLibrary.Function
             set { usingMemberID = value; }
         }
 
+        /// <summary>
+        /// 비회원이나 회원이 도서검색할 때 이용하는 메소드입니다.
+        /// 도서명, 출판사명, 저자명을 입력해 조건에 맞는 도서를 검색하고,
+        /// 해당 도서들 중 한 권을 선택하면 그 도서의 상세정보를 확인할 수 있습니다.
+        /// </summary>
         public void SearchInRegisteredBook()
         {
             string name;
@@ -39,6 +44,9 @@ namespace EnSharpLibrary.Function
             if (book == null) return;
         }
 
+        /// <summary>
+        /// 책의 반납기한을 연장하거나 반납하는 메소드입니다.
+        /// </summary>
         public void ExtendOrReturnBook()
         {
             List<string> bookID;
@@ -80,6 +88,9 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        /// <summary>
+        /// 관리자가 새로운 도서를 검색하고 등록하는 메소드입니다.
+        /// </summary>
         public void AddBookThroughNaverAPI()
         {
             string name;
@@ -105,6 +116,12 @@ namespace EnSharpLibrary.Function
             return;
         }
 
+        /// <summary>
+        /// 도서의 반납예정일을 연장하는 메소드입니다.
+        /// </summary>
+        /// <param name="history">해당 도서의 대여기록</param>
+        /// <param name="bookID">해당 도서 청구기호</param>
+        /// <returns>true</returns>
         public bool Extend(HistoryVO history, string bookID)
         {
             string title = ConnectDatabase.SelectFromDatabase("name", "book_api", "serial_number", "FLOOR(" + bookID + ")")[0];
@@ -120,6 +137,11 @@ namespace EnSharpLibrary.Function
             return true;
         }
 
+        /// <summary>
+        /// 해당 도서를 반납하는 메소드입니다.
+        /// </summary>
+        /// <param name="bookID">해당 도서 청구기호</param>
+        /// <returns>true</returns>
         public bool Return(string bookID)
         {
             string title = ConnectDatabase.SelectFromDatabase("name", "book_api", "serial_number", "FLOOR(" + bookID + ")")[0];
@@ -131,6 +153,14 @@ namespace EnSharpLibrary.Function
             return true;
         }
         
+        /// <summary>
+        /// 사용자로부터 도서명, 출판사명, 저자명의 검색어를 입력받고,
+        /// 등록된 책에서 검색어와 일치하는 책을 찾아내는 메소드입니다.
+        /// </summary>
+        /// <param name="searchedBook"></param>
+        /// <param name="bookName"></param>
+        /// <param name="publisher"></param>
+        /// <param name="author"></param>
         public void GetSearchWordAndSearchInRegisteredBook(out List<BookAPIVO> searchedBook, out string bookName, out string publisher, out string author)
         {
             string guideline = Constant.BOOK_SEARCH_CATEGORY_AND_GUIDELINE[1];
@@ -155,6 +185,15 @@ namespace EnSharpLibrary.Function
             searchedBook = getValue.SearchBookByCondition(bookName, publisher, author);
         }
 
+        /// <summary>
+        /// 검색된 도서의 목록을출력하고 그 중에서 한 권의 책을 선택하는 메소드입니다.
+        /// </summary>
+        /// <param name="mode">사용 모드</param>
+        /// <param name="searchedBook">검색된 책들</param>
+        /// <param name="name">사용자가 입력한 도서명</param>
+        /// <param name="publisher">사용자가 입력한 출판사명</param>
+        /// <param name="author">사용자가 입력한 저자명</param>
+        /// <returns>사용자가 선택한 책</returns>
         public BookAPIVO ListBooksAndChooseOneBook(int mode, List<BookAPIVO> searchedBook, string name, string publisher, string author)
         {
             BookAPIVO book;
@@ -202,6 +241,10 @@ namespace EnSharpLibrary.Function
             }
         }
         
+        /// <summary>
+        /// 관리자가 책을 등록하는 메소드입니다.
+        /// </summary>
+        /// <param name="book">등록할 책</param>
         public void RegisterBook(BookAPIVO book)
         {
             int cursorTop;
@@ -225,6 +268,10 @@ namespace EnSharpLibrary.Function
             tool.WaitUntilGetEscapeKey();
         }
 
+        /// <summary>
+        /// 도서의 상태를 바꾸는 메소드입니다.
+        /// </summary>
+        /// <param name="book">상태를 바꿀 도서</param>
         public void ChangeBookCondition(BookAPIVO book)
         {
             string guide;
@@ -271,6 +318,13 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        /// <summary>
+        /// 도서의 상태를 바꾸는 메소드입니다.
+        /// </summary>
+        /// <param name="cursorTop">커서 정보</param>
+        /// <param name="bookID">청구기호</param>
+        /// <param name="condition">바꿀 도서 상태</param>
+        /// <param name="currentCondition">이전 도서 상태</param>
         public void ChangeBookCondition(int cursorTop, float bookID, string condition, string currentCondition)
         {
             string title = ConnectDatabase.SelectFromDatabase("name", "book_api", " WHERE serial_number=Floor(" + bookID.ToString("n2") + ")")[0];
@@ -290,6 +344,10 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        /// <summary>
+        /// 대여할 도서를 고르는 메소드입니다.
+        /// </summary>
+        /// <param name="book">도서 정보</param>
         public void SelectBookToBorrow(BookAPIVO book)
         {
             int index;
@@ -324,6 +382,13 @@ namespace EnSharpLibrary.Function
             }
         }
 
+        /// <summary>
+        /// 도서를 대여하는 메소드입니다.
+        /// </summary>
+        /// <param name="condition">도서 상태</param>
+        /// <param name="usingMemberID">사용 회원 학번</param>
+        /// <param name="title">도서명</param>
+        /// <param name="bookID">도서 청구기호</param>
         public void BorrowBook(string condition, int usingMemberID, string title, float bookID)
         {
             if (getValue.IsNormal(condition, usingMemberID, bookID))
