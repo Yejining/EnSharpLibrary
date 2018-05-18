@@ -48,7 +48,7 @@ namespace EnSharpLibrary.Function
                     memberID = getValue.Information(17, 11, 8, Constant.ONLY_NUMBER, Constant.LOGIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
                     if (getValue.IsCanceled(memberID)) return 0;
                     else if (memberID.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 17); continue; }
-                    else if (!tool.IsExist(memberID)) { print.ErrorMessage(Constant.THERE_IS_NO_SUCH_ID, 17); continue; }
+                    else if (!getValue.IsExist(memberID)) { print.ErrorMessage(Constant.THERE_IS_NO_SUCH_ID, 17); continue; }
                 }
                 else memberID = Constant.ADMIN.ToString();
 

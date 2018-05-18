@@ -10,6 +10,14 @@ namespace EnSharpLibrary.IO
 {
     class Print
     {
+        public void SetPointerStartPosition(int cursorLeft, int cursorTop, string pointer)
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+            Console.Write(pointer);
+            Console.SetCursorPosition(cursorLeft, cursorTop);
+        }
+
         public void ChangeUserInformationTitle(int usingMemberID, string name, string address, string phoneNumber, DateTime birthDate)
         {
             if (usingMemberID == Constant.ADMIN)

@@ -119,7 +119,7 @@ namespace EnSharpLibrary.IO
             while (true)
             {
                 name = Information(17, 11, 5, Constant.ONLY_KOREAN, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[1]);
-                errorMode = tool.IsValidAnswer(Constant.ANSWER_NAME, name);
+                errorMode = IsValidAnswer(Constant.ANSWER_NAME, name);
                 if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
                 else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
                 else break;
@@ -129,7 +129,7 @@ namespace EnSharpLibrary.IO
             while (true)
             {
                 userID = Information(17, 13, 8, Constant.ONLY_NUMBER, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[3]);
-                errorMode = tool.IsValidAnswer(Constant.ANSWER_USER_ID, userID);
+                errorMode = IsValidAnswer(Constant.ANSWER_USER_ID, userID);
                 if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
                 else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
                 else break;
@@ -139,7 +139,7 @@ namespace EnSharpLibrary.IO
             while (true)
             {
                 password = Information(17, 15, 15, Constant.NO_KOREAN, Constant.JOIN_SEARCH_CATEGORY_AND_GUIDELINE[5]);
-                errorMode = tool.IsValidAnswer(Constant.ANSWER_PASSWORD, password);
+                errorMode = IsValidAnswer(Constant.ANSWER_PASSWORD, password);
                 if (errorMode == Constant.ESCAPE_KEY_ERROR) return;
                 else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 23); continue; }
                 else break;
@@ -209,31 +209,169 @@ namespace EnSharpLibrary.IO
 
         public bool IsQualifiedToBeNormal(ConsoleKey key, string condition)
         {
-            if (key == ConsoleKey.Q && string.Compare(condition, "대출 가능") != 0 && !tool.IsDeleted(condition)) return true;
+            if (key == ConsoleKey.Q && string.Compare(condition, "대출 가능") != 0 && !IsDeleted(condition)) return true;
             else return false;
         }
 
         public bool IsQualifiedToBeLost(ConsoleKey key, string condition)
         {
-            if (key == ConsoleKey.W && string.Compare(condition, "분실") != 0 && !tool.IsDeleted(condition)) return true;
+            if (key == ConsoleKey.W && string.Compare(condition, "분실") != 0 && !IsDeleted(condition)) return true;
             else return false;
         }
 
         public bool IsQualifiedToBeDamaged(ConsoleKey key, string condition)
         {
-            if (key == ConsoleKey.E && string.Compare(condition, "훼손") != 0 && !tool.IsDeleted(condition)) return true;
+            if (key == ConsoleKey.E && string.Compare(condition, "훼손") != 0 && !IsDeleted(condition)) return true;
             else return false;
         }
 
         public bool IsQualifiedToBeSaved(ConsoleKey key, string condition)
         {
-            if (key == ConsoleKey.R && string.Compare(condition, "대출 가능") == 0 && !tool.IsDeleted(condition)) return true;
+            if (key == ConsoleKey.R && string.Compare(condition, "대출 가능") == 0 && !IsDeleted(condition)) return true;
             else return false;
         }
 
         public bool IsQualiiedToBeDeleted(ConsoleKey key, string condition)
         {
-            if (key == ConsoleKey.T && !tool.IsDeleted(condition)) return true;
+            if (key == ConsoleKey.T && !IsDeleted(condition)) return true;
+            else return false;
+        }
+
+        public bool IsNotRented(string condition)
+        {
+            if (string.Compare(condition, "대출 가능") == 0) return true;
+            else return false;
+        }
+
+        public bool IsDeleted(string condition)
+        {
+            if (string.Compare(condition, "삭제") == 0) return true;
+            else return false;
+        }
+
+        public bool IsBorrowed(string condition)
+        {
+            if (string.Compare(condition, "대출중") == 0) return true;
+            else return false;
+        }
+
+        public bool IsValidUser(int usingMemberID)
+        {
+            int count;
+            List<string> dates;
+            DateTime deadline;
+            bool isMemberOverdued = false;
+
+            count = ConnectDatabase.GetCountFromDatabase("history", " WHERE member_id=" + usingMemberID.ToString() + " AND date_return IS NULL");
+
+            if (count != 0)
+            {
+                dates = ConnectDatabase.SelectFromDatabase("date_deadline_for_return", "history", "member_id", usingMemberID.ToString(), "date_return");
+
+                for (int date = 0; date < dates.Count; date++)
+                {
+                    deadline = StringToDateTime(dates[date].Remove(10));
+                    if (deadline < DateTime.Now) { isMemberOverdued = true; break; }
+                }
+            }
+
+            if (count == 4) return false;
+            else if (isMemberOverdued) return false;
+            else return true;
+        }
+
+        public bool IsNormal(string condition, int memberID, float application_Number)
+        {
+            int count = ConnectDatabase.GetCountFromDatabase("history", " WHERE member_id=" + memberID + " AND FLOOR(book_id)=" + Math.Floor(application_Number) + " AND date_return IS NULL");
+            bool isValidUser = IsValidUser(memberID);
+
+            if (!isValidUser) return false;
+            if (count != 0) return false;
+            if (string.Compare(condition, "대출 가능") == 0) return true;
+            else return false;
+        }
+
+        /// <summary>
+        /// 입력받은 키가 유호한지 검사하는 메소드입니다.
+        /// </summary>
+        /// <param name="keyInfo">입력받은 키</param>
+        /// <returns>입력받은 키의 유효성</returns>
+        public bool IsValid(ConsoleKeyInfo keyInfo, int mode)
+        {
+            // 엔터, 탭
+            if (keyInfo.Key == ConsoleKey.Enter) return false;
+            if (keyInfo.Key == ConsoleKey.Tab) return false;
+
+            // 숫자
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.NUMBER_PATTERN))
+            {
+                if (mode == Constant.ONLY_KOREAN) return false;
+                else return true;
+            }
+            if (mode == Constant.ONLY_NUMBER) return false;
+
+            // 한글, 영어
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.ENGLISH_PATTERN))
+            {
+                if (mode == Constant.ONLY_KOREAN) return false;
+                else return true;
+            }
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.KOREAN_PATTERN))
+            {
+                if (mode == Constant.NO_KOREAN) return false;
+                else return true;
+            }
+            if (mode == Constant.ONLY_KOREAN) return false;
+
+            // 특수기호
+            if (System.Text.RegularExpressions.Regex.IsMatch(keyInfo.KeyChar.ToString(), Constant.SPECIAL_LETTER)) return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// 입력취소 에러, 입력길이 에러 체크
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="userInputAnswer"></param>
+        /// <returns></returns>
+        public int IsValidAnswer(int mode, string userInputAnswer)
+        {
+            if (string.Compare(userInputAnswer, "@입력취소@") == 0) return Constant.ESCAPE_KEY_ERROR;
+
+            switch (mode)
+            {
+                case Constant.ANSWER_NAME: if (userInputAnswer.Length < 3) return Constant.LENGTH_ERROR; break;
+                case Constant.ANSWER_USER_ID: if (userInputAnswer.Length != 8) return Constant.LENGTH_ERROR; return IsValidID(userInputAnswer);
+                case Constant.ANSWER_PASSWORD: if (userInputAnswer.Length < 8) return Constant.LENGTH_ERROR; break;
+                case Constant.ANSWER_BOOK_NAME: if (userInputAnswer.Length < 1) return Constant.LENGTH_ERROR; break;
+            }
+
+            return Constant.VALID;
+        }
+
+        public int IsValidID(string userInputID)
+        {
+            int thisYear = DateTime.Now.Year - 2000;
+
+            // 90년대~현재 년도까지
+            StringBuilder year = new StringBuilder(userInputID);
+            year.Remove(2, 6);
+            if (Int32.Parse(year.ToString()) > thisYear && Int32.Parse(year.ToString()) < 90) return Constant.YEAR_ERROR;
+
+            // 이미 등록된 학번인지 확인
+            if (IsExist(userInputID)) return Constant.OVERRIDE_ERROR;
+
+            return Constant.VALID;
+        }
+
+        public bool IsExist(string userInputMemberID)
+        {
+            int count;
+
+            count = ConnectDatabase.GetCountFromDatabase("member", "member_id", userInputMemberID.ToString());
+
+            if (count > 0) return true;
             else return false;
         }
 
@@ -250,7 +388,7 @@ namespace EnSharpLibrary.IO
 
             for (int count = condition.Count - 1; count >= 0; count--)
             {
-                if (usingMemberID != Constant.ADMIN && !tool.IsBorrowed(condition[count]) && !tool.IsNotRented(condition[count]))
+                if (usingMemberID != Constant.ADMIN && !IsBorrowed(condition[count]) && !IsNotRented(condition[count]))
                 {
                     condition.RemoveAt(count);
                     bookID.RemoveAt(count);
@@ -321,7 +459,7 @@ namespace EnSharpLibrary.IO
                 // 정보 수정
                 // - 도서명
                 name = Information(19, 11, 15, Constant.ALL_CHARACTER, Constant.ADD_BOOK_CATEGORY_AND_GUILDLINE[1]);
-                errorMode = tool.IsValidAnswer(Constant.ANSWER_BOOK_NAME, name);
+                errorMode = IsValidAnswer(Constant.ANSWER_BOOK_NAME, name);
                 if (errorMode == Constant.ESCAPE_KEY_ERROR) return Constant.CANCELED_INPUT;
                 else if (errorMode != Constant.VALID) { print.ErrorMessage(errorMode, 15); continue; }
 
@@ -452,7 +590,7 @@ namespace EnSharpLibrary.IO
                 keyInfo = Console.ReadKey();
 
                 // 키값이 유효한지 검사
-                isValid = tool.IsValid(keyInfo, mode);
+                isValid = IsValid(keyInfo, mode);
 
                 if (answer.Length == 0) print.DeleteGuideLine(cursorLeft, isValid, keyInfo);
 
@@ -706,7 +844,7 @@ namespace EnSharpLibrary.IO
 
                 keyInfo = Console.ReadKey();
 
-                isValid = tool.IsValid(keyInfo, Constant.ONLY_NUMBER);
+                isValid = IsValid(keyInfo, Constant.ONLY_NUMBER);
 
                 if (middleNumber.Length == 0) print.DeleteGuideLine(cursorLeft + 4, isValid, keyInfo);
 
@@ -730,7 +868,7 @@ namespace EnSharpLibrary.IO
 
                 keyInfo = Console.ReadKey();
 
-                isValid = tool.IsValid(keyInfo, Constant.ONLY_NUMBER);
+                isValid = IsValid(keyInfo, Constant.ONLY_NUMBER);
 
                 if (endNumber.Length == 0) print.DeleteGuideLine(currentCursor, isValid, keyInfo);
 

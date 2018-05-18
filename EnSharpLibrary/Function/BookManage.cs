@@ -60,7 +60,7 @@ namespace EnSharpLibrary.Function
                     // 대출한 책 목록 출력
                     getValue.InformationAboutBorrowedBookFromMember(usingMemberID, out bookID, out borrowedBook, out histories);
                     print.BorrowedBook(cursorTop, borrowedBook, histories, bookID);
-                    tool.SetPointerStartPosition(4, cursorTop, "▷");
+                    print.SetPointerStartPosition(4, cursorTop, "▷");
 
                     if (borrowedBook.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
                     
@@ -157,7 +157,7 @@ namespace EnSharpLibrary.Function
                 if (isFirstLoop)
                 {
                     print.SearchedBook(mode, cursorTop, searchedBook, name, publisher, author);
-                    tool.SetPointerStartPosition(4, cursorTop, "▷");
+                    print.SetPointerStartPosition(4, cursorTop, "▷");
                     isFirstLoop = false;
                 }
 
@@ -257,7 +257,7 @@ namespace EnSharpLibrary.Function
             print.CompleteOrFaildProcess(4, Console.CursorTop, Constant.SUCCESS);
             print.SetCursorAndWrite(79, Console.CursorTop, condition);
 
-            if (tool.IsBorrowed(currentCondition))
+            if (getValue.IsBorrowed(currentCondition))
             {
                 ConnectDatabase.UpdateToDatabase("history", "date_return", "NOW()", "book_id", bookID.ToString("n2"), "date_return");
                 print.SetCursorAndWrite(95, Console.CursorTop, new string(' ', Console.WindowWidth - 96));
@@ -286,7 +286,7 @@ namespace EnSharpLibrary.Function
             while (true)
             {
                 index = Console.CursorTop - cursorTop;
-                if (!tool.IsNormal(condition[index], usingMemberID, bookID[index])) print.NonAvailableBookMark(30, Console.CursorTop);
+                if (!getValue.IsNormal(condition[index], usingMemberID, bookID[index])) print.NonAvailableBookMark(30, Console.CursorTop);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
@@ -300,7 +300,7 @@ namespace EnSharpLibrary.Function
 
         public void BorrowBook(string condition, int usingMemberID, float bookID)
         {
-            if (tool.IsNormal(condition, usingMemberID, bookID))
+            if (getValue.IsNormal(condition, usingMemberID, bookID))
             {
                 ConnectDatabase.BorrowBook(usingMemberID, bookID.ToString("n2"));
                 print.CompleteOrFaildProcess(30, Console.CursorTop, Constant.BORROW);
