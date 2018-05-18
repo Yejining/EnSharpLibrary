@@ -291,6 +291,8 @@ namespace EnSharpLibrary.IO
             { PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 4, Constant.FOREGROUND_COLOR); return; }
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 4, Constant.FOREGROUND_COLOR);
             PrintSentence(option[2], cursorTop + 5, Constant.FOREGROUND_COLOR);
+            if (mode == Constant.LOG_MODE)
+            { PrintSentence(Constant.LINE_FOR_OPTION[2], cursorTop + 6, Constant.FOREGROUND_COLOR); return; }
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 6, Constant.FOREGROUND_COLOR);
             PrintSentence(option[3], cursorTop + 7, Constant.FOREGROUND_COLOR);
             PrintSentence(Constant.LINE_FOR_OPTION[1], cursorTop + 8, Constant.FOREGROUND_COLOR);

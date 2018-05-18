@@ -13,9 +13,14 @@ namespace EnSharpLibrary.Function
     {
         Print print = new Print();
 
-        public static ReadLog()
+        public void ReadLog()
         {
 
+        }
+
+        public void DeleteLogFile()
+        {
+            // Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + fileName + ".xls";
         }
     }
 }

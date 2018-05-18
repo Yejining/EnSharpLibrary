@@ -22,7 +22,7 @@ namespace EnSharpLibrary.Function
         public int LogInOrLogOut(int usingMemberID)
         {
             if (usingMemberID == Constant.PUBLIC) return LogIn(Constant.ADMIN_MODE);
-            else return LogOut();
+            else return LogOut(usingMemberID);
         }
 
         /// <summary>
@@ -34,6 +34,7 @@ namespace EnSharpLibrary.Function
         {
             string memberID;
             string userInputPassword;
+            string name;
 
             print.SetWindowsizeAndPrintTitle(45, 30, Constant.LOG_IN_TITLE[mode]);
 
@@ -58,6 +59,10 @@ namespace EnSharpLibrary.Function
                 else if (userInputPassword.Length == 0) { print.ErrorMessage(Constant.THERE_IS_NO_SEARCHWORD, 17); continue; }
                 else if (!getValue.IsPasswordCorrespond(memberID, userInputPassword)) { print.ErrorMessage(Constant.PASSWORD_IS_WRONG, 17); continue; }
 
+                name = ConnectDatabase.SelectFromDatabase("name", "member", "member_id", memberID)[0];
+
+                ConnectDatabase.Log(Int32.Parse(memberID), "로그인");
+
                 return Int32.Parse(memberID);
             }
         }
@@ -66,8 +71,10 @@ namespace EnSharpLibrary.Function
         /// 로그아웃 기능을 수행하는 메소드입니다.
         /// </summary>
         /// <returns>공용 사용자 ID</returns>
-        public int LogOut()
+        public int LogOut(int usingMemberID)
         {
+            ConnectDatabase.Log(usingMemberID, "로그아웃");
+
             return Constant.PUBLIC;
         }
 
@@ -77,7 +84,7 @@ namespace EnSharpLibrary.Function
         /// </summary>
         /// <param name="title">"회원가입"</param>
         /// <returns>새로 만들어진 사용자 ID</returns>
-        public int JoinIn(string title)
+        public int JoinIn(int usingMemberID, string title)
         {
             string name;
             string userID;
@@ -97,6 +104,9 @@ namespace EnSharpLibrary.Function
             // 회원 등록
             RegisterMember(name, Int32.Parse(userID), password, address.ToString(), phoneNumber, birthdate);
 
+            if (usingMemberID != Constant.ADD_BOOK) ConnectDatabase.Log(Int32.Parse(userID), "회원가입 및 로그인");
+            else ConnectDatabase.Log(Constant.ADMIN, "\'학번:" + userID + " 이름:" + name + "\' 회원등록");
+
             return Int32.Parse(userID);
         }
 
@@ -106,7 +116,7 @@ namespace EnSharpLibrary.Function
             string columns = "(member_id, name, address, phone_number, password, accumulated_overdue_number, overdue_number, birthdate)";
             string values = "(" + userID + ",\'" + name + "\',\'" + address + "\',\'" + phoneNumber + "\',\'" + password + "\',0,0,\'" + birthdate.ToShortDateString() + "\');";
 
-            ConnectDatabase.InsertIntoDatabase(table, columns, values);            
+            ConnectDatabase.InsertIntoDatabase(table, columns, values);
         }
 
         /// <summary>
@@ -155,6 +165,8 @@ namespace EnSharpLibrary.Function
             int address1, address2;
             string address;
 
+            string previousAddress = ConnectDatabase.SelectFromDatabase("address", "member", "member_id", usingMemberID.ToString())[0];
+
             // 도단위 정보 입력
             address1 = getValue.DropBox(cursorLeft, cursorTop, Constant.ANSWER_ADDRESS);
             if (address1 == -1) return false;
@@ -168,6 +180,7 @@ namespace EnSharpLibrary.Function
 
             // DB에 변경할 주소 저장
             ConnectDatabase.UpdateToDatabase("member", "address", address, "member_id", usingMemberID.ToString());
+            ConnectDatabase.Log(usingMemberID, "\'" + previousAddress + "→" + address + "\' 주소변경");
 
             return true;
         }
@@ -176,12 +189,15 @@ namespace EnSharpLibrary.Function
         {
             string phoneNumber;
 
+            string previousPhoneNumber = ConnectDatabase.SelectFromDatabase("phone_number", "member", "member_id", usingMemberID.ToString())[0];
+
             // 수정할 전화번호 입력
             phoneNumber = getValue.PhoneNumber(cursorLeft, cursorTop);
             if (getValue.IsCanceled(phoneNumber)) return false;
 
             // DB에 변경할 전화번호 저장
             ConnectDatabase.UpdateToDatabase("member", "phone_number", phoneNumber, "member_id", usingMemberID.ToString());
+            ConnectDatabase.Log(usingMemberID, "\'" + previousPhoneNumber + "→" + phoneNumber + "\' 전화번호 수정");
 
             return true;
         }
@@ -229,6 +245,7 @@ namespace EnSharpLibrary.Function
             // 회원 검색
             SearchMember(out searchedMember, out borrowedBookForEachMember, out name, out address);
             if (getValue.IsCanceled(name) || getValue.IsCanceled(address)) return;
+            ConnectDatabase.Log(Constant.ADMIN, "회원목록 검색 및 열람");
 
             // 검색된 회원 관리
             CheckMemberAndDelete(searchedMember, borrowedBookForEachMember, name, address);
@@ -301,12 +318,13 @@ namespace EnSharpLibrary.Function
                     // 회원이 대여한 책 분실처리
                     if (string.Compare(borrowedBookForEachMember[Console.CursorTop - cursorTop], "없음") != 0)
                     {
-                        ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "대출 가능", "member_id", memberID.ToString(), "date_return");
+                        ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "분실", "member_id", memberID.ToString(), "date_return");
                         ConnectDatabase.UpdateToDatabase("history", "date_return", "NOW()", "member_id", memberID.ToString(), "date_return");
                     }
 
                     // DB 및 serachedMember에서 삭제 
                     ConnectDatabase.DeleteFromDatabase("member", " WHERE member_id=" + memberID);
+                    ConnectDatabase.Log(Constant.ADMIN, "\'학번:" + memberID + " 이름:" + name + "\' 회원삭제 및 대출도서 분실처리");
                     searchedMember.RemoveAt(Console.CursorTop - cursorTop);
                     print.ClearBoard(cursorTop, searchedMember.Count + 1);
 

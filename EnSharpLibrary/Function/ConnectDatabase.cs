@@ -22,6 +22,47 @@ namespace EnSharpLibrary.Function
         static MySqlCommand command;
         static MySqlDataReader reader;
 
+        public static void Log(int usingMemberID, string content)
+        {
+            string member;
+            string name;
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\log.txt";
+
+            if (usingMemberID == Constant.ADMIN)
+            {
+                member = "관리자";
+            }
+            else if (usingMemberID == Constant.PUBLIC)
+            {
+                member = "User";
+            }
+            else
+            {
+                name = SelectFromDatabase("name", "member", "member_id", usingMemberID.ToString())[0];
+                member = "\'학번:" + usingMemberID + " 이름:" + name + "\'";
+            }
+
+            string columns = "(time, member, content)";
+            string values = "(NOW(), \"" + member + "\", \"" + content + "\")";
+            
+            InsertIntoDatabase("log", columns, values);
+
+            if (!File.Exists(path))
+            {
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine("[" + DateTime.Now + "] " + member + " " + content);
+                }
+            }
+            else
+            {
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("[" + DateTime.Now + "] " + member + " " + content);
+                }
+            }
+        }
+
         public static void RegisterBookToDatabase(BookAPIVO book, int registeredCount, string count, int serialNumber)
         {
             int countToUpdate = registeredCount + Int32.Parse(count);

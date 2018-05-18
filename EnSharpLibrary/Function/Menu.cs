@@ -31,6 +31,8 @@ namespace EnSharpLibrary.Function
             if (usingMemberID == Constant.ADMIN) optionCount = 6;
             else optionCount = 5;
 
+            ConnectDatabase.Log(Constant.PUBLIC, "프로그램 실행");
+
             if (mode == Constant.NON_MEMBER_MODE) usingMemberID = Constant.PUBLIC;
 
             while (true)
@@ -88,13 +90,14 @@ namespace EnSharpLibrary.Function
                     else ManageMemberMenu();
                     break;
                 case Constant.JOIN_IN_OR_UPDATE_USER_INFORMATION:                // 회원가입,        정보수정,      암호수정
-                    if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.JoinIn("회원가입");
+                    if (usingMemberID == Constant.PUBLIC) usingMemberID = memberManage.JoinIn(usingMemberID, "회원가입");
                     else memberManage.ChangeUserInformation(usingMemberID);
                     break;
                 case Constant.LOG_IN_OR_LOG_OUT:                                 // 관리자 로그인,   로그아웃,      로그아웃
                     usingMemberID = memberManage.LogInOrLogOut(usingMemberID);
                     break;
                 case Constant.CLOSE_PROGRAM:                                     // 종료
+                    ConnectDatabase.Log(usingMemberID, "종료");
                     return true;
                 case Constant.MANAGE_LOG:
                     LogMenu();
@@ -187,7 +190,7 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.APPEND_MEMBER: memberManage.JoinIn("회원 등록"); break;
+                case Constant.APPEND_MEMBER: memberManage.JoinIn(Constant.ADMIN, "회원 등록"); break;
                 case Constant.MANAGE_REGISTERED_MEMBER: memberManage.ManageMember(); break;
             }
         }
@@ -206,7 +209,7 @@ namespace EnSharpLibrary.Function
                     print.MenuOption(Constant.LOG_MODE, Console.CursorTop + 2);
 
                     // 기능 선택
-                    print.SetCursorAndChoice(38, 10, "◁");
+                    print.SetCursorAndChoice(38, 12, "◁");
 
                     isFirstLoop = false;
                 }
@@ -216,8 +219,9 @@ namespace EnSharpLibrary.Function
                 // 기능 선택
                 switch (keyInfo.Key)
                 {
-                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, 3, 2, '◁'); break;
-                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, 3, 2, '◁'); break;
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 12, 3, 2, "◁"); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 12, 3, 2, "◁"); break;
+                    case ConsoleKey.Escape: return;
                     case ConsoleKey.Enter: isTimeToGo = true; break;
                     default: print.BlockCursorMove(38, "◁"); break;
                 }
