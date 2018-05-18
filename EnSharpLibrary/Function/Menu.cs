@@ -97,7 +97,7 @@ namespace EnSharpLibrary.Function
                 case Constant.CLOSE_PROGRAM:                                     // 종료
                     return true;
                 case Constant.MANAGE_LOG:
-                    logManage.LogMenu();
+                    LogMenu();
                     break;
             }
 
@@ -189,6 +189,47 @@ namespace EnSharpLibrary.Function
             {
                 case Constant.APPEND_MEMBER: memberManage.JoinIn("회원 등록"); break;
                 case Constant.MANAGE_REGISTERED_MEMBER: memberManage.ManageMember(); break;
+            }
+        }
+
+        public void LogMenu()
+        {
+            bool isFirstLoop = true;
+            bool isTimeToGo = false;
+
+            while (true)
+            {
+                if (isFirstLoop)
+                {
+                    // 메뉴 출력
+                    print.SetWindowsizeAndPrintTitle(45, 30, "로그 관리");
+                    print.MenuOption(Constant.LOG_MODE, Console.CursorTop + 2);
+
+                    // 기능 선택
+                    print.SetCursorAndChoice(38, 10, "◁");
+
+                    isFirstLoop = false;
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                // 기능 선택
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow: tool.UpArrow(38, 10, 3, 2, '◁'); break;
+                    case ConsoleKey.DownArrow: tool.DownArrow(38, 10, 3, 2, '◁'); break;
+                    case ConsoleKey.Enter: isTimeToGo = true; break;
+                    default: print.BlockCursorMove(38, "◁"); break;
+                }
+
+                if (isTimeToGo) break;
+            }
+
+            switch (Console.CursorTop)
+            {
+                case Constant.DELETE_LOG: ConnectDatabase.DeleteFromDatabase("log", Constant.BLANK); break;
+                case Constant.READ_LOG: logManage.ReadLog(); break;
+                case Constant.DELETE_LOG_FILE: logManage.DeleteLogFile(); break;
             }
         }
     }

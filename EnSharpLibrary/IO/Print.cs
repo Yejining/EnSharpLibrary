@@ -279,6 +279,7 @@ namespace EnSharpLibrary.IO
                 case Constant.ADMIN_MODE: option = Constant.ADMIN_OPTION; break;
                 case Constant.MANAGE_MEMBER_MODE: option = Constant.MANAGE_MEMBER_OPTION; break;
                 case Constant.MANAGE_BOOK_MODE: option = Constant.MANAGE_BOOK_OPTION; break;
+                case Constant.LOG_MODE: option = Constant.LOG_OPTION; break;
                 default: option = Constant.NON_MEMBER_OPTION; break;
             }
 

@@ -56,6 +56,13 @@ namespace EnSharpLibrary.Data
             "로그 관리"
         };
 
+        public static string[] LOG_OPTION =
+        {
+            "로그 열람",
+            "로그 초기화",
+            "txt 파일 삭제"
+        };
+
         public static string[] SEARCH_BOOK_TITLE =
         {
             "비회원 도서검색",
@@ -301,6 +308,7 @@ namespace EnSharpLibrary.Data
         public const int MEMBER_SEARCH_MODE = 3;
         public const int MANAGE_BORROWED_BOOK = 4;
         public const int ADD_BOOK = 5;
+        public const int LOG_MODE = 6;
 
         // Menu Class의 cursorTop 정보
         public const int RELEVANT_TO_BOOK = 10;
@@ -314,6 +322,10 @@ namespace EnSharpLibrary.Data
         public const int MANAGE_REGISTERED_MEMBER = 14;
         public const int APPEND_BOOK = 12;
         public const int MANAGE_REGISTERED_BOOK = 14;
+
+        public const int DELETE_LOG = 12;
+        public const int READ_LOG = 14;
+        public const int DELETE_LOG_FILE = 16;
 
         // BookManage SearchBook에서 사용
         // Menu에서 사용
