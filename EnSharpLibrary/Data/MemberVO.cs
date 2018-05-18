@@ -72,16 +72,19 @@ namespace EnSharpLibrary.Data
         public int MemberID
         {
             get { return memberID; }
+            set { memberID = value; }
         }
 
         public string Name
         {
             get { return name; }
+            set { name = value; }
         }
 
         public DateTime Birthdate
         {
             get { return birthdate; }
+            set { birthdate = value; }
         }
 
         public string Address

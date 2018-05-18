@@ -133,6 +133,13 @@ namespace EnSharpLibrary.Function
 
             return data;
         }
+        
+        public static void DeleteFromDatabase(string tableName, string conditionalExpression)
+        {
+            string sql = "DELETE FROM " + tableName + conditionalExpression + ";";
+
+            MakeCommand(sql);
+        }
 
         public static List<string> SelectFromDatabase(string column, string tableName, string conditionalExpression)
         {

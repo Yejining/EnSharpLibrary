@@ -188,7 +188,7 @@ namespace EnSharpLibrary.Function
             switch (Console.CursorTop)
             {
                 case Constant.APPEND_MEMBER: memberManage.JoinIn("회원 등록"); break;
-                case Constant.MANAGE_REGISTERED_MEMBER: memberManage.SearchMember(); break;
+                case Constant.MANAGE_REGISTERED_MEMBER: memberManage.ManageMember(); break;
             }
         }
     }

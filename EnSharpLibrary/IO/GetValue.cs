@@ -17,6 +17,30 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
+        public string Address(int cursorLeft, int cursorTop)
+        {
+            int address1;
+            int address2;
+            string address;
+
+            // 도단위 주소 입력
+            address1 = DropBox(cursorLeft, cursorTop, Constant.ANSWER_ADDRESS_INCLUDE_ALL_OPTION);
+            if (address1 == -1) return Constant.CANCELED_INPUT;
+            print.SetCursorAndWrite(cursorLeft, cursorTop, Constant.DISTRICT_INCLUDE_ALL_OPTION[address1]);
+
+            address = Constant.DISTRICT_INCLUDE_ALL_OPTION[address1];
+
+            // 시/군/구단위 주소 입력
+            if (address1 != 0)
+            {
+                address2 = DropBox(Console.CursorLeft + 1, cursorTop, Constant.ANSWER_ADDRESS_DEEPLY + address1 - 1);
+                if (address2 == -1) return Constant.CANCELED_INPUT;
+                address += " " + Constant.DISTRICT[address1][address2];
+            }
+
+            return address;
+        }
+ 
         public int GetDataTypeFromUser(int usingMemberID, out int cursorLeft, out int cursorTop)
         {
             int dataType;
@@ -587,69 +611,35 @@ namespace EnSharpLibrary.IO
             return searchedBook;
         }
 
-        public List<MemberVO> SearchMemberByCondition(string name, int age, string address)
+        public List<MemberVO> SearchMemberByCondition(string name, string address)
         {
             List<MemberVO> searchedMember = new List<MemberVO>();
-            StringBuilder sql = new StringBuilder("SELECT * FROM member ");
-            int memberID;
-            string memberName;
-            string memberAddress;
-            string phoneNumber;
-            string password;
-            int accumulatedOverdueNumber;
-            int overdueNumber;
-            string birthdate;
-            string[] date;
-            int year, month, day;
+            string conditionalExpression = "";
+            int countOfMembers;
+            string date;
 
-            if (name.Length != 0) sql.Append("WHERE name REGEXP \'" + name + "\'");
-            if (age != 0)
-            {
-                if (name.Length == 0) sql.Append("WHERE birthdate=" + age + 1989);
-                else sql.Append(" AND birthdate=" + age + 1989);
-            }
+            // 회원검색을 위한 sql문
+            if (name.Length != 0) conditionalExpression = " WHERE name REGEXP \'" + name + "\'";
             if (string.Compare(address, "전체") != 0)
             {
-                if (name.Length == 0 || age == 0) sql.Append("WHERE address REGEXP \'" + address + "\'");
-                else sql.Append(" AND address REGEXP \'" + address + "\'");
+                if (name.Length == 0) conditionalExpression = " WHERE address REGEXP \'" + address + "\'";
+                else conditionalExpression += " AND address REGEXP \'" + address + "\'";
             }
-            sql.Append(";");
 
-            String databaseConnect;
-            MySqlConnection connect;
+            countOfMembers = ConnectDatabase.GetCountFromDatabase("member", conditionalExpression);
 
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-            
-            while (reader.Read())
+            // 회원검색
+            for (int member = 0; member < countOfMembers; member++)
             {
-                memberID = Int32.Parse(reader["member_id"].ToString());
-                memberName = reader["name"].ToString();
-                memberAddress = reader["address"].ToString();
-                phoneNumber = reader["phone_number"].ToString();
-                password = reader["password"].ToString();
-                accumulatedOverdueNumber = Int32.Parse(reader["accumulated_overdue_number"].ToString());
-                overdueNumber = Int32.Parse(reader["overdue_number"].ToString());
-                birthdate = reader["birthdate"].ToString().Remove(10, 12);
-                date = birthdate.Split('-');
-                year = Int32.Parse(date[0]);
-                month = Int32.Parse(date[1]);
-                day = Int32.Parse(date[2]);
+                searchedMember.Add(new MemberVO());
 
-                MemberVO member = new MemberVO(memberID, memberName, password);
-                member.AppendInformation(memberAddress, phoneNumber, new DateTime(year, month, day));
-                member.AppendInformation(accumulatedOverdueNumber, overdueNumber);
-
-                searchedMember.Add(member); 
+                searchedMember[member].MemberID = Int32.Parse(ConnectDatabase.SelectFromDatabase("member_id", "member", conditionalExpression)[member]);
+                searchedMember[member].Name = ConnectDatabase.SelectFromDatabase("name", "member", conditionalExpression)[member];
+                searchedMember[member].Address = ConnectDatabase.SelectFromDatabase("address", "member", conditionalExpression)[member];
+                searchedMember[member].PhoneNumber = ConnectDatabase.SelectFromDatabase("phone_number", "member", conditionalExpression)[member];
+                date = ConnectDatabase.SelectFromDatabase("birthdate", "member", conditionalExpression)[member].Remove(10);
+                searchedMember[member].Birthdate = StringToDateTime(date);
             }
-            
-            reader.Close();
-            connect.Close();
 
             return searchedMember;
         }
@@ -913,47 +903,38 @@ namespace EnSharpLibrary.IO
         public List<string> BorrowedBookForEachMember(List<MemberVO> members)
         {
             List<string> borrowedBookForEachMember = new List<string>();
-            StringBuilder sql = new StringBuilder();
-            StringBuilder IDInOnePlace = new StringBuilder();
-            int count = 0;
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
+            int count;
+            string conditionalExpression;
+            string borrowedBook;
+            string bookID;
 
             foreach (MemberVO member in members)
             {
-                sql.Clear();
-                sql.Append("SELECT count(*) FROM history WHERE member_id=" + member.MemberID + " AND date_return IS NULL;");
+                // member가 대여한 책의 수
+                conditionalExpression = " WHERE member_id=" + member.MemberID + " AND date_return IS NULL";
+                count = ConnectDatabase.GetCountFromDatabase("history", conditionalExpression);
 
-                MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-                MySqlDataReader reader = command.ExecuteReader();
+                borrowedBook = "";
 
-                while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
-                reader.Close();
-
-                IDInOnePlace.Clear();
-                if (count == 0) { IDInOnePlace.Append("없음"); borrowedBookForEachMember.Add(IDInOnePlace.ToString()); }
+                // member가 대여한 책의 청구기호
+                if (count == 0)
+                {
+                    borrowedBook = "없음";
+                }
                 else
                 {
-                    sql.Clear();
-                    sql.Append("SELECT * FROM history WHERE member_id=" + member.MemberID + " AND date_return IS NULL;");
-                    command = new MySqlCommand(sql.ToString(), connect);
-                    reader = command.ExecuteReader();
+                    for (int book = 0; book < count; book++)
+                    {
+                        bookID = ConnectDatabase.SelectFromDatabase("book_id", "history", conditionalExpression)[book];
+                        if (bookID.Length == 1) bookID += ".00";
 
-                    while (reader.Read()) IDInOnePlace.Append(reader["book_id"].ToString() + " ");
-
-                    borrowedBookForEachMember.Add(IDInOnePlace.ToString());
-
-                    reader.Close();
+                        borrowedBook += bookID;
+                        if (book != count - 1) borrowedBook += ", ";
+                    }
                 }
-            }
 
-            connect.Close();
+                borrowedBookForEachMember.Add(borrowedBook);
+            }
 
             return borrowedBookForEachMember;
         }

@@ -219,47 +219,47 @@ namespace EnSharpLibrary.Function
 
             return true;
         }
+        
+        public void ManageMember()
+        {
+            List<MemberVO> searchedMember;
+            List<string> borrowedBookForEachMember;
+            string name, address;
+
+            // 회원 검색
+            SearchMember(out searchedMember, out borrowedBookForEachMember, out name, out address);
+            if (getValue.IsCanceled(name) || getValue.IsCanceled(address)) return;
+
+            // 검색된 회원 관리
+            CheckMemberAndDelete(searchedMember, borrowedBookForEachMember, name, address);
+        }
 
         /// <summary>
         /// 관리자가 회원 정보를 검색하는 메소드입니다.
         /// </summary>
-        public void SearchMember()
+        public void SearchMember(out List<MemberVO> searchedMember, out List<string> borrowedBookForEachMember, out string name, out string address)
         {
-            List<MemberVO> searchedMember;
-            string name;
-            int age;
+            int cursorLeft = 22;
+
+            // 초기화
+            searchedMember = null;
+            borrowedBookForEachMember = null;
+            name = Constant.BLANK;
+            address = Constant.BLANK;
 
             print.SearchCategoryAndGuideline(Constant.MEMBER_SEARCH_MODE);
 
             // 정보 수집
             // -이름
             name = getValue.Information(22, 11, 10, Constant.ONLY_KOREAN, Constant.MEMBER_SEARCH_CATEGORY_AND_GUIDELINE[1]);
-            if (string.Compare(name, "@입력취소@") == 0) return;
-            age = getValue.DropBox(22, 13, Constant.ANSWER_BIRTHDATE_YEAR_INCLUDE_ALL_OPTION);
-            if (age == -1) return;
+            if (getValue.IsCanceled(name)) return;
 
-            // - 주소
-            int currentCursor = 22;
-            int address1 = getValue.DropBox(currentCursor, 15, Constant.ANSWER_ADDRESS_INCLUDE_ALL_OPTION);
-            if (address1 == -1) return;
-            Console.SetCursorPosition(currentCursor, 15);
-            Console.Write(Constant.DISTRICT_INCLUDE_ALL_OPTION[address1]);
-            StringBuilder address = new StringBuilder(Constant.DISTRICT_INCLUDE_ALL_OPTION[address1]);
-            if (address1 != 0)
-            {
-                int address2 = getValue.DropBox(Console.CursorLeft + 1, 15, Constant.ANSWER_ADDRESS_DEEPLY + address1 - 1);
-                if (address2 == -1) return;
-                address.Append(" " + Constant.DISTRICT[address1][address2]);
-                if (string.Compare(address.ToString(), "@입력취소@") == 0) return;
-            }
+            // -주소
+            address = getValue.Address(cursorLeft, 13);
 
             // 검색
-            //searchedMember = getValue.SearchMemberByCondition(name, age, address.ToString());
-            //List<string> borrowedBookForEachMember = getValue.BorrowedBookForEachMember(searchedMember);
-
-            // 열람
-            //CheckMemberAndDelete(searchedMember, borrowedBookForEachMember, name, age.ToString(), address.ToString());
-
+            searchedMember = getValue.SearchMemberByCondition(name, address);
+            borrowedBookForEachMember = getValue.BorrowedBookForEachMember(searchedMember);
         }
 
         /// <summary>
@@ -269,41 +269,47 @@ namespace EnSharpLibrary.Function
         /// <param name="name">관리자가 검색한 회원 이름</param>
         /// <param name="age">관리자가 검색한 회원 출생년도</param>
         /// <param name="address">관리자가 검색한 회원 주소</param>
-        public void CheckMemberAndDelete(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string age, string address)
+        public void CheckMemberAndDelete(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string address)
         {
             bool isFirstLoop = true;
             int cursorTop = 13;
-
-            print.SearchedMember(searchedMember, borrowedBookForEachMember, name, age, address);
-            if (searchedMember.Count == 0) return;
+            int memberID;
 
             // 방향키 및 엔터, ESC키를 이용해 기능 수행
             while (true)
             {
                 if (isFirstLoop)
                 {
-                    Console.SetCursorPosition(4, cursorTop);
-                    Console.Write('▷');
-                    print.Members(searchedMember, borrowedBookForEachMember, cursorTop);
-                    Console.SetCursorPosition(4, cursorTop);
+                    // 등록된 회원 출력
+                    print.SearchedMember(searchedMember, borrowedBookForEachMember, name, address);
+                    if (searchedMember.Count == 0) { tool.WaitUntilGetEscapeKey(); return; }
+
+                    print.SetCursorAndChoice(4, cursorTop, "▷");
+                    
                     isFirstLoop = false;
                 }
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
-                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedMember.Count, 1, '▷');          // 위로 커서 옮김
-                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedMember.Count, 1, '▷'); // 밑으로 커서 옮김
+                if (keyInfo.Key == ConsoleKey.UpArrow) tool.UpArrow(4, cursorTop, searchedMember.Count, 1, "▷");          // 위로 커서 옮김
+                else if (keyInfo.Key == ConsoleKey.DownArrow) tool.DownArrow(4, cursorTop, searchedMember.Count, 1, "▷"); // 밑으로 커서 옮김
                 else if (keyInfo.Key == ConsoleKey.Escape) { print.BlockCursorMove(4, "▷"); return; }                     // 나가기
                 else if (keyInfo.Key == ConsoleKey.Enter)                                                                  // 해당 회원 선택
                 {
-                    // db에서 삭제
+                    memberID = searchedMember[Console.CursorTop - cursorTop].MemberID;
 
-                    // serachedMember에서 삭제
+                    // 회원이 대여한 책 분실처리
+                    if (string.Compare(borrowedBookForEachMember[Console.CursorTop - cursorTop], "없음") != 0)
+                    {
+                        ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", "대출 가능", "member_id", memberID.ToString(), "date_return");
+                        ConnectDatabase.UpdateToDatabase("history", "date_return", "NOW()", "member_id", memberID.ToString(), "date_return");
+                    }
+
+                    // DB 및 serachedMember에서 삭제 
+                    ConnectDatabase.DeleteFromDatabase("member", " WHERE member_id=" + memberID);
                     searchedMember.RemoveAt(Console.CursorTop - cursorTop);
+                    print.ClearBoard(cursorTop, searchedMember.Count + 1);
 
-                    // 이전 검색 결과 지움
-                    Console.SetCursorPosition(0, cursorTop);
-                    for (int clear = 0; clear <= searchedMember.Count + 1; clear++) { print.ClearCurrentConsoleLine(); Console.SetCursorPosition(0, cursorTop + clear); }
                     isFirstLoop = true;
                 }
                 else print.BlockCursorMove(4, "▷");                                                                       // 입력 무시 

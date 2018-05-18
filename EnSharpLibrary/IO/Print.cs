@@ -434,12 +434,12 @@ namespace EnSharpLibrary.IO
             PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
         }
 
-        public void SearchedMember(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string age, string address)
+        public void SearchedMember(List<MemberVO> searchedMember, List<string> borrowedBookForEachMember, string name, string address)
         {
             Console.SetWindowSize(114, 35);
             Console.Clear();
 
-            SearchedTitle(Constant.MEMBER_SEARCH_MODE, name, age, address);
+            SearchedTitle(Constant.MEMBER_SEARCH_MODE, name, "", address);
             Console.SetCursorPosition(0, 11);
             foreach (string guidline in Constant.SEARCHED_MEMBER_GUIDELINE) Console.WriteLine(guidline);
 
