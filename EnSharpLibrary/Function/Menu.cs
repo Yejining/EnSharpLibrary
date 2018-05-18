@@ -99,7 +99,7 @@ namespace EnSharpLibrary.Function
                 case Constant.CLOSE_PROGRAM:                                     // 종료
                     ConnectDatabase.Log(usingMemberID, "종료");
                     return true;
-                case Constant.MANAGE_LOG:
+                case Constant.MANAGE_LOG:                                        // 관리자 로그 관리 
                     LogMenu();
                     break;
             }
@@ -107,6 +107,9 @@ namespace EnSharpLibrary.Function
             return true;
         }
 
+        /// <summary>
+        /// 관리자가 도서관리 메뉴에서 다음 기능을 선택하는 메소드입니다.
+        /// </summary>
         public void ManageBookMenu()
         {
             bool isFirstLoop = true;
@@ -144,16 +147,19 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.APPEND_BOOK: bookManage.AddBookThroughNaverAPI(); break;
-                case Constant.MANAGE_REGISTERED_BOOK:
-                    {
-                        book = bookManage.ListBooksAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK);
-                        if (book != null) bookManage.ChangeBookCondition(book);
-                        break;
-                    }
+                case Constant.APPEND_BOOK:                  // 도서 등록
+                    bookManage.AddBookThroughNaverAPI();
+                    break;
+                case Constant.MANAGE_REGISTERED_BOOK:       // 등록된 도서 관리
+                    book = bookManage.ListBooksAndChooseOneBook(Constant.MANAGE_REGISTERED_BOOK, getValue.RegisteredBook(), Constant.BLANK, Constant.BLANK, Constant.BLANK);
+                    if (book != null) bookManage.ChangeBookCondition(book);
+                    break;
             }
         }
 
+        /// <summary>
+        /// 관리자가 회원관리 메뉴에서 다음 기능을 선택하는 메소드입니다.
+        /// </summary>
         public void ManageMemberMenu()
         {
             bool isFirstLoop = true;
@@ -190,11 +196,18 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.APPEND_MEMBER: memberManage.JoinIn(Constant.ADMIN, "회원 등록"); break;
-                case Constant.MANAGE_REGISTERED_MEMBER: memberManage.ManageMember(); break;
+                case Constant.APPEND_MEMBER:                // 회원 등록
+                    memberManage.JoinIn(Constant.ADMIN, "회원 등록");
+                    break;
+                case Constant.MANAGE_REGISTERED_MEMBER:     // 회원 관리
+                    memberManage.ManageMember();
+                    break;
             }
         }
 
+        /// <summary>
+        /// 로그관리 메뉴에서 다음 기능을 선택하는 메소드입니다.
+        /// </summary>
         public void LogMenu()
         {
             bool isFirstLoop = true;
@@ -231,9 +244,15 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.READ_LOG: logManage.ReadLog(); break;
-                case Constant.DELETE_LOG: ConnectDatabase.DeleteFromDatabase("log", Constant.BLANK); break;
-                case Constant.DELETE_LOG_FILE: logManage.DeleteLogFile(); break;
+                case Constant.READ_LOG:         // 로그 열람
+                    logManage.ReadLog();
+                    break;
+                case Constant.DELETE_LOG:       // 로그 초기화
+                    ConnectDatabase.DeleteFromDatabase("log", Constant.BLANK);
+                    break;
+                case Constant.DELETE_LOG_FILE:  // txt 파일 삭제
+                    logManage.DeleteLogFile();
+                    break;
             }
         }
     }

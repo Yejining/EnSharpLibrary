@@ -7,19 +7,14 @@ namespace EnSharpLibrary.Data
 {
     class MemberVO
     {
-        // 수정 불가능 변수
-        private int memberID;
-        private string name;
-        private DateTime birthdate;
-
-        // 수정 가능 변수 - 개인 정보
-        private string address;
-        private string phoneNumber;
-        private string password;
-
-        // 수정 가능 변수 - 대출 정보
-        private int accumulatedOverdueNumber;
-        private int overdueNumber;
+        private int memberID;                   // 회원 학번
+        private string name;                    // 이름
+        private DateTime birthdate;             // 생일
+        private string address;                 // 주소
+        private string phoneNumber;             // 전화번호
+        private string password;                // 암호
+        private int accumulatedOverdueNumber;   // 누적 연체 횟수
+        private int overdueNumber;              // 연체 횟수
 
         /// <summary>
         /// 회원의 정보를 저장하는 MemberVO의 생성자입니다.

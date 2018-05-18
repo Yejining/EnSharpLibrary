@@ -8,9 +8,9 @@ namespace EnSharpLibrary.Data
 {
     class HistoryVO
     {
-        private string dateBorrowed;
-        private string dateDeadlineForReturn;
-        private int numberOfRenew;
+        private string dateBorrowed;            // 대출일
+        private string dateDeadlineForReturn;   // 반납예정일
+        private int numberOfRenew;              // 연장 횟수
 
         /// <summary>
         /// HistoryVO의 생성자입니다. 어느 도서의 대출일, 예상 반납일, 연장 횟수를 저장합니다.
