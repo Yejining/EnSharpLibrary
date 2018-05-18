@@ -187,6 +187,12 @@ namespace EnSharpLibrary.Data
             "---------------------------------------------------------------------------------------------------------------------------------------------------------"
         };
 
+        public static string[] LOG_GUIDE =
+        {
+            "             시간             |           사용자           |                              내용                              ",
+            "----------------------------------------------------------------------------------------------------------------------------"
+        };
+
         public static string[][] DISTRICT =
         {
             new string[] {"강원도", "경기도", "경상남도", "경상북도", "광주광역시", "대구광역시", "대전광역시", "부산광역시", "서울특별시", "세종특별자치시", "울산광역시", "인천광역시", "제주특별자치도", "충청남도", "충청북도" },
@@ -323,8 +329,8 @@ namespace EnSharpLibrary.Data
         public const int APPEND_BOOK = 12;
         public const int MANAGE_REGISTERED_BOOK = 14;
 
-        public const int DELETE_LOG = 12;
-        public const int READ_LOG = 14;
+        public const int READ_LOG = 12;
+        public const int DELETE_LOG = 14;
         public const int DELETE_LOG_FILE = 16;
 
         // BookManage SearchBook에서 사용

@@ -231,8 +231,8 @@ namespace EnSharpLibrary.Function
 
             switch (Console.CursorTop)
             {
-                case Constant.DELETE_LOG: ConnectDatabase.DeleteFromDatabase("log", Constant.BLANK); break;
                 case Constant.READ_LOG: logManage.ReadLog(); break;
+                case Constant.DELETE_LOG: ConnectDatabase.DeleteFromDatabase("log", Constant.BLANK); break;
                 case Constant.DELETE_LOG_FILE: logManage.DeleteLogFile(); break;
             }
         }

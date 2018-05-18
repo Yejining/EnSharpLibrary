@@ -17,6 +17,13 @@ namespace EnSharpLibrary.IO
         Print print = new Print();
         Tool tool = new Tool();
 
+        public void Log(out List<string> time, out List<string> member, out List<string> content)
+        {
+            time = ConnectDatabase.SelectFromDatabase("time", "log", "");
+            member = ConnectDatabase.SelectFromDatabase("member", "log", "");
+            content = ConnectDatabase.SelectFromDatabase("content", "log", "");
+        }
+
         public string Address(int cursorLeft, int cursorTop)
         {
             int address1;
@@ -266,7 +273,7 @@ namespace EnSharpLibrary.IO
 
             if (count != 0)
             {
-                dates = ConnectDatabase.SelectFromDatabase("date_deadline_for_return", "history", "member_id", usingMemberID.ToString(), "date_return");
+                dates = ConnectDatabase.SelectFromDatabase("date_deadline_for_return", "history", " WHERE member_id=" + usingMemberID.ToString("n2") + " AND date_return IS NULL");
 
                 for (int date = 0; date < dates.Count; date++)
                 {
@@ -383,7 +390,7 @@ namespace EnSharpLibrary.IO
             for (int count = 0; count < registeredCount; count++)
             {
                 bookID.Add(book.SerialNumber + ((float)count / 100));
-                condition.Add(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", "application_number", bookID[count].ToString("n2"))[0]);
+                condition.Add(ConnectDatabase.SelectFromDatabase("book_condition", "book_detail", " WHERE application_number=" + bookID[count].ToString("n2"))[0]);
             }
 
             for (int count = condition.Count - 1; count >= 0; count--)
@@ -491,7 +498,7 @@ namespace EnSharpLibrary.IO
         {
             string information;
             string column = Constant.COLUMN_NAME_FOR_DETAIL_INFORMATION[mode];
-            information = ConnectDatabase.SelectFromDatabase(column, "history", "book_id", applicationNumber.ToString("n2"), "date_return")[0];
+            information = ConnectDatabase.SelectFromDatabase(column, "history", " WHERE book_id=" + applicationNumber.ToString("n2") + " AND date_return IS NULL")[0];
 
             return information;
         }

@@ -360,6 +360,20 @@ namespace EnSharpLibrary.IO
             Console.SetCursorPosition(cursorLeft, cursorTop);
         }
 
+        public void Log(List<string> time,  List<string> member, List<string> content)
+        {
+            int cursorTop = Console.CursorTop;
+
+            for (int log = 0; log < time.Count; log++)
+            {
+                SetCursorAndWrite(8, cursorTop + log, time[log]);
+                SetCursorAndWrite(38, cursorTop + log, member[log]);
+                SetCursorAndWrite(67, cursorTop + log, content[log]);
+            }
+
+            PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
+        }
+
         /// <summary>
         /// 사용자가 검색창에 검색어를 입력하면 안내문을 지워주는 메소드입니다.
         /// </summary>

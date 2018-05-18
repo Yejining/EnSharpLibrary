@@ -25,6 +25,7 @@ namespace EnSharpLibrary
 
             ConnectDatabase.ConnectToMySQL();
             menu.RunLibraryProgram(Constant.NON_MEMBER_MODE);
+
             ConnectDatabase.CloseConnectMySQL();
         }
     }

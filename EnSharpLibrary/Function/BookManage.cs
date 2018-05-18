@@ -255,7 +255,7 @@ namespace EnSharpLibrary.Function
                 currentCondition = condition[index];
 
                 guide = getValue.GuideForModifyingBookCondition(bookID[index]);
-                Console.Write(guide);
+                print.SetCursorAndChoice(4, Console.CursorTop, guide);
 
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
@@ -273,7 +273,7 @@ namespace EnSharpLibrary.Function
 
         public void ChangeBookCondition(int cursorTop, float bookID, string condition, string currentCondition)
         {
-            string title = ConnectDatabase.SelectFromDatabase("name", "book_api", "book_id", "FLOOR(" + bookID + ")")[0];
+            string title = ConnectDatabase.SelectFromDatabase("name", "book_api", " WHERE serial_number=Floor(" + bookID.ToString("n2") + ")")[0];
 
             ConnectDatabase.UpdateToDatabase("book_detail", "book_condition", condition, "application_number", bookID.ToString("n2"));
             ConnectDatabase.Log(Constant.ADMIN, "\'청구기호:" + bookID.ToString("n2") + " " + currentCondition + "→" + condition + "\' 도서상태수정");
