@@ -53,6 +53,56 @@ namespace EnSharpLibrary.Function
             else return false;
         }
 
+        public bool IsValidUser(int usingMemberID)
+        {
+            StringBuilder sql = new StringBuilder("SELECT count(*) FROM history WHERE member_id=" + usingMemberID + " AND date_return IS NULL;");
+            int count = 0;
+            bool isMemberOverdued = false;
+
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
+            reader.Close();
+
+            if (count != 0)
+            {
+                sql.Clear();
+                sql.Append("SELECT * FROM history WHERE member_id=" + usingMemberID + " AND date_return IS NULL;");
+                command = new MySqlCommand(sql.ToString(), connect);
+                reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string date = reader["date_deadline_for_return"].ToString().Remove(10, 12);
+                    string[] dateInformation = date.Split('-');
+                    int year = Int32.Parse(dateInformation[0]);
+                    int month = Int32.Parse(dateInformation[1]);
+                    int day = Int32.Parse(dateInformation[2]);
+                    DateTime deadline = new DateTime(year, month, day);
+
+                    if (deadline < DateTime.Now) { isMemberOverdued = true; break; }
+                }
+
+                reader.Close();
+            }
+
+            connect.Close();
+
+            if (count == 4) return false;
+            else if (isMemberOverdued) return false;
+            else return true;
+        }
+
+
         public bool IsNotRented(string condition)
         {
             if (string.Compare(condition, "대출 가능") == 0) return true;
@@ -158,134 +208,6 @@ namespace EnSharpLibrary.Function
             return false;
         }
 
-        public bool IsExist(string userInputMemberID)
-        {
-            int isExist = 0;
-
-            StringBuilder sql = new StringBuilder("SELECT count(*) FROM member WHERE member_id=" + userInputMemberID + ";");
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read()) isExist = Int32.Parse(reader["count(*)"].ToString());
-
-            reader.Close();
-            connect.Close();
-
-            if (isExist > 0) return true;
-            else return false;
-        }
-
-        
-
-        public void MakeQuerry(string sql)
-        {
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            command.ExecuteReader();
-
-            connect.Close();
-        }
-
-        
-
-        public void AddBook(string name, string author, string publisher, int publishingYear, int price, float bookID)
-        {
-            StringBuilder sql = new StringBuilder("INSERT INTO book (name, author, publisher, publishing_year, price, book_condition, borrowed_member_id, book_id)");
-            sql.Append("VALUES (\'" + name + "\', \'" + author + "\',\'" + publisher + "\'," + publishingYear + "," + price + ",\"대출 가능\", 0,"+bookID+");");
-
-            MakeQuerry(sql.ToString());
-        }
-
-        public bool IsValidBook(float bookID)
-        {
-            StringBuilder sql = new StringBuilder("SELECT count(*) FROM history WHERE book_id=" + bookID + " AND date_return IS NULL;");
-            int count = 0;
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
-            reader.Close();
-
-            connect.Close();
-
-            if (count != 0) return false;
-            else return true;
-        }
-
-        public bool IsValidUser(int usingMemberID)
-        {
-            StringBuilder sql = new StringBuilder("SELECT count(*) FROM history WHERE member_id=" + usingMemberID + " AND date_return IS NULL;");
-            int count = 0;
-            bool isMemberOverdued = false;
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read()) count = Int32.Parse(reader["count(*)"].ToString());
-            reader.Close();
-
-            if (count != 0)
-            {
-                sql.Clear();
-                sql.Append("SELECT * FROM history WHERE member_id=" + usingMemberID + " AND date_return IS NULL;");
-                command = new MySqlCommand(sql.ToString(), connect);
-                reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string date = reader["date_deadline_for_return"].ToString().Remove(10, 12);
-                    string[] dateInformation = date.Split('-');
-                    int year = Int32.Parse(dateInformation[0]);
-                    int month = Int32.Parse(dateInformation[1]);
-                    int day = Int32.Parse(dateInformation[2]);
-                    DateTime deadline = new DateTime(year, month, day);
-                    
-                    if (deadline < DateTime.Now) { isMemberOverdued = true; break; }
-                }
-
-                reader.Close();
-            }
-
-            connect.Close();
-
-            if (count == 4) return false;
-            else if (isMemberOverdued) return false;
-            else return true;
-        }
-
         /// <summary>
         /// 입력취소 에러, 입력길이 에러 체크
         /// </summary>
@@ -322,35 +244,32 @@ namespace EnSharpLibrary.Function
             return Constant.VALID;
         }
 
-        public void Borrow(int memberID, float bookID)
+        public bool IsExist(string userInputMemberID)
         {
-            StringBuilder sql = new StringBuilder("INSERT INTO history (member_id, book_id, date_borrowed, date_deadline_for_return, number_of_renew)");
-            sql.Append(" VALUES (" + memberID + ", " + bookID + ", \'" + DateTime.Now.ToShortDateString() + "\', \'" + DateTime.Now.AddDays(6).ToShortDateString() + "\', 0);");
+            int isExist = 0;
 
-            MakeQuerry(sql.ToString());
+            StringBuilder sql = new StringBuilder("SELECT count(*) FROM member WHERE member_id=" + userInputMemberID + ";");
 
-            sql.Clear();
-            sql.Append("UPDATE book SET book_condition=\"대출중\", borrowed_member_id="+ memberID);
-            sql.Append(" WHERE book_id=" + bookID + ";");
-            MakeQuerry(sql.ToString());
+            String databaseConnect;
+            MySqlConnection connect;
+
+            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
+            connect = new MySqlConnection(databaseConnect);
+
+            connect.Open();
+
+            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read()) isExist = Int32.Parse(reader["count(*)"].ToString());
+
+            reader.Close();
+            connect.Close();
+
+            if (isExist > 0) return true;
+            else return false;
         }
 
-        public void Extend(float bookID)
-        {
-            StringBuilder sql = new StringBuilder("UPDATE history SET date_deadline_for_return=ADDDATE(date_deadline_for_return, INTERVAL 6 DAY), number_of_renew=number_of_renew+1");
-            sql.Append(" WHERE book_id=" + bookID + ";");
-
-            MakeQuerry(sql.ToString());
-        }
-
-        public void Return(float bookID)
-        {
-            StringBuilder sql1 = new StringBuilder("UPDATE history SET date_return=NOW() WHERE book_id="+bookID+";");
-            StringBuilder sql2 = new StringBuilder("UPDATE book SET borrowed_member_id=0 WHERE book_id=" + bookID + ";");
-
-            MakeQuerry(sql1.ToString());
-            MakeQuerry(sql2.ToString());
-        }
 
         /// <summary>
         /// 사용자로부터 엔터 혹은 탭키를 받을 때까지 기다리는 메소드입니다.

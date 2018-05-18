@@ -317,4 +317,3 @@ namespace EnSharpLibrary.Function
         }    
     }
 }
-

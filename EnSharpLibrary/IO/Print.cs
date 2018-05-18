@@ -364,25 +364,6 @@ namespace EnSharpLibrary.IO
             if (isValid) Console.Write(keyInfo.KeyChar);
         }
 
-        /// <summary>
-        /// 도서 검색 결과를 출력하는 메소드입니다.
-        /// </summary>
-        /// <param name="searchedBook">검색된 도서</param>
-        /// <param name="bookName">사용자가 입력한 도서명</param>
-        /// <param name="publisher">사용자가 입력한 출판사</param>
-        /// <param name="author">사용자가 입력한 저자</param>
-        public void SearchedBook(List<BookVO> searchedBook, string bookName, string publisher, string author)
-        {
-            Console.SetWindowSize(130, 35);
-            Console.Clear();
-
-            SearchedTitle(Constant.BOOK_SEARCH_MODE, bookName, publisher, author);
-            Console.SetCursorPosition(0, 11);
-            foreach (string guideline in Constant.SEARCHED_BOOK_GUIDELINE) Console.WriteLine(guideline);
-            
-            Books(searchedBook, Console.CursorTop);
-        }
-
         public void SearchedBook(int mode, int cursorTop, List<BookAPIVO> searchedBook, string bookName, string publisher, string author)
         {
             string[] guideline;
@@ -402,12 +383,6 @@ namespace EnSharpLibrary.IO
 
             Books(mode, searchedBook, Console.CursorTop);
             PrintSentence(Constant.OUT, Console.CursorTop + 1, Constant.FOREGROUND_COLOR);
-        }
-
-        public void SearchedBookWithMoreDetail(BookAPIVO book, int count)
-        {
-
-            
         }
 
         public void BorrowedBook(int cursorTop, List<BookAPIVO> books, List<HistoryVO> histories, List<string> numbers)
@@ -444,34 +419,6 @@ namespace EnSharpLibrary.IO
             foreach (string guidline in Constant.SEARCHED_MEMBER_GUIDELINE) Console.WriteLine(guidline);
 
             if (searchedMember.Count != 0) Members(searchedMember, borrowedBookForEachMember, Console.CursorTop);
-            PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
-        }
-
-        public void Books(List<BookVO> books, int cursorTop)
-        {
-            Console.SetCursorPosition(0, cursorTop);
-            
-            for (int order = 0; order < books.Count; order++)
-            {
-                if ((int)(books[order].BookID - (int)books[order].BookID) * 100 == 0)
-                {
-                    Console.SetCursorPosition(10, Console.CursorTop);
-                    Console.Write(books[order].Name);
-                    Console.SetCursorPosition(54, Console.CursorTop);
-                    Console.Write(books[order].Author);
-                    Console.SetCursorPosition(78, Console.CursorTop);
-                    Console.Write(books[order].Publisher);
-                    Console.SetCursorPosition(102, Console.CursorTop);
-                    Console.Write(books[order].PublishingYear);
-                    Console.SetCursorPosition(114, Console.CursorTop);
-                    Console.Write(books[order].NumberOfBooks);
-                    Console.SetCursorPosition(120, Console.CursorTop);
-                    Console.Write(books[order].Price + "원");
-                    Console.SetCursorPosition(128, Console.CursorTop);
-                    Console.SetCursorPosition(0, Console.CursorTop + 1);
-                }
-            }
-            
             PrintSentence(Constant.OUT, Console.CursorTop + 2, Constant.FOREGROUND_COLOR);
         }
 

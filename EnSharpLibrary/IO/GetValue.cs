@@ -177,6 +177,36 @@ namespace EnSharpLibrary.IO
             }
         }
 
+        public string[] YEAR(int mode)
+        {
+            string[] years;
+
+            if (mode == Constant.INCLUDE_ALL_OPTION)
+            {
+                years = new string[DateTime.Now.Year - 1990 + 2];
+                years.SetValue("전체", 0);
+            }
+            else years = new string[DateTime.Now.Year - 1990 + 1];
+
+            for (int year = 1990; year <= DateTime.Now.Year; year++)
+            {
+                if (mode == Constant.GENERAL_MODE) years.SetValue(year + "년", year - 1990);
+                else years.SetValue(year + "년", year - 1989);
+            }
+
+            return years;
+        }
+
+
+        public DateTime Birthdate(int yearIndex, int monthIndex, int dayIndex)
+        {
+            string year = YEAR(Constant.GENERAL_MODE)[yearIndex].Remove(4, 1);
+            string month = Constant.MONTH[monthIndex].Remove(2, 1);
+            string day = Constant.DAY[dayIndex].Remove(2, 1);
+
+            return new DateTime(Int32.Parse(year), Int32.Parse(month), Int32.Parse(day));
+        }
+
         public bool IsQualifiedToBeNormal(ConsoleKey key, string condition)
         {
             if (key == ConsoleKey.Q && string.Compare(condition, "대출 가능") != 0 && !tool.IsDeleted(condition)) return true;
@@ -519,56 +549,6 @@ namespace EnSharpLibrary.IO
             return histories;
         }
 
-        //public List<BookVO> SearchBookByID(int mode, int ID)
-        //{
-        //    List<BookVO> searchedBook = new List<BookVO>();
-        //    StringBuilder sql = new StringBuilder();
-
-        //    if (mode == Constant.BOOK_ID) sql.Append("SELECT * FROM book WHERE FLOOR(book_id)=" + ID + ";");
-        //    else sql.Append("SELECT * FROM book WHERE FLOOR(borrowed_member_id)=" + ID + ";");
-
-        //    string nameForVO;
-        //    string authorForVO;
-        //    string publisherForVO;
-        //    int publishingYearForVO;
-        //    float bookIDForVO;
-        //    string bookConditionForVO;
-        //    int borrowedMemberIDForVO;
-        //    int priceForVO;
-
-        //    String databaseConnect;
-        //    MySqlConnection connect;
-
-        //    databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-        //    connect = new MySqlConnection(databaseConnect);
-
-        //    connect.Open();
-
-        //    MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-        //    MySqlDataReader reader = command.ExecuteReader();
-
-        //    while (reader.Read())
-        //    {
-        //        nameForVO = reader["name"].ToString();
-        //        authorForVO = reader["author"].ToString();
-        //        publisherForVO = reader["publisher"].ToString();
-        //        publishingYearForVO = Int32.Parse(reader["publishing_year"].ToString());
-        //        bookIDForVO = float.Parse(reader["book_id"].ToString());
-        //        bookConditionForVO = reader["book_condition"].ToString();
-        //        borrowedMemberIDForVO = Int32.Parse(reader["borrowed_member_id"].ToString());
-        //        priceForVO = Int32.Parse(reader["price"].ToString());
-
-        //        BookVO book = new BookVO(nameForVO, authorForVO, publisherForVO, publishingYearForVO);
-        //        book.AppendInformation(bookIDForVO, bookConditionForVO, borrowedMemberIDForVO, priceForVO);
-
-        //        searchedBook.Add(book);
-        //    }
-
-        //    reader.Close();
-
-        //    return searchedBook;
-        //}
-
         public string ConditionalExpression(string bookName, string publisher, string author)
         {
             string conditionalExpression = "";
@@ -646,64 +626,8 @@ namespace EnSharpLibrary.IO
 
         public string Password(int memberID)
         {
-            string password = "";
-
-            StringBuilder sql = new StringBuilder("SELECT password FROM member WHERE member_id=" + memberID + ";");
-
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read()) password = reader["password"].ToString();
-
-            reader.Close();
-            connect.Close();
-
-            return password;
+            return ConnectDatabase.SelectFromDatabase("password", "member", "member_id", memberID.ToString())[0];
         }
-
-        //public List<HistoryVO> BookHistory(int memberID)
-        //{
-        //    List<HistoryVO> histories = new List<HistoryVO>();
-        //    StringBuilder sql = new StringBuilder("SELECT * FROM history WHERE member_id=" + memberID + " AND date_return IS NULL;");
-
-        //    String databaseConnect;
-        //    MySqlConnection connect;
-
-        //    databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-        //    connect = new MySqlConnection(databaseConnect);
-
-        //    connect.Open();
-
-        //    MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-        //    MySqlDataReader reader = command.ExecuteReader();
-
-        //    while (reader.Read())
-        //    {
-        //        string date1 = reader["date_borrowed"].ToString().Remove(10, 12);
-        //        string[] date2 = date1.Split('-');
-        //        string date3 = reader["date_deadline_for_return"].ToString().Remove(10, 12);
-        //        string[] date4 = date3.Split('-');
-        //        int numberOfRenew = Int32.Parse(reader["number_of_renew"].ToString());
-
-        //        HistoryVO history = new HistoryVO(new DateTime(Int32.Parse(date2[0]), Int32.Parse(date2[1]), Int32.Parse(date2[2])),
-        //            new DateTime(Int32.Parse(date4[0]), Int32.Parse(date4[1]), Int32.Parse(date4[2])), numberOfRenew);
-
-        //        histories.Add(history);
-        //    }
-
-        //    reader.Close();
-        //    connect.Close();
-
-        //    return histories;
-        //}
 
         /// <summary>
         /// 드롭박스에서 원하는 옵션을 선택하는 메소드입니다.
@@ -762,36 +686,7 @@ namespace EnSharpLibrary.IO
                 }
             }
         }
-
-        public string[] YEAR(int mode)
-        {
-            string[] years;
-
-            if (mode == Constant.INCLUDE_ALL_OPTION)
-            {
-                years = new string[DateTime.Now.Year - 1990 + 2];
-                years.SetValue("전체", 0);
-            }
-            else years = new string[DateTime.Now.Year - 1990 + 1];
-
-            for (int year = 1990; year <= DateTime.Now.Year; year++)
-            {
-                if (mode == Constant.GENERAL_MODE) years.SetValue(year + "년", year - 1990);
-                else years.SetValue(year + "년", year - 1989);
-            }
-
-            return years;
-        }
-
-        public DateTime Birthdate(int yearIndex, int monthIndex, int dayIndex)
-        {
-            string year = YEAR(Constant.GENERAL_MODE)[yearIndex].Remove(4, 1);
-            string month = Constant.MONTH[monthIndex].Remove(2, 1);
-            string day = Constant.DAY[dayIndex].Remove(2, 1);
-
-            return new DateTime(Int32.Parse(year), Int32.Parse(month), Int32.Parse(day));
-        }
-
+        
         public string PhoneNumber(int cursorLeft, int cursorTop)
         {
             StringBuilder phoneNumber = new StringBuilder("010-");
@@ -937,41 +832,6 @@ namespace EnSharpLibrary.IO
             }
 
             return borrowedBookForEachMember;
-        }
-
-        public float BookID(string name, string author, string publisher, int publishingYear)
-        {
-            StringBuilder sql = new StringBuilder("SELECT count(*) FROM book WHERE name=\'" + name + "\' AND author=\'" + author + "\' AND publisher=\'" + publisher + "\' AND publishing_year=" + publishingYear + ";");
-            float count = 0;
-            float bookCount = 0;
-                       
-            String databaseConnect;
-            MySqlConnection connect;
-
-            databaseConnect = "Server=Localhost;Database=ensharp_library;Uid=root;Pwd=0000";
-            connect = new MySqlConnection(databaseConnect);
-
-            connect.Open();
-
-            MySqlCommand command = new MySqlCommand(sql.ToString(), connect);
-            MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read()) count = float.Parse(reader["count(*)"].ToString());
-            reader.Close();
-
-            sql.Clear();
-            sql.Append("SELECT count(*) FROM book;");
-
-            command = new MySqlCommand(sql.ToString(), connect);
-            reader = command.ExecuteReader();
-
-            while (reader.Read()) bookCount = float.Parse(reader["count(*)"].ToString());
-            reader.Close();
-            connect.Close();
-
-            float ID = bookCount + 1 + (count / 100);
-
-            return ID;
         }
     }
 }
